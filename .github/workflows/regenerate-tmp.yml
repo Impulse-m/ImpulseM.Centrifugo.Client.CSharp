@@ -1,0 +1,28 @@
+name: regenerate (temporary)
+on:
+  push:
+    branches:
+      - port/f0
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install protoc 34.0
+        run: |
+          curl -sSL -o protoc.zip https://github.com/protocolbuffers/protobuf/releases/download/v34.0/protoc-34.0-linux-x86_64.zip
+          unzip -q protoc.zip -d "$HOME/protoc"
+          rm protoc.zip
+          echo "$HOME/protoc/bin" >> "$GITHUB_PATH"
+
+      - name: Generate
+        run: |
+          protoc --csharp_out=src/Centrifugal.Centrifuge/Protocol --proto_path=. client.proto
+          mv src/Centrifugal.Centrifuge/Protocol/Client.cs src/Centrifugal.Centrifuge/Protocol/Client.g.cs
+          git diff --stat
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: generated
+          path: src/Centrifugal.Centrifuge/Protocol/Client.g.cs
