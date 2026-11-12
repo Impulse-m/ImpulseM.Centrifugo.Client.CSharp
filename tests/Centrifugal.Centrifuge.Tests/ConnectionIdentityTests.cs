@@ -1,9 +1,7 @@
-// Port status of the Java tests of this file (connection-identity-and-capabilities, S02):
-// - No Java test pins the unit rules below. They are new tests written for the identity rules (apply, connect step,
-//   refresh step, token sink, token confirmed with the identity, no logging of the token).
-// - The connect-path tests of the identity are in AuthEventTests.cs (AuthTest.authEventFiresOnConnectAndWhenTheIdentityChanges,
-//   AuthTest.connectedEventCarriesTheIdentity and AuthTest.legacyServerReportsEmptyIdentity, connect parts).
-// - AuthTest.refreshIsAnsweredAfterTheAuthListenerThrowsOnATimerRefresh needs the timer refresh: not in this slice.
+// Identity tests: the identity the connection records, the token sink it notifies, and the token confirmed with the identity.
+// No Java test pins these unit rules: they cover the apply, connect step, refresh step, token sink and logging of the token.
+// The connect-path tests of the identity are in AuthEventTests.cs.
+// Not ported: AuthTest.refreshIsAnsweredAfterTheAuthListenerThrowsOnATimerRefresh: it needs the timer refresh.
 
 using System;
 using System.Collections.Generic;

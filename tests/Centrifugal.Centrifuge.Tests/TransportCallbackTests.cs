@@ -1,5 +1,5 @@
-// Port-only tests of the transport callbacks, pinning the upstream behaviour the fork keeps (decisions O-4 and the close
-// mapping of the Java client). They have no Java counterpart of their own; see each test.
+// Transport callback tests: the close codes of the socket and an undecodable frame, as the transport callbacks map them.
+// They pin the upstream behaviour that the fork keeps, where the Java client maps the same cases differently.
 using System;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -51,7 +51,7 @@ namespace Centrifugal.Centrifuge.Tests {
         /// A frame that is not Centrifugo data reports a parse error and then reconnects, with the transport closed code.
         /// </summary>
         [Fact]
-        // The Java client disconnects with code 2 and no reconnect here. The fork keeps the upstream rule (decision O-4).
+        // The upstream rule is kept: the Java client disconnects with code 2 and no reconnect here.
         public async Task UndecodableFrameReconnectsWithTransportClosed() {
             CentrifugeClient client = NewClient();
             Task connected = WhenConnected(client);

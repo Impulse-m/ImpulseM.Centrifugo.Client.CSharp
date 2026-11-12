@@ -1,19 +1,10 @@
-// Port status of the Java tests of this file (connection-identity-and-capabilities, S02):
-// - RpcOptionsTest.java (capability part), ported with the Java name in a // comment on each test:
-//   connectRequestAdvertisesRpcOptionsBit, capabilityIsOnWhenConnectReplyHasRpcOptionsBit,
-//   capabilityIsOnWhenRpcOptionsBitComesWithOtherBits, capabilityIsOffWhenConnectReplyHasNoRpcOptionsBit,
-//   capabilityIsOffWhenConnectReplyHasNoFlag, capabilityIsClearedOnReconnectUntilConnectReplyConfirmsIt,
-//   capabilityIsClearedOnDisconnect, capabilitySnapshotDoesNotChangeAfterwards.
-// - ExtensionsTest.java, ported in ConnectCapabilityFlagTests: rpcOptionsFlagIsBit32, hasFlagFindsBit32AmongOtherBits,
-//   hasFlagIsFalseWithoutTheBit. Not ported here: the estimated server time tests (estimatedServerTimeAddsOffsetToLocalTime,
-//   estimatedServerTimeIsLocalTimeWithoutOffset). F0 has no pure estimate function, and ServerTimeMillis is private to the
-//   client seam, so they need a seam decision first. The two offset tests belong to the server time slice.
-// - No Java test: Connect_WithErrorReply_LeavesCapabilityOff (rule: an error connect reply does not confirm the capability).
-// - Not in this file: the HTTP stream connect flag. It needs an emulation fixture that the fake server does not have.
-// - Known gap: the clear in InitializeTransport (the reconnect point of rule R23, point 1) is not pinned. Removing it
-//   leaves every test here green, because the disconnect path clears the flag first. Pinned when the HTTP stream
-//   connect case (Q11) has an emulation fixture. Java RpcOptionsTest.capabilityIsClearedOnReconnectUntilConnectReplyConfirmsIt
-//   has the same limit.
+// Capability tests: the RPC options bit of the connect reply, and when the capability is on and off.
+// Not ported: ExtensionsTest.estimatedServerTimeAddsOffsetToLocalTime and ExtensionsTest.estimatedServerTimeIsLocalTimeWithoutOffset:
+// the client has no pure estimate function, and the server time is private to the client, so they need a test seam first.
+// Not ported: the HTTP stream connect flag: it needs an emulation of the HTTP stream transport in the fake server.
+// Connect_WithErrorReply_LeavesCapabilityOff has no Java counterpart: an error connect reply does not confirm the capability.
+// Known gap: the clear in InitializeTransport is not pinned. Removing it leaves every test here green, because the disconnect
+// path clears the flag first. The HTTP stream connect case has the same limit.
 
 using System;
 using System.Threading.Tasks;

@@ -5,7 +5,7 @@ using Xunit;
 namespace Centrifugal.Centrifuge.Tests {
     /// <summary>
     /// Checks that the regenerated protocol code (Protocol/Client.g.cs) has every fork field the port uses.
-    /// Reflection only: the wire behaviour is tested by the slices that use the fields.
+    /// Reflection only: the wire behaviour is tested by the tests of the features that use the fields.
     /// </summary>
     public sealed class ProtocolFieldsTests {
         [Fact]

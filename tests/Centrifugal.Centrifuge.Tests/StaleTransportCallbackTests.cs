@@ -1,7 +1,7 @@
-// Ported from Java StaleTransportCallbackTest (1 test). The Java test sleeps 500 ms so that late callbacks of the replaced
-// socket arrive. The port waits for the replaced socket to close at the TCP level (through a relay) and then for the steps
-// queued on the loop, so no fixed delay is used (rule 4.4.2). The client's own callbacks cannot be observed, so a late
-// callback that the guard drops is seen only as the absence of an effect.
+// Stale transport tests: the callbacks of a replaced socket that arrive late must have no effect. The Java test sleeps
+// 500 ms so that late callbacks of the replaced socket arrive. This test waits for the replaced socket to close at the
+// TCP level (through a relay) and then for the steps queued on the loop, so no fixed delay is used. The client's own
+// callbacks cannot be observed, so a late callback that the guard drops is seen only as the absence of an effect.
 using System;
 using System.Threading.Channels;
 using System.Threading.Tasks;

@@ -1,12 +1,7 @@
-// Ported from the Java fork's ExtensionsTest (the flag arithmetic, 3 tests of 7) and ExtensionsExactlyOnceTest (3 tests).
-// Status:
-//   ExtensionsTest.rpcOptionsFlagIsBit32, hasFlagFindsBit32AmongOtherBits, hasFlagIsFalseWithoutTheBit: ported against
-//     ConnectCapabilities (the flag helpers live there in this port).
-//   ExtensionsTest.serverTimeOffsetIsServerTimeMinusLocalTime, zeroServerTimeMeansNoOffset: ported in ServerTimeOffsetTests.cs.
-//   ExtensionsTest.estimatedServerTimeAddsOffsetToLocalTime, estimatedServerTimeIsLocalTimeWithoutOffset: not applicable.
-//     The estimate is one addition in CentrifugeClient.Host, with no function of its own to test.
-//   ExtensionsExactlyOnceTest: all 3 ported.
-// Gap tests: the retry signal key and its values (rule R45), and the instance check of a null value.
+// Protocol extension tests: the RPC options flag arithmetic, the instance check, the error metadata and the retry signal.
+// The flag helpers live in ConnectCapabilities. The server time offset tests are in ServerTimeOffsetTests.cs.
+// Not ported: ExtensionsTest.estimatedServerTimeAddsOffsetToLocalTime and ExtensionsTest.estimatedServerTimeIsLocalTimeWithoutOffset: the estimate is one addition in CentrifugeClient.Host, with no function of its own to test.
+// Gap tests: the retry signal key and its values, and the instance check of a null value.
 using System;
 using Xunit;
 
@@ -77,7 +72,7 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
-        // Gap: the retry signal is the value of the error metadata key (rule R45).
+        // Gap: the retry signal is the value of the error metadata key.
         [Fact]
         public void RetrySignal_ReadsTheMetadataKey() {
             Protocol.Error error = new Protocol.Error();
@@ -89,7 +84,7 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
-        // Gap: an error without the key carries no retry signal (rule R45).
+        // Gap: an error without the key carries no retry signal.
         [Fact]
         public void RetrySignal_WithoutTheKey_IsNull() {
             Protocol.Error error = new Protocol.Error();

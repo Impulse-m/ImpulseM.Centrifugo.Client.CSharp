@@ -1,11 +1,8 @@
-// Port status of the Java tests of this file (connection-identity-and-capabilities, S02, AuthTest.java):
-// - authEventFiresOnConnectAndWhenTheIdentityChanges: ported, connect part. The identity changes come from the
-//   reconnect replies of the fake server. The refresh steps of the Java test need the refresh path (not in this slice).
-// - authEventsFireOnTheClientExecutor: ported, connect part. The refresh part needs the refresh path (not in this slice).
-// - connectedEventCarriesTheIdentity: ported, renamed Connected_WithIdentity_CarriesUserAndAuthClass.
-// - legacyServerReportsEmptyIdentity: ported, connect part. The refresh part needs the refresh path (not in this slice).
-// - refreshIsAnsweredAfterTheAuthListenerThrowsOnATimerRefresh: not in this file. It needs the timer refresh (not in this slice).
-// - The connect-path handler failure (disconnect with BadProtocol) waits for the connect notice list: not in this file.
+// Auth event tests: the Auth and Connected events carry the identity of the connect reply.
+// The identity changes come from the reconnect replies of the fake server.
+// Not ported: AuthTest.authEventFiresOnConnectAndWhenTheIdentityChanges, AuthTest.authEventsFireOnTheClientExecutor and
+// AuthTest.legacyServerReportsEmptyIdentity: they need the refresh path, which these tests do not run.
+// Not ported: AuthTest.refreshIsAnsweredAfterTheAuthListenerThrowsOnATimerRefresh: it needs the timer refresh.
 
 using System;
 using System.Collections.Concurrent;
@@ -67,7 +64,7 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
-        // Java: AuthTest.authEventFiresOnConnectAndWhenTheIdentityChanges (connect part).
+        // Java: AuthTest.authEventFiresOnConnectAndWhenTheIdentityChanges
         /// <summary>The auth event fires on every connect, also when the identity did not change, and carries each connect's identity.</summary>
         [Fact]
         public async Task Auth_OnConnectAndReconnect_RaisesOnEveryConnectWithTheIdentity() {
@@ -91,7 +88,7 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
-        // Java: AuthTest.authEventsFireOnTheClientExecutor (connect part).
+        // Java: AuthTest.authEventsFireOnTheClientExecutor
         /// <summary>The auth event is raised inside a loop step, on the client executor.</summary>
         [Fact]
         public async Task Auth_OnConnect_RunsInsideTheLoopStep() {
@@ -111,7 +108,7 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
-        // Java: AuthTest.connectedEventCarriesTheIdentity (renamed).
+        // Java: AuthTest.connectedEventCarriesTheIdentity
         /// <summary>The Connected event carries the user and the auth class of the connect reply.</summary>
         [Fact]
         public async Task Connected_WithIdentity_CarriesUserAndAuthClass() {
@@ -127,7 +124,7 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
-        // Java: AuthTest.legacyServerReportsEmptyIdentity (connect part).
+        // Java: AuthTest.legacyServerReportsEmptyIdentity
         /// <summary>A server that sends no identity gives empty values on the Connected event, and one auth event with them.</summary>
         [Fact]
         public async Task Auth_WithLegacyServer_RaisesEmptyIdentity() {

@@ -1,12 +1,7 @@
-// The pure offset rule of the server time (rule R55 points 1 to 3), ported from the Java fork's ExtensionsTest and from the
-// implausible-time case of ServerTimeTest. Status:
-//   ExtensionsTest.serverTimeOffsetIsServerTimeMinusLocalTime: ported (ServerTimeOffsetFrom_ServerTimeMinusLocalTime).
-//   ExtensionsTest.zeroServerTimeMeansNoOffset: ported (ServerTimeOffsetFrom_ZeroServerTime_ReturnsNull).
-//   ServerTimeTest.serverTimeIgnoresAnImplausibleReplyTime: the pure part is ported
-//     (ServerTimeOffsetFrom_ImplausibleTime_ReturnsNull). The integration part belongs to the rpc slices (the client keeps
-//     the previous offset over a real reply).
-// The Java ExtensionsTest estimate tests (estimatedServerTime...) are not applicable: the server time is one addition in
-// CentrifugeClient.Host (local clock plus offset), with no separate function to test.
+// The pure offset rule of the server time: the offset is the server time minus the local time, and a zero or implausible
+// server time gives no offset. The client keeps the previous offset over a reply with an implausible time.
+// Not ported: ServerTimeTest.serverTimeIgnoresAnImplausibleReplyTime: the check needs a real reply over the rpc path, which these pure tests do not run.
+// Not ported: ExtensionsTest.estimatedServerTime...: the server time is one addition in CentrifugeClient.Host (local clock plus offset), with no separate function to test.
 using System;
 using Xunit;
 
@@ -34,7 +29,7 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
-        // Java: serverTimeIgnoresAnImplausibleReplyTime (pure part)
+        // Java: serverTimeIgnoresAnImplausibleReplyTime
         [Fact]
         public void ServerTimeOffsetFrom_ImplausibleTime_ReturnsNull() {
             Assert.Null(ProtocolExtensions.ServerTimeOffsetFrom(long.MaxValue, LocalMillis));
@@ -43,7 +38,7 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
-        // Gap: the limit is inclusive. A server time exactly one year ahead is still a clock (rule R55 point 2: "more than").
+        // Gap: the limit is inclusive. A server time exactly one year ahead is still a clock: the rule is "more than".
         [Fact]
         public void ServerTimeOffsetFrom_ExactlyOneYearAhead_ReturnsTheOffset() {
             long oneYear = ProtocolExtensions.MaxServerTimeSkewMillis;

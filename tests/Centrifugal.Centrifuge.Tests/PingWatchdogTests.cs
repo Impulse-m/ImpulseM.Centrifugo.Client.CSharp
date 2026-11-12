@@ -1,8 +1,9 @@
-// Ported from Java PingWatchdogTest (8 tests) and ServerPingDisabledTest (1 test). The Java tests move a ManualScheduler
-// clock; these move the fake step timers of the host, so no real time passes. The reply kinds of the Java tests
-// (server ping, push, command reply) all reach the watchdog through MarkReply, so the watchdog sees them alike. The
-// client-level reply kinds are checked in PingWatchdogClientTests.
-// Rule tests: R9 (half window), R39 (large ping interval), R10 (ping disabled), R13 to R16 (checks, close, stale check).
+// Ping watchdog tests on the fake step timers: the checks, the close of an idle connection and the stale check.
+// Each test names the Java test it ports in a // Java: tag, except the unit part of ServerPingDisabledTest, which has a plain comment on its method. The Java tests move a manual scheduler clock; these move the
+// fake step timers of the host, so no real time passes. The reply kinds (server ping, push, command reply) all reach
+// the watchdog through MarkReply, so the watchdog sees them alike. The client-level reply kinds are checked in
+// PingWatchdogClientTests.
+// Rule coverage: the half window, the large ping interval, the ping disabled case, and the checks, close and stale check.
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -129,7 +130,7 @@ namespace Centrifugal.Centrifuge.Tests {
 
         /// <summary>A ping interval of zero arms nothing, so a connection with pings disabled is never closed for silence.</summary>
         [Fact]
-        // Java: testConnectionStaysWithoutServerPings (ServerPingDisabledTest)
+        // Unit part of the Java ServerPingDisabledTest
         public void PingDisabledNeverCloses() {
             Rig rig = new Rig(TimeSpan.FromSeconds(10), 0);
             Assert.Equal(0, rig.Host.FakeTimers.PendingCount);
