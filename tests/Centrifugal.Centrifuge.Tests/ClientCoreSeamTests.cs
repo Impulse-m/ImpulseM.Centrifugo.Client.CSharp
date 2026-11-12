@@ -23,6 +23,9 @@ namespace Centrifugal.Centrifuge.Tests {
         // Half the ping window of a connect reply with ping 1 s and the default MaxServerPingDelay of 10 s: (1000 + 10000 + 1) / 2.
         private const int PingHalfWindowMs = 5500;
 
+        // The renewal delay of a connection with a ttl of 100 s: 95 percent of the ttl, in milliseconds.
+        private const int ExpiryDelayMs = 95000;
+
 
         // Java: testThrowingConnectedHandlerStopsVisibly
         /// <summary>A Connected handler that throws disconnects the client once with code 2 and reason "exception in event handler".</summary>
@@ -80,7 +83,7 @@ namespace Centrifugal.Centrifuge.Tests {
         /// </summary>
         [Fact]
         public async Task OnConnected_ListenerThrows_LeavesTheHandshakeWhole() {
-            Server.ConnectResult = ConnectReplies.Connect(ping: 1);
+            Server.ConnectResult = ConnectReplies.Connect(ping: 1, expires: true, ttl: 100);
             CentrifugeClient client = NewClientWithTestClock(out FakeStepTimerFactory timers);
             bool failOnConnect = false;
             client.Connected += (_, _) => {
@@ -91,12 +94,15 @@ namespace Centrifugal.Centrifuge.Tests {
             TaskCompletionSource<CentrifugeErrorEventArgs> reported =
                 new TaskCompletionSource<CentrifugeErrorEventArgs>(TaskCreationOptions.RunContinuationsAsynchronously);
             bool watchdogArmedAtReport = false;
+            bool expiryArmedAtReport = false;
             client.Error += (_, e) => {
                 if (e.Type != "unclassified") {
                     return;
                 }
                 // The ping watchdog arms its first check at half the window: (ping 1 s + MaxServerPingDelay 10 s + 1) / 2.
                 watchdogArmedAtReport = timers.PendingWithDelay(PingHalfWindowMs) == 1;
+                // The expiry timer of the connection is armed before the listeners run: 95 percent of the ttl of 100 s.
+                expiryArmedAtReport = timers.PendingWithDelay(ExpiryDelayMs) == 1;
                 reported.TrySetResult(e);
             };
             TaskCompletionSource<bool> queuedWritten = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -118,6 +124,7 @@ namespace Centrifugal.Centrifuge.Tests {
             CentrifugeErrorEventArgs error = await reported.Task.WaitAsync(TimeSpan.FromSeconds(10));
             await queuedWritten.Task.WaitAsync(TimeSpan.FromSeconds(10));
             Assert.True(watchdogArmedAtReport);
+            Assert.True(expiryArmedAtReport);
             Assert.IsType<InvalidOperationException>(((CentrifugeUnclassifiedException)error.Exception!).Error);
         }
 

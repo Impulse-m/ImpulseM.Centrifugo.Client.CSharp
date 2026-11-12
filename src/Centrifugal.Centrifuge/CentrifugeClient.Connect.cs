@@ -27,8 +27,7 @@ namespace Centrifugal.Centrifuge
             // A StateChanged handler may have disconnected already.
             if (TransitionSuperseded(transition)) return;
 
-            ClearRefreshTimer();
-            if (result.Expires) ScheduleRefresh(Utilities.TtlToMilliseconds(result.Ttl));
+            _auth.ScheduleExpiry(result.Expires, result.Ttl);
 
             _serverPing = result.Ping;
             _sendPong = result.Pong;
