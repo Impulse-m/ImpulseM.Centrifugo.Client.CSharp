@@ -67,3 +67,12 @@ const Centrifugal.Centrifuge.CentrifugeErrorCodes.Cancelled = 17 -> int
 const Centrifugal.Centrifuge.CentrifugeErrorCodes.LimitExceeded = 16 -> int
 const Centrifugal.Centrifuge.CentrifugeErrorCodes.RedirectFailed = 18 -> int
 const Centrifugal.Centrifuge.CentrifugeErrorCodes.Unsupported = 15 -> int
+Centrifugal.Centrifuge.CentrifugeRpcCall
+Centrifugal.Centrifuge.CentrifugeRpcCall.Cancel() -> void
+Centrifugal.Centrifuge.CentrifugeRpcCall.Result.get -> System.Threading.Tasks.Task<Centrifugal.Centrifuge.CentrifugeRpcResult!>!
+Centrifugal.Centrifuge.CentrifugeRpcOptions
+Centrifugal.Centrifuge.CentrifugeRpcOptions.CentrifugeRpcOptions() -> void
+Centrifugal.Centrifuge.CentrifugeRpcOptions.Headers.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
+Centrifugal.Centrifuge.CentrifugeRpcOptions.Timeout.get -> System.TimeSpan?
+Centrifugal.Centrifuge.CentrifugeRpcOptions.Timeout.set -> void
+Centrifugal.Centrifuge.CentrifugeRpcOptions.WithHeader(string! key, string! value) -> Centrifugal.Centrifuge.CentrifugeRpcOptions!
