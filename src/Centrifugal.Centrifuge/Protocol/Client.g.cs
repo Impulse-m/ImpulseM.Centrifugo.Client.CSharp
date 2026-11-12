@@ -25,165 +25,181 @@ namespace Centrifugal.Centrifuge.Protocol {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "CgxjbGllbnQucHJvdG8SH2NlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2UucHJvdG9j",
-            "b2wiOQoFRXJyb3ISDAoEY29kZRgBIAEoDRIPCgdtZXNzYWdlGAIgASgJEhEK",
-            "CXRlbXBvcmFyeRgDIAEoCCI/ChBFbXVsYXRpb25SZXF1ZXN0EgwKBG5vZGUY",
-            "ASABKAkSDwoHc2Vzc2lvbhgCIAEoCRIMCgRkYXRhGAMgASgMIscGCgdDb21t",
-            "YW5kEgoKAmlkGAEgASgNEkAKB2Nvbm5lY3QYBCABKAsyLy5jZW50cmlmdWdh",
-            "bC5jZW50cmlmdWdlLnByb3RvY29sLkNvbm5lY3RSZXF1ZXN0EkQKCXN1YnNj",
-            "cmliZRgFIAEoCzIxLmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2UucHJvdG9jb2wu",
-            "U3Vic2NyaWJlUmVxdWVzdBJICgt1bnN1YnNjcmliZRgGIAEoCzIzLmNlbnRy",
-            "aWZ1Z2FsLmNlbnRyaWZ1Z2UucHJvdG9jb2wuVW5zdWJzY3JpYmVSZXF1ZXN0",
-            "EkAKB3B1Ymxpc2gYByABKAsyLy5jZW50cmlmdWdhbC5jZW50cmlmdWdlLnBy",
-            "b3RvY29sLlB1Ymxpc2hSZXF1ZXN0EkIKCHByZXNlbmNlGAggASgLMjAuY2Vu",
-            "dHJpZnVnYWwuY2VudHJpZnVnZS5wcm90b2NvbC5QcmVzZW5jZVJlcXVlc3QS",
-            "TQoOcHJlc2VuY2Vfc3RhdHMYCSABKAsyNS5jZW50cmlmdWdhbC5jZW50cmlm",
-            "dWdlLnByb3RvY29sLlByZXNlbmNlU3RhdHNSZXF1ZXN0EkAKB2hpc3RvcnkY",
-            "CiABKAsyLy5jZW50cmlmdWdhbC5jZW50cmlmdWdlLnByb3RvY29sLkhpc3Rv",
-            "cnlSZXF1ZXN0EjoKBHBpbmcYCyABKAsyLC5jZW50cmlmdWdhbC5jZW50cmlm",
-            "dWdlLnByb3RvY29sLlBpbmdSZXF1ZXN0EjoKBHNlbmQYDCABKAsyLC5jZW50",
-            "cmlmdWdhbC5jZW50cmlmdWdlLnByb3RvY29sLlNlbmRSZXF1ZXN0EjgKA3Jw",
-            "YxgNIAEoCzIrLmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2UucHJvdG9jb2wuUlBD",
-            "UmVxdWVzdBJACgdyZWZyZXNoGA4gASgLMi8uY2VudHJpZnVnYWwuY2VudHJp",
-            "ZnVnZS5wcm90b2NvbC5SZWZyZXNoUmVxdWVzdBJHCgtzdWJfcmVmcmVzaBgP",
-            "IAEoCzIyLmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2UucHJvdG9jb2wuU3ViUmVm",
-            "cmVzaFJlcXVlc3RKBAgCEANKBAgDEAQi5AYKBVJlcGx5EgoKAmlkGAEgASgN",
-            "EjUKBWVycm9yGAIgASgLMiYuY2VudHJpZnVnYWwuY2VudHJpZnVnZS5wcm90",
-            "b2NvbC5FcnJvchIzCgRwdXNoGAQgASgLMiUuY2VudHJpZnVnYWwuY2VudHJp",
-            "ZnVnZS5wcm90b2NvbC5QdXNoEj8KB2Nvbm5lY3QYBSABKAsyLi5jZW50cmlm",
-            "dWdhbC5jZW50cmlmdWdlLnByb3RvY29sLkNvbm5lY3RSZXN1bHQSQwoJc3Vi",
-            "c2NyaWJlGAYgASgLMjAuY2VudHJpZnVnYWwuY2VudHJpZnVnZS5wcm90b2Nv",
-            "bC5TdWJzY3JpYmVSZXN1bHQSRwoLdW5zdWJzY3JpYmUYByABKAsyMi5jZW50",
-            "cmlmdWdhbC5jZW50cmlmdWdlLnByb3RvY29sLlVuc3Vic2NyaWJlUmVzdWx0",
-            "Ej8KB3B1Ymxpc2gYCCABKAsyLi5jZW50cmlmdWdhbC5jZW50cmlmdWdlLnBy",
-            "b3RvY29sLlB1Ymxpc2hSZXN1bHQSQQoIcHJlc2VuY2UYCSABKAsyLy5jZW50",
-            "cmlmdWdhbC5jZW50cmlmdWdlLnByb3RvY29sLlByZXNlbmNlUmVzdWx0EkwK",
-            "DnByZXNlbmNlX3N0YXRzGAogASgLMjQuY2VudHJpZnVnYWwuY2VudHJpZnVn",
-            "ZS5wcm90b2NvbC5QcmVzZW5jZVN0YXRzUmVzdWx0Ej8KB2hpc3RvcnkYCyAB",
-            "KAsyLi5jZW50cmlmdWdhbC5jZW50cmlmdWdlLnByb3RvY29sLkhpc3RvcnlS",
-            "ZXN1bHQSOQoEcGluZxgMIAEoCzIrLmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2Uu",
-            "cHJvdG9jb2wuUGluZ1Jlc3VsdBI3CgNycGMYDSABKAsyKi5jZW50cmlmdWdh",
-            "bC5jZW50cmlmdWdlLnByb3RvY29sLlJQQ1Jlc3VsdBI/CgdyZWZyZXNoGA4g",
-            "ASgLMi4uY2VudHJpZnVnYWwuY2VudHJpZnVnZS5wcm90b2NvbC5SZWZyZXNo",
-            "UmVzdWx0EkYKC3N1Yl9yZWZyZXNoGA8gASgLMjEuY2VudHJpZnVnYWwuY2Vu",
-            "dHJpZnVnZS5wcm90b2NvbC5TdWJSZWZyZXNoUmVzdWx0SgQIAxAEIsQECgRQ",
-            "dXNoEgoKAmlkGAEgASgDEg8KB2NoYW5uZWwYAiABKAkSOQoDcHViGAQgASgL",
+            "b2wi2QEKBUVycm9yEgwKBGNvZGUYASABKA0SDwoHbWVzc2FnZRgCIAEoCRIR",
+            "Cgl0ZW1wb3JhcnkYAyABKAgSEQoIYXBwX2NvZGUY6AcgASgFEhEKCGFwcF90",
+            "eXBlGOkHIAEoCRJHCghtZXRhZGF0YRjqByADKAsyNC5jZW50cmlmdWdhbC5j",
+            "ZW50cmlmdWdlLnByb3RvY29sLkVycm9yLk1ldGFkYXRhRW50cnkaLwoNTWV0",
+            "YWRhdGFFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIj8K",
+            "EEVtdWxhdGlvblJlcXVlc3QSDAoEbm9kZRgBIAEoCRIPCgdzZXNzaW9uGAIg",
+            "ASgJEgwKBGRhdGEYAyABKAwixwYKB0NvbW1hbmQSCgoCaWQYASABKA0SQAoH",
+            "Y29ubmVjdBgEIAEoCzIvLmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2UucHJvdG9j",
+            "b2wuQ29ubmVjdFJlcXVlc3QSRAoJc3Vic2NyaWJlGAUgASgLMjEuY2VudHJp",
+            "ZnVnYWwuY2VudHJpZnVnZS5wcm90b2NvbC5TdWJzY3JpYmVSZXF1ZXN0EkgK",
+            "C3Vuc3Vic2NyaWJlGAYgASgLMjMuY2VudHJpZnVnYWwuY2VudHJpZnVnZS5w",
+            "cm90b2NvbC5VbnN1YnNjcmliZVJlcXVlc3QSQAoHcHVibGlzaBgHIAEoCzIv",
+            "LmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2UucHJvdG9jb2wuUHVibGlzaFJlcXVl",
+            "c3QSQgoIcHJlc2VuY2UYCCABKAsyMC5jZW50cmlmdWdhbC5jZW50cmlmdWdl",
+            "LnByb3RvY29sLlByZXNlbmNlUmVxdWVzdBJNCg5wcmVzZW5jZV9zdGF0cxgJ",
+            "IAEoCzI1LmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2UucHJvdG9jb2wuUHJlc2Vu",
+            "Y2VTdGF0c1JlcXVlc3QSQAoHaGlzdG9yeRgKIAEoCzIvLmNlbnRyaWZ1Z2Fs",
+            "LmNlbnRyaWZ1Z2UucHJvdG9jb2wuSGlzdG9yeVJlcXVlc3QSOgoEcGluZxgL",
+            "IAEoCzIsLmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2UucHJvdG9jb2wuUGluZ1Jl",
+            "cXVlc3QSOgoEc2VuZBgMIAEoCzIsLmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2Uu",
+            "cHJvdG9jb2wuU2VuZFJlcXVlc3QSOAoDcnBjGA0gASgLMisuY2VudHJpZnVn",
+            "YWwuY2VudHJpZnVnZS5wcm90b2NvbC5SUENSZXF1ZXN0EkAKB3JlZnJlc2gY",
+            "DiABKAsyLy5jZW50cmlmdWdhbC5jZW50cmlmdWdlLnByb3RvY29sLlJlZnJl",
+            "c2hSZXF1ZXN0EkcKC3N1Yl9yZWZyZXNoGA8gASgLMjIuY2VudHJpZnVnYWwu",
+            "Y2VudHJpZnVnZS5wcm90b2NvbC5TdWJSZWZyZXNoUmVxdWVzdEoECAIQA0oE",
+            "CAMQBCLzBgoFUmVwbHkSCgoCaWQYASABKA0SNQoFZXJyb3IYAiABKAsyJi5j",
+            "ZW50cmlmdWdhbC5jZW50cmlmdWdlLnByb3RvY29sLkVycm9yEjMKBHB1c2gY",
+            "BCABKAsyJS5jZW50cmlmdWdhbC5jZW50cmlmdWdlLnByb3RvY29sLlB1c2gS",
+            "PwoHY29ubmVjdBgFIAEoCzIuLmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2UucHJv",
+            "dG9jb2wuQ29ubmVjdFJlc3VsdBJDCglzdWJzY3JpYmUYBiABKAsyMC5jZW50",
+            "cmlmdWdhbC5jZW50cmlmdWdlLnByb3RvY29sLlN1YnNjcmliZVJlc3VsdBJH",
+            "Cgt1bnN1YnNjcmliZRgHIAEoCzIyLmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2Uu",
+            "cHJvdG9jb2wuVW5zdWJzY3JpYmVSZXN1bHQSPwoHcHVibGlzaBgIIAEoCzIu",
+            "LmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2UucHJvdG9jb2wuUHVibGlzaFJlc3Vs",
+            "dBJBCghwcmVzZW5jZRgJIAEoCzIvLmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2Uu",
+            "cHJvdG9jb2wuUHJlc2VuY2VSZXN1bHQSTAoOcHJlc2VuY2Vfc3RhdHMYCiAB",
+            "KAsyNC5jZW50cmlmdWdhbC5jZW50cmlmdWdlLnByb3RvY29sLlByZXNlbmNl",
+            "U3RhdHNSZXN1bHQSPwoHaGlzdG9yeRgLIAEoCzIuLmNlbnRyaWZ1Z2FsLmNl",
+            "bnRyaWZ1Z2UucHJvdG9jb2wuSGlzdG9yeVJlc3VsdBI5CgRwaW5nGAwgASgL",
+            "MisuY2VudHJpZnVnYWwuY2VudHJpZnVnZS5wcm90b2NvbC5QaW5nUmVzdWx0",
+            "EjcKA3JwYxgNIAEoCzIqLmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2UucHJvdG9j",
+            "b2wuUlBDUmVzdWx0Ej8KB3JlZnJlc2gYDiABKAsyLi5jZW50cmlmdWdhbC5j",
+            "ZW50cmlmdWdlLnByb3RvY29sLlJlZnJlc2hSZXN1bHQSRgoLc3ViX3JlZnJl",
+            "c2gYDyABKAsyMS5jZW50cmlmdWdhbC5jZW50cmlmdWdlLnByb3RvY29sLlN1",
+            "YlJlZnJlc2hSZXN1bHQSDQoEdGltZRjoByABKANKBAgDEAQixAQKBFB1c2gS",
+            "CgoCaWQYASABKAMSDwoHY2hhbm5lbBgCIAEoCRI5CgNwdWIYBCABKAsyLC5j",
+            "ZW50cmlmdWdhbC5jZW50cmlmdWdlLnByb3RvY29sLlB1YmxpY2F0aW9uEjMK",
+            "BGpvaW4YBSABKAsyJS5jZW50cmlmdWdhbC5jZW50cmlmdWdlLnByb3RvY29s",
+            "LkpvaW4SNQoFbGVhdmUYBiABKAsyJi5jZW50cmlmdWdhbC5jZW50cmlmdWdl",
+            "LnByb3RvY29sLkxlYXZlEkEKC3Vuc3Vic2NyaWJlGAcgASgLMiwuY2VudHJp",
+            "ZnVnYWwuY2VudHJpZnVnZS5wcm90b2NvbC5VbnN1YnNjcmliZRI5CgdtZXNz",
+            "YWdlGAggASgLMiguY2VudHJpZnVnYWwuY2VudHJpZnVnZS5wcm90b2NvbC5N",
+            "ZXNzYWdlEj0KCXN1YnNjcmliZRgJIAEoCzIqLmNlbnRyaWZ1Z2FsLmNlbnRy",
+            "aWZ1Z2UucHJvdG9jb2wuU3Vic2NyaWJlEjkKB2Nvbm5lY3QYCiABKAsyKC5j",
+            "ZW50cmlmdWdhbC5jZW50cmlmdWdlLnByb3RvY29sLkNvbm5lY3QSPwoKZGlz",
+            "Y29ubmVjdBgLIAEoCzIrLmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2UucHJvdG9j",
+            "b2wuRGlzY29ubmVjdBI5CgdyZWZyZXNoGAwgASgLMiguY2VudHJpZnVnYWwu",
+            "Y2VudHJpZnVnZS5wcm90b2NvbC5SZWZyZXNoSgQIAxAEIjgKCkRpY3Rpb25h",
+            "cnkSCgoCaWQYASABKAkSDAoEZGF0YRgCIAEoDBIQCghkYXRhX2I2NBgDIAEo",
+            "CSJQCgpDbGllbnRJbmZvEgwKBHVzZXIYASABKAkSDgoGY2xpZW50GAIgASgJ",
+            "EhEKCWNvbm5faW5mbxgDIAEoDBIRCgljaGFuX2luZm8YBCABKAwi+QIKC1B1",
+            "YmxpY2F0aW9uEgwKBGRhdGEYBCABKAwSOQoEaW5mbxgFIAEoCzIrLmNlbnRy",
+            "aWZ1Z2FsLmNlbnRyaWZ1Z2UucHJvdG9jb2wuQ2xpZW50SW5mbxIOCgZvZmZz",
+            "ZXQYBiABKAQSRAoEdGFncxgHIAMoCzI2LmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1",
+            "Z2UucHJvdG9jb2wuUHVibGljYXRpb24uVGFnc0VudHJ5Eg0KBWRlbHRhGAgg",
+            "ASgIEgwKBHRpbWUYCSABKAMSDwoHY2hhbm5lbBgKIAEoCRILCgNrZXkYCyAB",
+            "KAkSDwoHcmVtb3ZlZBgMIAEoCBINCgVzY29yZRgNIAEoEhINCgVlcG9jaBgO",
+            "IAEoCRIRCglwcmV2X2RhdGEYDyABKAwSDwoHdmVyc2lvbhgQIAEoBBorCglU",
+            "YWdzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4AUoECAEQ",
+            "AkoECAIQA0oECAMQBCJBCgRKb2luEjkKBGluZm8YASABKAsyKy5jZW50cmlm",
+            "dWdhbC5jZW50cmlmdWdlLnByb3RvY29sLkNsaWVudEluZm8iQgoFTGVhdmUS",
+            "OQoEaW5mbxgBIAEoCzIrLmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2UucHJvdG9j",
+            "b2wuQ2xpZW50SW5mbyIxCgtVbnN1YnNjcmliZRIMCgRjb2RlGAIgASgNEg4K",
+            "BnJlYXNvbhgDIAEoCUoECAEQAiJtCglTdWJzY3JpYmUSEwoLcmVjb3ZlcmFi",
+            "bGUYASABKAgSDQoFZXBvY2gYBCABKAkSDgoGb2Zmc2V0GAUgASgEEhIKCnBv",
+            "c2l0aW9uZWQYBiABKAgSDAoEZGF0YRgHIAEoDEoECAIQA0oECAMQBCIXCgdN",
+            "ZXNzYWdlEgwKBGRhdGEYASABKAwiwAIKB0Nvbm5lY3QSDgoGY2xpZW50GAEg",
+            "ASgJEg8KB3ZlcnNpb24YAiABKAkSDAoEZGF0YRgDIAEoDBJACgRzdWJzGAQg",
+            "AygLMjIuY2VudHJpZnVnYWwuY2VudHJpZnVnZS5wcm90b2NvbC5Db25uZWN0",
+            "LlN1YnNFbnRyeRIPCgdleHBpcmVzGAUgASgIEgsKA3R0bBgGIAEoDRIMCgRw",
+            "aW5nGAcgASgNEgwKBHBvbmcYCCABKAgSDwoHc2Vzc2lvbhgJIAEoCRIMCgRu",
+            "b2RlGAogASgJEgwKBHRpbWUYCyABKAMaXQoJU3Vic0VudHJ5EgsKA2tleRgB",
+            "IAEoCRI/CgV2YWx1ZRgCIAEoCzIwLmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2Uu",
+            "cHJvdG9jb2wuU3Vic2NyaWJlUmVzdWx0OgI4ASI9CgpEaXNjb25uZWN0EgwK",
+            "BGNvZGUYASABKA0SDgoGcmVhc29uGAIgASgJEhEKCXJlY29ubmVjdBgDIAEo",
+            "CCInCgdSZWZyZXNoEg8KB2V4cGlyZXMYASABKAgSCwoDdHRsGAIgASgNIrQD",
+            "Cg5Db25uZWN0UmVxdWVzdBINCgV0b2tlbhgBIAEoCRIMCgRkYXRhGAIgASgM",
+            "EkcKBHN1YnMYAyADKAsyOS5jZW50cmlmdWdhbC5jZW50cmlmdWdlLnByb3Rv",
+            "Y29sLkNvbm5lY3RSZXF1ZXN0LlN1YnNFbnRyeRIMCgRuYW1lGAQgASgJEg8K",
+            "B3ZlcnNpb24YBSABKAkSTQoHaGVhZGVycxgGIAMoCzI8LmNlbnRyaWZ1Z2Fs",
+            "LmNlbnRyaWZ1Z2UucHJvdG9jb2wuQ29ubmVjdFJlcXVlc3QuSGVhZGVyc0Vu",
+            "dHJ5EgwKBGZsYWcYByABKAMSDwoHcHJvZmlsZRgJIAEoCRIMCgRkaWN0GAgg",
+            "ASgJEhEKCGluc3RhbmNlGOgHIAEoCRpeCglTdWJzRW50cnkSCwoDa2V5GAEg",
+            "ASgJEkAKBXZhbHVlGAIgASgLMjEuY2VudHJpZnVnYWwuY2VudHJpZnVnZS5w",
+            "cm90b2NvbC5TdWJzY3JpYmVSZXF1ZXN0OgI4ARouCgxIZWFkZXJzRW50cnkS",
+            "CwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASK5AwoNQ29ubmVjdFJl",
+            "c3VsdBIOCgZjbGllbnQYASABKAkSDwoHdmVyc2lvbhgCIAEoCRIPCgdleHBp",
+            "cmVzGAMgASgIEgsKA3R0bBgEIAEoDRIMCgRkYXRhGAUgASgMEkYKBHN1YnMY",
+            "BiADKAsyOC5jZW50cmlmdWdhbC5jZW50cmlmdWdlLnByb3RvY29sLkNvbm5l",
+            "Y3RSZXN1bHQuU3Vic0VudHJ5EgwKBHBpbmcYByABKA0SDAoEcG9uZxgIIAEo",
+            "CBIPCgdzZXNzaW9uGAkgASgJEgwKBG5vZGUYCiABKAkSDAoEdGltZRgLIAEo",
+            "AxIMCgRmbGFnGAwgASgDEjkKBGRpY3QYDSABKAsyKy5jZW50cmlmdWdhbC5j",
+            "ZW50cmlmdWdlLnByb3RvY29sLkRpY3Rpb25hcnkSDQoEdXNlchjoByABKAkS",
+            "EwoKYXV0aF9jbGFzcxjpByABKAkaXQoJU3Vic0VudHJ5EgsKA2tleRgBIAEo",
+            "CRI/CgV2YWx1ZRgCIAEoCzIwLmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2UucHJv",
+            "dG9jb2wuU3Vic2NyaWJlUmVzdWx0OgI4ASIfCg5SZWZyZXNoUmVxdWVzdBIN",
+            "CgV0b2tlbhgBIAEoCSJyCg1SZWZyZXNoUmVzdWx0Eg4KBmNsaWVudBgBIAEo",
+            "CRIPCgd2ZXJzaW9uGAIgASgJEg8KB2V4cGlyZXMYAyABKAgSCwoDdHRsGAQg",
+            "ASgNEg0KBHVzZXIY6AcgASgJEhMKCmF1dGhfY2xhc3MY6QcgASgJItgCChBT",
+            "dWJzY3JpYmVSZXF1ZXN0Eg8KB2NoYW5uZWwYASABKAkSDQoFdG9rZW4YAiAB",
+            "KAkSDwoHcmVjb3ZlchgDIAEoCBINCgVlcG9jaBgGIAEoCRIOCgZvZmZzZXQY",
+            "ByABKAQSDAoEZGF0YRgIIAEoDBISCgpwb3NpdGlvbmVkGAkgASgIEhMKC3Jl",
+            "Y292ZXJhYmxlGAogASgIEhIKCmpvaW5fbGVhdmUYCyABKAgSDQoFZGVsdGEY",
+            "DCABKAkSNwoCdGYYDSABKAsyKy5jZW50cmlmdWdhbC5jZW50cmlmdWdlLnBy",
+            "b3RvY29sLkZpbHRlck5vZGUSDAoEZmxhZxgOIAEoAxIMCgR0eXBlGA8gASgF",
+            "Eg0KBXBoYXNlGBAgASgFEg4KBmN1cnNvchgRIAEoCRINCgVsaW1pdBgSIAEo",
+            "BRILCgNhc2MYEyABKAhKBAgEEAVKBAgFEAYinwMKD1N1YnNjcmliZVJlc3Vs",
+            "dBIPCgdleHBpcmVzGAEgASgIEgsKA3R0bBgCIAEoDRITCgtyZWNvdmVyYWJs",
+            "ZRgDIAEoCBINCgVlcG9jaBgGIAEoCRJCCgxwdWJsaWNhdGlvbnMYByADKAsy",
+            "LC5jZW50cmlmdWdhbC5jZW50cmlmdWdlLnByb3RvY29sLlB1YmxpY2F0aW9u",
+            "EhEKCXJlY292ZXJlZBgIIAEoCBIOCgZvZmZzZXQYCSABKAQSEgoKcG9zaXRp",
+            "b25lZBgKIAEoCBIMCgRkYXRhGAsgASgMEhYKDndhc19yZWNvdmVyaW5nGAwg",
+            "ASgIEg0KBWRlbHRhGA0gASgIEgoKAmlkGA4gASgDEgwKBHR5cGUYDyABKAUS",
+            "DQoFcGhhc2UYECABKAUSDgoGY3Vyc29yGBEgASgJEjsKBXN0YXRlGBIgAygL",
             "MiwuY2VudHJpZnVnYWwuY2VudHJpZnVnZS5wcm90b2NvbC5QdWJsaWNhdGlv",
-            "bhIzCgRqb2luGAUgASgLMiUuY2VudHJpZnVnYWwuY2VudHJpZnVnZS5wcm90",
-            "b2NvbC5Kb2luEjUKBWxlYXZlGAYgASgLMiYuY2VudHJpZnVnYWwuY2VudHJp",
-            "ZnVnZS5wcm90b2NvbC5MZWF2ZRJBCgt1bnN1YnNjcmliZRgHIAEoCzIsLmNl",
-            "bnRyaWZ1Z2FsLmNlbnRyaWZ1Z2UucHJvdG9jb2wuVW5zdWJzY3JpYmUSOQoH",
-            "bWVzc2FnZRgIIAEoCzIoLmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2UucHJvdG9j",
-            "b2wuTWVzc2FnZRI9CglzdWJzY3JpYmUYCSABKAsyKi5jZW50cmlmdWdhbC5j",
-            "ZW50cmlmdWdlLnByb3RvY29sLlN1YnNjcmliZRI5Cgdjb25uZWN0GAogASgL",
-            "MiguY2VudHJpZnVnYWwuY2VudHJpZnVnZS5wcm90b2NvbC5Db25uZWN0Ej8K",
-            "CmRpc2Nvbm5lY3QYCyABKAsyKy5jZW50cmlmdWdhbC5jZW50cmlmdWdlLnBy",
-            "b3RvY29sLkRpc2Nvbm5lY3QSOQoHcmVmcmVzaBgMIAEoCzIoLmNlbnRyaWZ1",
-            "Z2FsLmNlbnRyaWZ1Z2UucHJvdG9jb2wuUmVmcmVzaEoECAMQBCJQCgpDbGll",
-            "bnRJbmZvEgwKBHVzZXIYASABKAkSDgoGY2xpZW50GAIgASgJEhEKCWNvbm5f",
-            "aW5mbxgDIAEoDBIRCgljaGFuX2luZm8YBCABKAwi+QIKC1B1YmxpY2F0aW9u",
-            "EgwKBGRhdGEYBCABKAwSOQoEaW5mbxgFIAEoCzIrLmNlbnRyaWZ1Z2FsLmNl",
-            "bnRyaWZ1Z2UucHJvdG9jb2wuQ2xpZW50SW5mbxIOCgZvZmZzZXQYBiABKAQS",
-            "RAoEdGFncxgHIAMoCzI2LmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2UucHJvdG9j",
-            "b2wuUHVibGljYXRpb24uVGFnc0VudHJ5Eg0KBWRlbHRhGAggASgIEgwKBHRp",
-            "bWUYCSABKAMSDwoHY2hhbm5lbBgKIAEoCRILCgNrZXkYCyABKAkSDwoHcmVt",
-            "b3ZlZBgMIAEoCBINCgVzY29yZRgNIAEoEhINCgVlcG9jaBgOIAEoCRIRCglw",
-            "cmV2X2RhdGEYDyABKAwSDwoHdmVyc2lvbhgQIAEoBBorCglUYWdzRW50cnkS",
-            "CwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4AUoECAEQAkoECAIQA0oE",
-            "CAMQBCJBCgRKb2luEjkKBGluZm8YASABKAsyKy5jZW50cmlmdWdhbC5jZW50",
-            "cmlmdWdlLnByb3RvY29sLkNsaWVudEluZm8iQgoFTGVhdmUSOQoEaW5mbxgB",
-            "IAEoCzIrLmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2UucHJvdG9jb2wuQ2xpZW50",
-            "SW5mbyIxCgtVbnN1YnNjcmliZRIMCgRjb2RlGAIgASgNEg4KBnJlYXNvbhgD",
-            "IAEoCUoECAEQAiJtCglTdWJzY3JpYmUSEwoLcmVjb3ZlcmFibGUYASABKAgS",
-            "DQoFZXBvY2gYBCABKAkSDgoGb2Zmc2V0GAUgASgEEhIKCnBvc2l0aW9uZWQY",
-            "BiABKAgSDAoEZGF0YRgHIAEoDEoECAIQA0oECAMQBCIXCgdNZXNzYWdlEgwK",
-            "BGRhdGEYASABKAwiwAIKB0Nvbm5lY3QSDgoGY2xpZW50GAEgASgJEg8KB3Zl",
-            "cnNpb24YAiABKAkSDAoEZGF0YRgDIAEoDBJACgRzdWJzGAQgAygLMjIuY2Vu",
-            "dHJpZnVnYWwuY2VudHJpZnVnZS5wcm90b2NvbC5Db25uZWN0LlN1YnNFbnRy",
-            "eRIPCgdleHBpcmVzGAUgASgIEgsKA3R0bBgGIAEoDRIMCgRwaW5nGAcgASgN",
-            "EgwKBHBvbmcYCCABKAgSDwoHc2Vzc2lvbhgJIAEoCRIMCgRub2RlGAogASgJ",
-            "EgwKBHRpbWUYCyABKAMaXQoJU3Vic0VudHJ5EgsKA2tleRgBIAEoCRI/CgV2",
-            "YWx1ZRgCIAEoCzIwLmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2UucHJvdG9jb2wu",
-            "U3Vic2NyaWJlUmVzdWx0OgI4ASI9CgpEaXNjb25uZWN0EgwKBGNvZGUYASAB",
-            "KA0SDgoGcmVhc29uGAIgASgJEhEKCXJlY29ubmVjdBgDIAEoCCInCgdSZWZy",
-            "ZXNoEg8KB2V4cGlyZXMYASABKAgSCwoDdHRsGAIgASgNIoIDCg5Db25uZWN0",
-            "UmVxdWVzdBINCgV0b2tlbhgBIAEoCRIMCgRkYXRhGAIgASgMEkcKBHN1YnMY",
-            "AyADKAsyOS5jZW50cmlmdWdhbC5jZW50cmlmdWdlLnByb3RvY29sLkNvbm5l",
-            "Y3RSZXF1ZXN0LlN1YnNFbnRyeRIMCgRuYW1lGAQgASgJEg8KB3ZlcnNpb24Y",
-            "BSABKAkSTQoHaGVhZGVycxgGIAMoCzI8LmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1",
-            "Z2UucHJvdG9jb2wuQ29ubmVjdFJlcXVlc3QuSGVhZGVyc0VudHJ5EgwKBGZs",
-            "YWcYByABKAMaXgoJU3Vic0VudHJ5EgsKA2tleRgBIAEoCRJACgV2YWx1ZRgC",
-            "IAEoCzIxLmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2UucHJvdG9jb2wuU3Vic2Ny",
-            "aWJlUmVxdWVzdDoCOAEaLgoMSGVhZGVyc0VudHJ5EgsKA2tleRgBIAEoCRIN",
-            "CgV2YWx1ZRgCIAEoCToCOAEizAIKDUNvbm5lY3RSZXN1bHQSDgoGY2xpZW50",
-            "GAEgASgJEg8KB3ZlcnNpb24YAiABKAkSDwoHZXhwaXJlcxgDIAEoCBILCgN0",
-            "dGwYBCABKA0SDAoEZGF0YRgFIAEoDBJGCgRzdWJzGAYgAygLMjguY2VudHJp",
-            "ZnVnYWwuY2VudHJpZnVnZS5wcm90b2NvbC5Db25uZWN0UmVzdWx0LlN1YnNF",
-            "bnRyeRIMCgRwaW5nGAcgASgNEgwKBHBvbmcYCCABKAgSDwoHc2Vzc2lvbhgJ",
-            "IAEoCRIMCgRub2RlGAogASgJEgwKBHRpbWUYCyABKAMaXQoJU3Vic0VudHJ5",
-            "EgsKA2tleRgBIAEoCRI/CgV2YWx1ZRgCIAEoCzIwLmNlbnRyaWZ1Z2FsLmNl",
-            "bnRyaWZ1Z2UucHJvdG9jb2wuU3Vic2NyaWJlUmVzdWx0OgI4ASIfCg5SZWZy",
-            "ZXNoUmVxdWVzdBINCgV0b2tlbhgBIAEoCSJOCg1SZWZyZXNoUmVzdWx0Eg4K",
-            "BmNsaWVudBgBIAEoCRIPCgd2ZXJzaW9uGAIgASgJEg8KB2V4cGlyZXMYAyAB",
-            "KAgSCwoDdHRsGAQgASgNItgCChBTdWJzY3JpYmVSZXF1ZXN0Eg8KB2NoYW5u",
-            "ZWwYASABKAkSDQoFdG9rZW4YAiABKAkSDwoHcmVjb3ZlchgDIAEoCBINCgVl",
-            "cG9jaBgGIAEoCRIOCgZvZmZzZXQYByABKAQSDAoEZGF0YRgIIAEoDBISCgpw",
-            "b3NpdGlvbmVkGAkgASgIEhMKC3JlY292ZXJhYmxlGAogASgIEhIKCmpvaW5f",
-            "bGVhdmUYCyABKAgSDQoFZGVsdGEYDCABKAkSNwoCdGYYDSABKAsyKy5jZW50",
-            "cmlmdWdhbC5jZW50cmlmdWdlLnByb3RvY29sLkZpbHRlck5vZGUSDAoEZmxh",
-            "ZxgOIAEoAxIMCgR0eXBlGA8gASgFEg0KBXBoYXNlGBAgASgFEg4KBmN1cnNv",
-            "chgRIAEoCRINCgVsaW1pdBgSIAEoBRILCgNhc2MYEyABKAhKBAgEEAVKBAgF",
-            "EAYinwMKD1N1YnNjcmliZVJlc3VsdBIPCgdleHBpcmVzGAEgASgIEgsKA3R0",
-            "bBgCIAEoDRITCgtyZWNvdmVyYWJsZRgDIAEoCBINCgVlcG9jaBgGIAEoCRJC",
-            "CgxwdWJsaWNhdGlvbnMYByADKAsyLC5jZW50cmlmdWdhbC5jZW50cmlmdWdl",
-            "LnByb3RvY29sLlB1YmxpY2F0aW9uEhEKCXJlY292ZXJlZBgIIAEoCBIOCgZv",
-            "ZmZzZXQYCSABKAQSEgoKcG9zaXRpb25lZBgKIAEoCBIMCgRkYXRhGAsgASgM",
-            "EhYKDndhc19yZWNvdmVyaW5nGAwgASgIEg0KBWRlbHRhGA0gASgIEgoKAmlk",
-            "GA4gASgDEgwKBHR5cGUYDyABKAUSDQoFcGhhc2UYECABKAUSDgoGY3Vyc29y",
-            "GBEgASgJEjsKBXN0YXRlGBIgAygLMiwuY2VudHJpZnVnYWwuY2VudHJpZnVn",
-            "ZS5wcm90b2NvbC5QdWJsaWNhdGlvbhIYChBwdWJsaXNoX2RlYm91bmNlGBMg",
-            "ASgNSgQIBBAFSgQIBRAGIikKCUtleWVkSXRlbRILCgNrZXkYASABKAkSDwoH",
-            "dmVyc2lvbhgCIAEoBCJaCgpUcmFja0JhdGNoEhEKCXNpZ25hdHVyZRgBIAEo",
-            "CRI5CgVpdGVtcxgCIAMoCzIqLmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2UucHJv",
-            "dG9jb2wuS2V5ZWRJdGVtIo4BChFTdWJSZWZyZXNoUmVxdWVzdBIPCgdjaGFu",
-            "bmVsGAEgASgJEg0KBXRva2VuGAIgASgJEgwKBHR5cGUYAyABKAUSOgoFdHJh",
-            "Y2sYBCADKAsyKy5jZW50cmlmdWdhbC5jZW50cmlmdWdlLnByb3RvY29sLlRy",
-            "YWNrQmF0Y2gSDwoHdW50cmFjaxgFIAMoCSJtChBTdWJSZWZyZXNoUmVzdWx0",
-            "Eg8KB2V4cGlyZXMYASABKAgSCwoDdHRsGAIgASgNEjsKBWl0ZW1zGAMgAygL",
-            "MiwuY2VudHJpZnVnYWwuY2VudHJpZnVnZS5wcm90b2NvbC5QdWJsaWNhdGlv",
-            "biIlChJVbnN1YnNjcmliZVJlcXVlc3QSDwoHY2hhbm5lbBgBIAEoCSITChFV",
-            "bnN1YnNjcmliZVJlc3VsdCJbCg5QdWJsaXNoUmVxdWVzdBIPCgdjaGFubmVs",
-            "GAEgASgJEgwKBGRhdGEYAiABKAwSDAoEdHlwZRgDIAEoBRILCgNrZXkYBCAB",
-            "KAkSDwoHcmVtb3ZlZBgFIAEoCCIPCg1QdWJsaXNoUmVzdWx0IiIKD1ByZXNl",
-            "bmNlUmVxdWVzdBIPCgdjaGFubmVsGAEgASgJIr8BCg5QcmVzZW5jZVJlc3Vs",
-            "dBJPCghwcmVzZW5jZRgBIAMoCzI9LmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2Uu",
-            "cHJvdG9jb2wuUHJlc2VuY2VSZXN1bHQuUHJlc2VuY2VFbnRyeRpcCg1QcmVz",
-            "ZW5jZUVudHJ5EgsKA2tleRgBIAEoCRI6CgV2YWx1ZRgCIAEoCzIrLmNlbnRy",
-            "aWZ1Z2FsLmNlbnRyaWZ1Z2UucHJvdG9jb2wuQ2xpZW50SW5mbzoCOAEiJwoU",
-            "UHJlc2VuY2VTdGF0c1JlcXVlc3QSDwoHY2hhbm5lbBgBIAEoCSI9ChNQcmVz",
-            "ZW5jZVN0YXRzUmVzdWx0EhMKC251bV9jbGllbnRzGAEgASgNEhEKCW51bV91",
-            "c2VycxgCIAEoDSIvCg5TdHJlYW1Qb3NpdGlvbhIOCgZvZmZzZXQYASABKAQS",
-            "DQoFZXBvY2gYAiABKAkinwEKDkhpc3RvcnlSZXF1ZXN0Eg8KB2NoYW5uZWwY",
-            "ASABKAkSDQoFbGltaXQYByABKAUSPgoFc2luY2UYCCABKAsyLy5jZW50cmlm",
-            "dWdhbC5jZW50cmlmdWdlLnByb3RvY29sLlN0cmVhbVBvc2l0aW9uEg8KB3Jl",
-            "dmVyc2UYCSABKAhKBAgCEANKBAgDEARKBAgEEAVKBAgFEAZKBAgGEAcicgoN",
-            "SGlzdG9yeVJlc3VsdBJCCgxwdWJsaWNhdGlvbnMYASADKAsyLC5jZW50cmlm",
-            "dWdhbC5jZW50cmlmdWdlLnByb3RvY29sLlB1YmxpY2F0aW9uEg0KBWVwb2No",
-            "GAIgASgJEg4KBm9mZnNldBgDIAEoBCINCgtQaW5nUmVxdWVzdCIMCgpQaW5n",
-            "UmVzdWx0IioKClJQQ1JlcXVlc3QSDAoEZGF0YRgBIAEoDBIOCgZtZXRob2QY",
-            "AiABKAkiGQoJUlBDUmVzdWx0EgwKBGRhdGEYASABKAwiGwoLU2VuZFJlcXVl",
-            "c3QSDAoEZGF0YRgBIAEoDCKJAQoKRmlsdGVyTm9kZRIKCgJvcBgBIAEoCRIL",
-            "CgNrZXkYAiABKAkSCwoDY21wGAMgASgJEgsKA3ZhbBgEIAEoCRIMCgR2YWxz",
-            "GAUgAygJEjoKBW5vZGVzGAYgAygLMisuY2VudHJpZnVnYWwuY2VudHJpZnVn",
-            "ZS5wcm90b2NvbC5GaWx0ZXJOb2RlQiFaH2dpdGh1Yi5jb20vY2VudHJpZnVn",
-            "YWwvcHJvdG9jb2xiBnByb3RvMw=="));
+            "bhIYChBwdWJsaXNoX2RlYm91bmNlGBMgASgNSgQIBBAFSgQIBRAGIikKCUtl",
+            "eWVkSXRlbRILCgNrZXkYASABKAkSDwoHdmVyc2lvbhgCIAEoBCJaCgpUcmFj",
+            "a0JhdGNoEhEKCXNpZ25hdHVyZRgBIAEoCRI5CgVpdGVtcxgCIAMoCzIqLmNl",
+            "bnRyaWZ1Z2FsLmNlbnRyaWZ1Z2UucHJvdG9jb2wuS2V5ZWRJdGVtIo4BChFT",
+            "dWJSZWZyZXNoUmVxdWVzdBIPCgdjaGFubmVsGAEgASgJEg0KBXRva2VuGAIg",
+            "ASgJEgwKBHR5cGUYAyABKAUSOgoFdHJhY2sYBCADKAsyKy5jZW50cmlmdWdh",
+            "bC5jZW50cmlmdWdlLnByb3RvY29sLlRyYWNrQmF0Y2gSDwoHdW50cmFjaxgF",
+            "IAMoCSJtChBTdWJSZWZyZXNoUmVzdWx0Eg8KB2V4cGlyZXMYASABKAgSCwoD",
+            "dHRsGAIgASgNEjsKBWl0ZW1zGAMgAygLMiwuY2VudHJpZnVnYWwuY2VudHJp",
+            "ZnVnZS5wcm90b2NvbC5QdWJsaWNhdGlvbiIlChJVbnN1YnNjcmliZVJlcXVl",
+            "c3QSDwoHY2hhbm5lbBgBIAEoCSITChFVbnN1YnNjcmliZVJlc3VsdCJbCg5Q",
+            "dWJsaXNoUmVxdWVzdBIPCgdjaGFubmVsGAEgASgJEgwKBGRhdGEYAiABKAwS",
+            "DAoEdHlwZRgDIAEoBRILCgNrZXkYBCABKAkSDwoHcmVtb3ZlZBgFIAEoCCIP",
+            "Cg1QdWJsaXNoUmVzdWx0IiIKD1ByZXNlbmNlUmVxdWVzdBIPCgdjaGFubmVs",
+            "GAEgASgJIr8BCg5QcmVzZW5jZVJlc3VsdBJPCghwcmVzZW5jZRgBIAMoCzI9",
+            "LmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2UucHJvdG9jb2wuUHJlc2VuY2VSZXN1",
+            "bHQuUHJlc2VuY2VFbnRyeRpcCg1QcmVzZW5jZUVudHJ5EgsKA2tleRgBIAEo",
+            "CRI6CgV2YWx1ZRgCIAEoCzIrLmNlbnRyaWZ1Z2FsLmNlbnRyaWZ1Z2UucHJv",
+            "dG9jb2wuQ2xpZW50SW5mbzoCOAEiJwoUUHJlc2VuY2VTdGF0c1JlcXVlc3QS",
+            "DwoHY2hhbm5lbBgBIAEoCSI9ChNQcmVzZW5jZVN0YXRzUmVzdWx0EhMKC251",
+            "bV9jbGllbnRzGAEgASgNEhEKCW51bV91c2VycxgCIAEoDSIvCg5TdHJlYW1Q",
+            "b3NpdGlvbhIOCgZvZmZzZXQYASABKAQSDQoFZXBvY2gYAiABKAkinwEKDkhp",
+            "c3RvcnlSZXF1ZXN0Eg8KB2NoYW5uZWwYASABKAkSDQoFbGltaXQYByABKAUS",
+            "PgoFc2luY2UYCCABKAsyLy5jZW50cmlmdWdhbC5jZW50cmlmdWdlLnByb3Rv",
+            "Y29sLlN0cmVhbVBvc2l0aW9uEg8KB3JldmVyc2UYCSABKAhKBAgCEANKBAgD",
+            "EARKBAgEEAVKBAgFEAZKBAgGEAcicgoNSGlzdG9yeVJlc3VsdBJCCgxwdWJs",
+            "aWNhdGlvbnMYASADKAsyLC5jZW50cmlmdWdhbC5jZW50cmlmdWdlLnByb3Rv",
+            "Y29sLlB1YmxpY2F0aW9uEg0KBWVwb2NoGAIgASgJEg4KBm9mZnNldBgDIAEo",
+            "BCINCgtQaW5nUmVxdWVzdCIMCgpQaW5nUmVzdWx0IpUCCgpSUENSZXF1ZXN0",
+            "EgwKBGRhdGEYASABKAwSDgoGbWV0aG9kGAIgASgJEkoKB2hlYWRlcnMY6Acg",
+            "AygLMjguY2VudHJpZnVnYWwuY2VudHJpZnVnZS5wcm90b2NvbC5SUENSZXF1",
+            "ZXN0LkhlYWRlcnNFbnRyeRIPCgZtc2dfaWQY6QcgASgEEgwKA2FjaxjqByAD",
+            "KAQSEwoKcmV0cmFuc21pdBjrByABKAgSDgoFYWZ0ZXIY7AcgAygEEhgKD3dp",
+            "dGhvdXRfdXBkYXRlcxjtByABKAgSDwoGY2FuY2VsGO4HIAEoBBouCgxIZWFk",
+            "ZXJzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASIqCglS",
+            "UENSZXN1bHQSDAoEZGF0YRgBIAEoDBIPCgZjYWNoZWQY6AcgASgIIhsKC1Nl",
+            "bmRSZXF1ZXN0EgwKBGRhdGEYASABKAwiiQEKCkZpbHRlck5vZGUSCgoCb3AY",
+            "ASABKAkSCwoDa2V5GAIgASgJEgsKA2NtcBgDIAEoCRILCgN2YWwYBCABKAkS",
+            "DAoEdmFscxgFIAMoCRI6CgVub2RlcxgGIAMoCzIrLmNlbnRyaWZ1Z2FsLmNl",
+            "bnRyaWZ1Z2UucHJvdG9jb2wuRmlsdGVyTm9kZUIhWh9naXRodWIuY29tL2Nl",
+            "bnRyaWZ1Z2FsL3Byb3RvY29sYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.Error), global::Centrifugal.Centrifuge.Protocol.Error.Parser, new[]{ "Code", "Message", "Temporary" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.Error), global::Centrifugal.Centrifuge.Protocol.Error.Parser, new[]{ "Code", "Message", "Temporary", "AppCode", "AppType", "Metadata" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
             new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.EmulationRequest), global::Centrifugal.Centrifuge.Protocol.EmulationRequest.Parser, new[]{ "Node", "Session", "Data" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.Command), global::Centrifugal.Centrifuge.Protocol.Command.Parser, new[]{ "Id", "Connect", "Subscribe", "Unsubscribe", "Publish", "Presence", "PresenceStats", "History", "Ping", "Send", "Rpc", "Refresh", "SubRefresh" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.Reply), global::Centrifugal.Centrifuge.Protocol.Reply.Parser, new[]{ "Id", "Error", "Push", "Connect", "Subscribe", "Unsubscribe", "Publish", "Presence", "PresenceStats", "History", "Ping", "Rpc", "Refresh", "SubRefresh" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.Reply), global::Centrifugal.Centrifuge.Protocol.Reply.Parser, new[]{ "Id", "Error", "Push", "Connect", "Subscribe", "Unsubscribe", "Publish", "Presence", "PresenceStats", "History", "Ping", "Rpc", "Refresh", "SubRefresh", "Time" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.Push), global::Centrifugal.Centrifuge.Protocol.Push.Parser, new[]{ "Id", "Channel", "Pub", "Join", "Leave", "Unsubscribe", "Message", "Subscribe", "Connect", "Disconnect", "Refresh" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.Dictionary), global::Centrifugal.Centrifuge.Protocol.Dictionary.Parser, new[]{ "Id", "Data", "DataB64" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.ClientInfo), global::Centrifugal.Centrifuge.Protocol.ClientInfo.Parser, new[]{ "User", "Client", "ConnInfo", "ChanInfo" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.Publication), global::Centrifugal.Centrifuge.Protocol.Publication.Parser, new[]{ "Data", "Info", "Offset", "Tags", "Delta", "Time", "Channel", "Key", "Removed", "Score", "Epoch", "PrevData", "Version" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
             new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.Join), global::Centrifugal.Centrifuge.Protocol.Join.Parser, new[]{ "Info" }, null, null, null, null),
@@ -194,10 +210,10 @@ namespace Centrifugal.Centrifuge.Protocol {
             new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.Connect), global::Centrifugal.Centrifuge.Protocol.Connect.Parser, new[]{ "Client", "Version", "Data", "Subs", "Expires", "Ttl", "Ping", "Pong", "Session", "Node", "Time" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
             new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.Disconnect), global::Centrifugal.Centrifuge.Protocol.Disconnect.Parser, new[]{ "Code", "Reason", "Reconnect" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.Refresh), global::Centrifugal.Centrifuge.Protocol.Refresh.Parser, new[]{ "Expires", "Ttl" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.ConnectRequest), global::Centrifugal.Centrifuge.Protocol.ConnectRequest.Parser, new[]{ "Token", "Data", "Subs", "Name", "Version", "Headers", "Flag" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, null, }),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.ConnectResult), global::Centrifugal.Centrifuge.Protocol.ConnectResult.Parser, new[]{ "Client", "Version", "Expires", "Ttl", "Data", "Subs", "Ping", "Pong", "Session", "Node", "Time" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.ConnectRequest), global::Centrifugal.Centrifuge.Protocol.ConnectRequest.Parser, new[]{ "Token", "Data", "Subs", "Name", "Version", "Headers", "Flag", "Profile", "Dict", "Instance" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, null, }),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.ConnectResult), global::Centrifugal.Centrifuge.Protocol.ConnectResult.Parser, new[]{ "Client", "Version", "Expires", "Ttl", "Data", "Subs", "Ping", "Pong", "Session", "Node", "Time", "Flag", "Dict", "User", "AuthClass" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
             new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.RefreshRequest), global::Centrifugal.Centrifuge.Protocol.RefreshRequest.Parser, new[]{ "Token" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.RefreshResult), global::Centrifugal.Centrifuge.Protocol.RefreshResult.Parser, new[]{ "Client", "Version", "Expires", "Ttl" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.RefreshResult), global::Centrifugal.Centrifuge.Protocol.RefreshResult.Parser, new[]{ "Client", "Version", "Expires", "Ttl", "User", "AuthClass" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.SubscribeRequest), global::Centrifugal.Centrifuge.Protocol.SubscribeRequest.Parser, new[]{ "Channel", "Token", "Recover", "Epoch", "Offset", "Data", "Positioned", "Recoverable", "JoinLeave", "Delta", "Tf", "Flag", "Type", "Phase", "Cursor", "Limit", "Asc" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.SubscribeResult), global::Centrifugal.Centrifuge.Protocol.SubscribeResult.Parser, new[]{ "Expires", "Ttl", "Recoverable", "Epoch", "Publications", "Recovered", "Offset", "Positioned", "Data", "WasRecovering", "Delta", "Id", "Type", "Phase", "Cursor", "State", "PublishDebounce" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.KeyedItem), global::Centrifugal.Centrifuge.Protocol.KeyedItem.Parser, new[]{ "Key", "Version" }, null, null, null, null),
@@ -217,8 +233,8 @@ namespace Centrifugal.Centrifuge.Protocol {
             new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.HistoryResult), global::Centrifugal.Centrifuge.Protocol.HistoryResult.Parser, new[]{ "Publications", "Epoch", "Offset" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.PingRequest), global::Centrifugal.Centrifuge.Protocol.PingRequest.Parser, null, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.PingResult), global::Centrifugal.Centrifuge.Protocol.PingResult.Parser, null, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.RPCRequest), global::Centrifugal.Centrifuge.Protocol.RPCRequest.Parser, new[]{ "Data", "Method" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.RPCResult), global::Centrifugal.Centrifuge.Protocol.RPCResult.Parser, new[]{ "Data" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.RPCRequest), global::Centrifugal.Centrifuge.Protocol.RPCRequest.Parser, new[]{ "Data", "Method", "Headers", "MsgId", "Ack", "Retransmit", "After", "WithoutUpdates", "Cancel" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.RPCResult), global::Centrifugal.Centrifuge.Protocol.RPCResult.Parser, new[]{ "Data", "Cached" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.SendRequest), global::Centrifugal.Centrifuge.Protocol.SendRequest.Parser, new[]{ "Data" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Centrifugal.Centrifuge.Protocol.FilterNode), global::Centrifugal.Centrifuge.Protocol.FilterNode.Parser, new[]{ "Op", "Key", "Cmp", "Val", "Vals", "Nodes" }, null, null, null, null)
           }));
@@ -227,6 +243,30 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
   #region Messages
+  /// <summary>
+  /// Error is returned in Reply to a Command which could not be processed.
+  ///
+  /// Codes in range [0, 399] are reserved by Centrifuge, applications use
+  /// codes in range [400, 1999]. Built-in codes:
+  ///
+  ///   100 internal server error (temporary)
+  ///   101 unauthorized
+  ///   102 unknown channel
+  ///   103 permission denied
+  ///   104 method not found
+  ///   105 already subscribed
+  ///   106 limit exceeded
+  ///   107 bad request
+  ///   108 not available
+  ///   109 token expired
+  ///   110 expired
+  ///   111 too many requests (temporary)
+  ///   112 unrecoverable position
+  ///   113 concurrent pagination (temporary)
+  ///
+  /// Note that many protocol violations result in a Disconnect instead of an
+  /// Error reply.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class Error : pb::IMessage<Error>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -265,6 +305,9 @@ namespace Centrifugal.Centrifuge.Protocol {
       code_ = other.code_;
       message_ = other.message_;
       temporary_ = other.temporary_;
+      appCode_ = other.appCode_;
+      appType_ = other.appType_;
+      metadata_ = other.metadata_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -277,6 +320,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "code" field.</summary>
     public const int CodeFieldNumber = 1;
     private uint code_;
+    /// <summary>
+    /// Error code.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public uint Code {
@@ -289,6 +335,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "message" field.</summary>
     public const int MessageFieldNumber = 2;
     private string message_ = "";
+    /// <summary>
+    /// Human readable error description. Clients must not rely on its content,
+    /// use code instead.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Message {
@@ -301,6 +351,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "temporary" field.</summary>
     public const int TemporaryFieldNumber = 3;
     private bool temporary_;
+    /// <summary>
+    /// When set the error condition is temporary and the same command may succeed
+    /// if retried later (preferably with a backoff).
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Temporary {
@@ -308,6 +362,50 @@ namespace Centrifugal.Centrifuge.Protocol {
       set {
         temporary_ = value;
       }
+    }
+
+    /// <summary>Field number for the "app_code" field.</summary>
+    public const int AppCodeFieldNumber = 1000;
+    private int appCode_;
+    /// <summary>
+    /// Application error code passed through from the backend; 0 = none.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int AppCode {
+      get { return appCode_; }
+      set {
+        appCode_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "app_type" field.</summary>
+    public const int AppTypeFieldNumber = 1001;
+    private string appType_ = "";
+    /// <summary>
+    /// Application error type passed through from the backend.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string AppType {
+      get { return appType_; }
+      set {
+        appType_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "metadata" field.</summary>
+    public const int MetadataFieldNumber = 1002;
+    private static readonly pbc::MapField<string, string>.Codec _map_metadata_codec
+        = new pbc::MapField<string, string>.Codec(pb::FieldCodec.ForString(10, ""), pb::FieldCodec.ForString(18, ""), 8018);
+    private readonly pbc::MapField<string, string> metadata_ = new pbc::MapField<string, string>();
+    /// <summary>
+    /// Allow-listed backend metadata for the client.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::MapField<string, string> Metadata {
+      get { return metadata_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -328,6 +426,9 @@ namespace Centrifugal.Centrifuge.Protocol {
       if (Code != other.Code) return false;
       if (Message != other.Message) return false;
       if (Temporary != other.Temporary) return false;
+      if (AppCode != other.AppCode) return false;
+      if (AppType != other.AppType) return false;
+      if (!Metadata.Equals(other.Metadata)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -338,6 +439,9 @@ namespace Centrifugal.Centrifuge.Protocol {
       if (Code != 0) hash ^= Code.GetHashCode();
       if (Message.Length != 0) hash ^= Message.GetHashCode();
       if (Temporary != false) hash ^= Temporary.GetHashCode();
+      if (AppCode != 0) hash ^= AppCode.GetHashCode();
+      if (AppType.Length != 0) hash ^= AppType.GetHashCode();
+      hash ^= Metadata.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -368,6 +472,15 @@ namespace Centrifugal.Centrifuge.Protocol {
         output.WriteRawTag(24);
         output.WriteBool(Temporary);
       }
+      if (AppCode != 0) {
+        output.WriteRawTag(192, 62);
+        output.WriteInt32(AppCode);
+      }
+      if (AppType.Length != 0) {
+        output.WriteRawTag(202, 62);
+        output.WriteString(AppType);
+      }
+      metadata_.WriteTo(output, _map_metadata_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -390,6 +503,15 @@ namespace Centrifugal.Centrifuge.Protocol {
         output.WriteRawTag(24);
         output.WriteBool(Temporary);
       }
+      if (AppCode != 0) {
+        output.WriteRawTag(192, 62);
+        output.WriteInt32(AppCode);
+      }
+      if (AppType.Length != 0) {
+        output.WriteRawTag(202, 62);
+        output.WriteString(AppType);
+      }
+      metadata_.WriteTo(ref output, _map_metadata_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -409,6 +531,13 @@ namespace Centrifugal.Centrifuge.Protocol {
       if (Temporary != false) {
         size += 1 + 1;
       }
+      if (AppCode != 0) {
+        size += 2 + pb::CodedOutputStream.ComputeInt32Size(AppCode);
+      }
+      if (AppType.Length != 0) {
+        size += 2 + pb::CodedOutputStream.ComputeStringSize(AppType);
+      }
+      size += metadata_.CalculateSize(_map_metadata_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -430,6 +559,13 @@ namespace Centrifugal.Centrifuge.Protocol {
       if (other.Temporary != false) {
         Temporary = other.Temporary;
       }
+      if (other.AppCode != 0) {
+        AppCode = other.AppCode;
+      }
+      if (other.AppType.Length != 0) {
+        AppType = other.AppType;
+      }
+      metadata_.MergeFrom(other.metadata_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -459,6 +595,18 @@ namespace Centrifugal.Centrifuge.Protocol {
           }
           case 24: {
             Temporary = input.ReadBool();
+            break;
+          }
+          case 8000: {
+            AppCode = input.ReadInt32();
+            break;
+          }
+          case 8010: {
+            AppType = input.ReadString();
+            break;
+          }
+          case 8018: {
+            metadata_.AddEntriesFrom(input, _map_metadata_codec);
             break;
           }
         }
@@ -492,6 +640,18 @@ namespace Centrifugal.Centrifuge.Protocol {
             Temporary = input.ReadBool();
             break;
           }
+          case 8000: {
+            AppCode = input.ReadInt32();
+            break;
+          }
+          case 8010: {
+            AppType = input.ReadString();
+            break;
+          }
+          case 8018: {
+            metadata_.AddEntriesFrom(ref input, _map_metadata_codec);
+            break;
+          }
         }
       }
     }
@@ -499,6 +659,18 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// EmulationRequest is the body of an HTTP request a client sends to the
+  /// emulation endpoint when it uses bidirectional emulation over a transport
+  /// which can only stream data from server to client (HTTP-streaming, SSE).
+  /// Server-to-client data flows over the stream, while client commands are
+  /// delivered with EmulationRequest and routed to the node which holds the
+  /// connection.
+  ///
+  /// The request body is Protobuf when sent with Content-Type
+  /// application/octet-stream, JSON otherwise. The server responds with HTTP
+  /// 204 No Content on success - replies to commands arrive over the stream.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class EmulationRequest : pb::IMessage<EmulationRequest>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -549,6 +721,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "node" field.</summary>
     public const int NodeFieldNumber = 1;
     private string node_ = "";
+    /// <summary>
+    /// Id of the node serving the connection, from ConnectResult.node.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Node {
@@ -561,6 +736,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "session" field.</summary>
     public const int SessionFieldNumber = 2;
     private string session_ = "";
+    /// <summary>
+    /// Session of the connection, from ConnectResult.session.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Session {
@@ -573,6 +751,11 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "data" field.</summary>
     public const int DataFieldNumber = 3;
     private pb::ByteString data_ = pb::ByteString.Empty;
+    /// <summary>
+    /// Encoded Command(s) in the connection protocol, may contain several
+    /// commands in the same format as a regular transport frame. For JSON this
+    /// is a JSON string containing the encoded commands, for Protobuf - raw bytes.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pb::ByteString Data {
@@ -772,7 +955,7 @@ namespace Centrifugal.Centrifuge.Protocol {
   }
 
   /// <summary>
-  /// Command sent from a client to a server.
+  /// Command is sent from a client to a server.
   /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class Command : pb::IMessage<Command>
@@ -835,7 +1018,13 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int IdFieldNumber = 1;
     private uint id_;
     /// <summary>
-    /// Id of command to let client match replies to commands.
+    /// Id of the command, echoed back in Reply.id to let the client match replies
+    /// to commands. Must be > 0 for every command expecting a reply. Only a send
+    /// command, which never gets a reply, may have zero id.
+    ///
+    /// A command with zero id and no request set (empty Command) is a pong - the
+    /// response to a server ping, see ConnectResult.pong. A pong without a
+    /// preceding server ping results in a bad request disconnect.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -850,10 +1039,8 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int ConnectFieldNumber = 4;
     private global::Centrifugal.Centrifuge.Protocol.ConnectRequest connect_;
     /// <summary>
-    /// Client can send one of the following requests. Server will
-    /// only take the first non-null request out of these and may return an error if
-    /// client passed more than one request. We are not using oneof here due to JSON
-    /// interoperability concerns.
+    /// Connect must be the first command sent over a connection. Any other
+    /// command before a successful connect results in a disconnect.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -939,6 +1126,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "ping" field.</summary>
     public const int PingFieldNumber = 11;
     private global::Centrifugal.Centrifuge.Protocol.PingRequest ping_;
+    /// <summary>
+    /// Not supported by the server at the moment, see PingRequest.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Centrifugal.Centrifuge.Protocol.PingRequest Ping {
@@ -951,6 +1141,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "send" field.</summary>
     public const int SendFieldNumber = 12;
     private global::Centrifugal.Centrifuge.Protocol.SendRequest send_;
+    /// <summary>
+    /// Asynchronous message to the server, no Reply is sent in response.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Centrifugal.Centrifuge.Protocol.SendRequest Send {
@@ -1534,8 +1727,12 @@ namespace Centrifugal.Centrifuge.Protocol {
   }
 
   /// <summary>
-  /// Reply is sent from a server to a client is sent as a response to Command or
-  /// can be an async server-to-client Push.
+  /// Reply is sent from a server to a client as a response to a Command, or as
+  /// an asynchronous server-to-client Push.
+  ///
+  /// An empty Reply (all fields unset, i.e. {} in JSON) is a server ping. When
+  /// ConnectResult.pong is set the client must respond to it with an empty
+  /// Command.
   /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class Reply : pb::IMessage<Reply>
@@ -1586,6 +1783,7 @@ namespace Centrifugal.Centrifuge.Protocol {
       rpc_ = other.rpc_ != null ? other.rpc_.Clone() : null;
       refresh_ = other.refresh_ != null ? other.refresh_.Clone() : null;
       subRefresh_ = other.subRefresh_ != null ? other.subRefresh_.Clone() : null;
+      time_ = other.time_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -1599,8 +1797,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int IdFieldNumber = 1;
     private uint id_;
     /// <summary>
-    /// Id will only be set to a value > 0 for replies to commands. For pushes
-    /// coming from server to client it has zero value.
+    /// Id of the Command this Reply responds to. It is zero for pushes.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -1615,7 +1812,8 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int ErrorFieldNumber = 2;
     private global::Centrifugal.Centrifuge.Protocol.Error error_;
     /// <summary>
-    /// Error can only be set in replies to commands. For pushes it is never set.
+    /// Error of the command. Only set in replies to commands, never for pushes.
+    /// When set, no result field is set.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -1630,8 +1828,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int PushFieldNumber = 4;
     private global::Centrifugal.Centrifuge.Protocol.Push push_;
     /// <summary>
-    /// ProtocolVersion2 server can send one of the following fields. We are not using
-    /// oneof here due to JSON interoperability concerns.
+    /// Server sets at most one of the following fields: push for asynchronous
+    /// pushes, or the result matching the request of the Command. We are not
+    /// using oneof here due to JSON interoperability concerns.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -1774,6 +1973,21 @@ namespace Centrifugal.Centrifuge.Protocol {
       }
     }
 
+    /// <summary>Field number for the "time" field.</summary>
+    public const int TimeFieldNumber = 1000;
+    private long time_;
+    /// <summary>
+    /// Server Unix time in milliseconds, set on command replies only.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long Time {
+      get { return time_; }
+      set {
+        time_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -1803,6 +2017,7 @@ namespace Centrifugal.Centrifuge.Protocol {
       if (!object.Equals(Rpc, other.Rpc)) return false;
       if (!object.Equals(Refresh, other.Refresh)) return false;
       if (!object.Equals(SubRefresh, other.SubRefresh)) return false;
+      if (Time != other.Time) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -1824,6 +2039,7 @@ namespace Centrifugal.Centrifuge.Protocol {
       if (rpc_ != null) hash ^= Rpc.GetHashCode();
       if (refresh_ != null) hash ^= Refresh.GetHashCode();
       if (subRefresh_ != null) hash ^= SubRefresh.GetHashCode();
+      if (Time != 0L) hash ^= Time.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1898,6 +2114,10 @@ namespace Centrifugal.Centrifuge.Protocol {
         output.WriteRawTag(122);
         output.WriteMessage(SubRefresh);
       }
+      if (Time != 0L) {
+        output.WriteRawTag(192, 62);
+        output.WriteInt64(Time);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -1964,6 +2184,10 @@ namespace Centrifugal.Centrifuge.Protocol {
         output.WriteRawTag(122);
         output.WriteMessage(SubRefresh);
       }
+      if (Time != 0L) {
+        output.WriteRawTag(192, 62);
+        output.WriteInt64(Time);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -2015,6 +2239,9 @@ namespace Centrifugal.Centrifuge.Protocol {
       }
       if (subRefresh_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(SubRefresh);
+      }
+      if (Time != 0L) {
+        size += 2 + pb::CodedOutputStream.ComputeInt64Size(Time);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -2108,6 +2335,9 @@ namespace Centrifugal.Centrifuge.Protocol {
           SubRefresh = new global::Centrifugal.Centrifuge.Protocol.SubRefreshResult();
         }
         SubRefresh.MergeFrom(other.SubRefresh);
+      }
+      if (other.Time != 0L) {
+        Time = other.Time;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -2221,6 +2451,10 @@ namespace Centrifugal.Centrifuge.Protocol {
               SubRefresh = new global::Centrifugal.Centrifuge.Protocol.SubRefreshResult();
             }
             input.ReadMessage(SubRefresh);
+            break;
+          }
+          case 8000: {
+            Time = input.ReadInt64();
             break;
           }
         }
@@ -2337,6 +2571,10 @@ namespace Centrifugal.Centrifuge.Protocol {
             input.ReadMessage(SubRefresh);
             break;
           }
+          case 8000: {
+            Time = input.ReadInt64();
+            break;
+          }
         }
       }
     }
@@ -2345,8 +2583,10 @@ namespace Centrifugal.Centrifuge.Protocol {
   }
 
   /// <summary>
-  /// Push can be sent to a client as part of Reply in case of bidirectional transport or
-  /// without additional wrapping in case of unidirectional transports.
+  /// Push is an asynchronous message from a server to a client. It is sent
+  /// inside Reply.push on bidirectional transports, and without additional
+  /// wrapping on unidirectional transports. An empty Push on a unidirectional
+  /// transport is a server ping, no response is expected.
   /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class Push : pb::IMessage<Push>
@@ -2407,7 +2647,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int IdFieldNumber = 1;
     private long id_;
     /// <summary>
-    /// Optional numeric channel ID to avoid sending string channel in Push (bandwidth optimization).
+    /// Optional numeric channel id, used instead of channel to save bandwidth.
+    /// Only used in pub, join and leave pushes of subscriptions where the client
+    /// requested a numeric channel id and the server provided one in
+    /// SubscribeResult.id. When it is used, channel is empty.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -2421,6 +2664,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "channel" field.</summary>
     public const int ChannelFieldNumber = 2;
     private string channel_ = "";
+    /// <summary>
+    /// Channel the push relates to. Empty for pushes not related to a channel
+    /// (message, connect, disconnect, refresh) and when id is used.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Channel {
@@ -2434,8 +2681,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int PubFieldNumber = 4;
     private global::Centrifugal.Centrifuge.Protocol.Publication pub_;
     /// <summary>
-    /// Server can push one of the following fields to the client. We are
-    /// not using oneof here due to JSON interoperability concerns.
+    /// Publication in a subscribed channel.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -2449,6 +2695,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "join" field.</summary>
     public const int JoinFieldNumber = 5;
     private global::Centrifugal.Centrifuge.Protocol.Join join_;
+    /// <summary>
+    /// A client subscribed to the channel, only sent when join/leave pushes are
+    /// enabled for the subscription.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Centrifugal.Centrifuge.Protocol.Join Join {
@@ -2461,6 +2711,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "leave" field.</summary>
     public const int LeaveFieldNumber = 6;
     private global::Centrifugal.Centrifuge.Protocol.Leave leave_;
+    /// <summary>
+    /// A client unsubscribed from the channel, only sent when join/leave pushes
+    /// are enabled for the subscription.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Centrifugal.Centrifuge.Protocol.Leave Leave {
@@ -2473,6 +2727,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "unsubscribe" field.</summary>
     public const int UnsubscribeFieldNumber = 7;
     private global::Centrifugal.Centrifuge.Protocol.Unsubscribe unsubscribe_;
+    /// <summary>
+    /// Server unsubscribed the client from the channel.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Centrifugal.Centrifuge.Protocol.Unsubscribe Unsubscribe {
@@ -2485,6 +2742,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "message" field.</summary>
     public const int MessageFieldNumber = 8;
     private global::Centrifugal.Centrifuge.Protocol.Message message_;
+    /// <summary>
+    /// Asynchronous message from the server to the client, not related to a channel.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Centrifugal.Centrifuge.Protocol.Message Message {
@@ -2497,6 +2757,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "subscribe" field.</summary>
     public const int SubscribeFieldNumber = 9;
     private global::Centrifugal.Centrifuge.Protocol.Subscribe subscribe_;
+    /// <summary>
+    /// Server subscribed the client to the channel (server-side subscription).
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Centrifugal.Centrifuge.Protocol.Subscribe Subscribe {
@@ -2509,6 +2772,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "connect" field.</summary>
     public const int ConnectFieldNumber = 10;
     private global::Centrifugal.Centrifuge.Protocol.Connect connect_;
+    /// <summary>
+    /// Connection established. Only sent on unidirectional transports, where it
+    /// is the first push and replaces ConnectResult.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Centrifugal.Centrifuge.Protocol.Connect Connect {
@@ -2521,6 +2788,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "disconnect" field.</summary>
     public const int DisconnectFieldNumber = 11;
     private global::Centrifugal.Centrifuge.Protocol.Disconnect disconnect_;
+    /// <summary>
+    /// Server is closing the connection. May not be sent on transports which
+    /// deliver code and reason natively (e.g. in a WebSocket close frame).
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Centrifugal.Centrifuge.Protocol.Disconnect Disconnect {
@@ -2533,6 +2804,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "refresh" field.</summary>
     public const int RefreshFieldNumber = 12;
     private global::Centrifugal.Centrifuge.Protocol.Refresh refresh_;
+    /// <summary>
+    /// Connection credentials refreshed on the server side.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Centrifugal.Centrifuge.Protocol.Refresh Refresh {
@@ -3005,7 +3279,321 @@ namespace Centrifugal.Centrifuge.Protocol {
   }
 
   /// <summary>
-  /// ClientInfo contains information about client connection.
+  /// Dictionary is a shared compression dictionary the server asks the client to
+  /// use for subsequent frames on this connection. It arrives in the connect
+  /// reply, and every frame after that reply starts with a one byte codec marker
+  /// saying whether it was compressed.
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class Dictionary : pb::IMessage<Dictionary>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<Dictionary> _parser = new pb::MessageParser<Dictionary>(() => new Dictionary());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<Dictionary> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[5]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public Dictionary() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public Dictionary(Dictionary other) : this() {
+      id_ = other.id_;
+      data_ = other.data_;
+      dataB64_ = other.dataB64_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public Dictionary Clone() {
+      return new Dictionary(this);
+    }
+
+    /// <summary>Field number for the "id" field.</summary>
+    public const int IdFieldNumber = 1;
+    private string id_ = "";
+    /// <summary>
+    /// Identifier of dictionary content, client may cache by it.
+    ///
+    /// It is SHA-256 of the content, first 12 bytes, base64url without padding.
+    ///
+    /// The derivation is fixed rather than conventional, because a client that
+    /// keeps a dictionary between connections hashes the bytes it stored against
+    /// this id before reusing them. Storage shared with anything else on the
+    /// client's origin can be rewritten, and DEFLATE back references resolve into
+    /// the dictionary - so substituted content does not corrupt a frame, it makes
+    /// a genuine server frame decode into whatever the substituter chose. Only an
+    /// id the server issued detects that: a checksum the client stored alongside
+    /// would simply be rewritten with the bytes.
+    ///
+    /// A server identifying dictionaries some other way is not rejected. It has
+    /// every caching client quietly stop caching instead, which is worse.
+    ///
+    /// It also means one id can never name two different dictionaries, so a client
+    /// reconnecting to a node that built its own gets an exact match or a miss,
+    /// never the wrong bytes.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Id {
+      get { return id_; }
+      set {
+        id_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "data" field.</summary>
+    public const int DataFieldNumber = 2;
+    private pb::ByteString data_ = pb::ByteString.Empty;
+    /// <summary>
+    /// The dictionary content, always DEFLATE compressed. Inflate it with no preset
+    /// dictionary before use.
+    ///
+    /// It is compressed because it arrives in the connect reply, which cannot be
+    /// compressed at the frame level - nothing is installed yet to compress it
+    /// against. Compressing the content instead is worth about 8x on JSON, and a
+    /// dictionary is sampled message text so it always compresses.
+    ///
+    /// data is set on Protobuf connections, where bytes travel directly. data_b64
+    /// is set on JSON connections, where a bytes field carries raw JSON and cannot
+    /// hold binary - it is standard base64 with padding of the same compressed
+    /// content. Exactly one of them is set, and neither when the server is naming
+    /// a dictionary the client already holds.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pb::ByteString Data {
+      get { return data_; }
+      set {
+        data_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "data_b64" field.</summary>
+    public const int DataB64FieldNumber = 3;
+    private string dataB64_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string DataB64 {
+      get { return dataB64_; }
+      set {
+        dataB64_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as Dictionary);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(Dictionary other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Id != other.Id) return false;
+      if (Data != other.Data) return false;
+      if (DataB64 != other.DataB64) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Id.Length != 0) hash ^= Id.GetHashCode();
+      if (Data.Length != 0) hash ^= Data.GetHashCode();
+      if (DataB64.Length != 0) hash ^= DataB64.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Id.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Id);
+      }
+      if (Data.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteBytes(Data);
+      }
+      if (DataB64.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(DataB64);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Id.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Id);
+      }
+      if (Data.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteBytes(Data);
+      }
+      if (DataB64.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(DataB64);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Id.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Id);
+      }
+      if (Data.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeBytesSize(Data);
+      }
+      if (DataB64.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(DataB64);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(Dictionary other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Id.Length != 0) {
+        Id = other.Id;
+      }
+      if (other.Data.Length != 0) {
+        Data = other.Data;
+      }
+      if (other.DataB64.Length != 0) {
+        DataB64 = other.DataB64;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            Id = input.ReadString();
+            break;
+          }
+          case 18: {
+            Data = input.ReadBytes();
+            break;
+          }
+          case 26: {
+            DataB64 = input.ReadString();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            Id = input.ReadString();
+            break;
+          }
+          case 18: {
+            Data = input.ReadBytes();
+            break;
+          }
+          case 26: {
+            DataB64 = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// ClientInfo contains information about a client connection.
   /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class ClientInfo : pb::IMessage<ClientInfo>
@@ -3022,7 +3610,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[5]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[6]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3058,6 +3646,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "user" field.</summary>
     public const int UserFieldNumber = 1;
     private string user_ = "";
+    /// <summary>
+    /// User id. Empty for anonymous connections.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string User {
@@ -3070,6 +3661,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "client" field.</summary>
     public const int ClientFieldNumber = 2;
     private string client_ = "";
+    /// <summary>
+    /// Unique client (connection) id.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Client {
@@ -3082,6 +3676,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "conn_info" field.</summary>
     public const int ConnInfoFieldNumber = 3;
     private pb::ByteString connInfo_ = pb::ByteString.Empty;
+    /// <summary>
+    /// Optional connection info attached by the application at connect time,
+    /// may be updated on connection refresh.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pb::ByteString ConnInfo {
@@ -3094,6 +3692,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "chan_info" field.</summary>
     public const int ChanInfoFieldNumber = 4;
     private pb::ByteString chanInfo_ = pb::ByteString.Empty;
+    /// <summary>
+    /// Optional channel info attached by the application at subscribe time.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pb::ByteString ChanInfo {
@@ -3317,7 +3918,7 @@ namespace Centrifugal.Centrifuge.Protocol {
   }
 
   /// <summary>
-  /// Publication in channel.
+  /// Publication in a channel.
   /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class Publication : pb::IMessage<Publication>
@@ -3334,7 +3935,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[6]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[7]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3380,7 +3981,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int DataFieldNumber = 4;
     private pb::ByteString data_ = pb::ByteString.Empty;
     /// <summary>
-    /// Data contains publication payload.
+    /// Publication payload. When Publication.delta is set it is a delta patch
+    /// against the previous payload. On JSON connections with delta compression
+    /// negotiated it is a JSON string with the payload (or patch) inside.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -3395,7 +3998,8 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int InfoFieldNumber = 5;
     private global::Centrifugal.Centrifuge.Protocol.ClientInfo info_;
     /// <summary>
-    /// Info contains optional information about publisher. Usually it is set only if publication goes from the client side.
+    /// Optional information about the publisher. Usually it is set only if
+    /// the publication was sent from the client side.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -3410,7 +4014,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int OffsetFieldNumber = 6;
     private ulong offset_;
     /// <summary>
-    /// Offset is a stream offset of the publication. Epoch is given in SubscribeResult.
+    /// Position of the publication in the channel stream. Epoch is given in
+    /// SubscribeResult (and in Publication.epoch when it changes). Zero when the
+    /// channel has no stream.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -3427,7 +4033,8 @@ namespace Centrifugal.Centrifuge.Protocol {
         = new pbc::MapField<string, string>.Codec(pb::FieldCodec.ForString(10, ""), pb::FieldCodec.ForString(18, ""), 58);
     private readonly pbc::MapField<string, string> tags_ = new pbc::MapField<string, string>();
     /// <summary>
-    /// Optional tags associated with publication.
+    /// Optional tags associated with the publication, also used by tags filter,
+    /// see SubscribeRequest.tf.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -3439,7 +4046,8 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int DeltaFieldNumber = 8;
     private bool delta_;
     /// <summary>
-    /// When set indicates that data in Publication is a delta from previous data.
+    /// When set, data is a delta patch against the data of the previous
+    /// publication in this subscription, see SubscribeRequest.delta.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -3454,7 +4062,8 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int TimeFieldNumber = 9;
     private long time_;
     /// <summary>
-    /// Optional time of publication as Unix timestamp milliseconds.
+    /// Time of the publication as Unix timestamp in milliseconds. Used between
+    /// server nodes, not sent to clients by the current server.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -3469,7 +4078,8 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int ChannelFieldNumber = 10;
     private string channel_ = "";
     /// <summary>
-    /// Optional channel name if Publication relates to wildcard subscription.
+    /// Channel of the publication. Only set when it differs from the channel of
+    /// the subscription, i.e. for wildcard subscriptions.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -3484,7 +4094,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int KeyFieldNumber = 11;
     private string key_ = "";
     /// <summary>
-    /// Optional key associated with publication.
+    /// Key of the entry in a map subscription, or of the item in a shared poll
+    /// subscription. For map presence subscriptions it is a client id or a user
+    /// id.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -3499,7 +4111,8 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int RemovedFieldNumber = 12;
     private bool removed_;
     /// <summary>
-    /// When set indicates that this publication is a removal of a previously published item.
+    /// When set, the publication removes the entry with the given key from map
+    /// (or shared poll) state.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -3514,7 +4127,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int ScoreFieldNumber = 13;
     private long score_;
     /// <summary>
-    /// Represents score to order.
+    /// Score of the entry used to order ordered map state.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -3529,7 +4142,8 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int EpochFieldNumber = 14;
     private string epoch_ = "";
     /// <summary>
-    /// Optional epoch.
+    /// Optional stream epoch, set to let the client learn the new epoch (for
+    /// example on the first publication of a new stream).
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -3544,7 +4158,8 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int PrevDataFieldNumber = 15;
     private pb::ByteString prevData_ = pb::ByteString.Empty;
     /// <summary>
-    /// Previous data for delta computation in broker fan-out.
+    /// Previous data used for delta computation during broker fan-out between
+    /// server nodes. Never sent to clients.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -3558,6 +4173,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "version" field.</summary>
     public const int VersionFieldNumber = 16;
     private ulong version_;
+    /// <summary>
+    /// Version of the item, used by shared poll subscriptions to only deliver
+    /// data newer than the client already has.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ulong Version {
@@ -3996,7 +4615,7 @@ namespace Centrifugal.Centrifuge.Protocol {
   }
 
   /// <summary>
-  /// Join to channel.
+  /// Join is sent when a client subscribes to a channel.
   /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class Join : pb::IMessage<Join>
@@ -4013,7 +4632,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[7]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[8]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4046,6 +4665,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "info" field.</summary>
     public const int InfoFieldNumber = 1;
     private global::Centrifugal.Centrifuge.Protocol.ClientInfo info_;
+    /// <summary>
+    /// Information about the client which subscribed.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Centrifugal.Centrifuge.Protocol.ClientInfo Info {
@@ -4206,7 +4828,7 @@ namespace Centrifugal.Centrifuge.Protocol {
   }
 
   /// <summary>
-  /// Leave from channel.
+  /// Leave is sent when a client unsubscribes from a channel.
   /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class Leave : pb::IMessage<Leave>
@@ -4223,7 +4845,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[8]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[9]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4256,6 +4878,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "info" field.</summary>
     public const int InfoFieldNumber = 1;
     private global::Centrifugal.Centrifuge.Protocol.ClientInfo info_;
+    /// <summary>
+    /// Information about the client which unsubscribed.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Centrifugal.Centrifuge.Protocol.ClientInfo Info {
@@ -4416,7 +5041,7 @@ namespace Centrifugal.Centrifuge.Protocol {
   }
 
   /// <summary>
-  /// Unsubscribe from channel.
+  /// Unsubscribe from a channel, sent by the server.
   /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class Unsubscribe : pb::IMessage<Unsubscribe>
@@ -4433,7 +5058,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[9]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[10]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4467,6 +5092,17 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "code" field.</summary>
     public const int CodeFieldNumber = 2;
     private uint code_;
+    /// <summary>
+    /// Unsubscribe code in range [2000, 2999]. Codes >= 2500 mean the client
+    /// should resubscribe, codes &lt; 2500 mean it should not. Codes [2000, 2099]
+    /// and [2500, 2599] are reserved by Centrifuge. Built-in codes:
+    ///
+    ///   2000 server unsubscribe
+    ///   2500 insufficient state
+    ///   2501 subscription expired
+    ///   2502 state invalidated - client must drop its subscription token and
+    ///        any state accumulated for the subscription before resubscribing
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public uint Code {
@@ -4479,6 +5115,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "reason" field.</summary>
     public const int ReasonFieldNumber = 3;
     private string reason_ = "";
+    /// <summary>
+    /// Human readable reason, for logging and debugging.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Reason {
@@ -4654,7 +5293,10 @@ namespace Centrifugal.Centrifuge.Protocol {
   }
 
   /// <summary>
-  /// Subscribe to channel, used for server-side subscriptions.
+  /// Subscribe is sent when the server subscribes the client to a channel
+  /// (server-side subscription) after the connection was established. Server-side
+  /// subscriptions established at connect time are delivered in
+  /// ConnectResult.subs instead.
   /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class Subscribe : pb::IMessage<Subscribe>
@@ -4671,7 +5313,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[10]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[11]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4708,6 +5350,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "recoverable" field.</summary>
     public const int RecoverableFieldNumber = 1;
     private bool recoverable_;
+    /// <summary>
+    /// When set the subscription supports recovery: the client should keep the
+    /// stream position and pass it in ConnectRequest.subs on reconnect.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Recoverable {
@@ -4720,6 +5366,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "epoch" field.</summary>
     public const int EpochFieldNumber = 4;
     private string epoch_ = "";
+    /// <summary>
+    /// Current stream epoch.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Epoch {
@@ -4732,6 +5381,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "offset" field.</summary>
     public const int OffsetFieldNumber = 5;
     private ulong offset_;
+    /// <summary>
+    /// Current stream offset.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ulong Offset {
@@ -4744,6 +5396,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "positioned" field.</summary>
     public const int PositionedFieldNumber = 6;
     private bool positioned_;
+    /// <summary>
+    /// When set the client should track stream position of the subscription.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Positioned {
@@ -4756,6 +5411,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "data" field.</summary>
     public const int DataFieldNumber = 7;
     private pb::ByteString data_ = pb::ByteString.Empty;
+    /// <summary>
+    /// Optional custom data attached to the subscription by the application.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pb::ByteString Data {
@@ -5003,7 +5661,8 @@ namespace Centrifugal.Centrifuge.Protocol {
   }
 
   /// <summary>
-  /// Message from client to server. No Reply is sent in response to Message.
+  /// Message is an asynchronous message sent from the server to the client. It is
+  /// not related to any channel and the client does not reply to it.
   /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class Message : pb::IMessage<Message>
@@ -5020,7 +5679,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[11]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[12]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5053,6 +5712,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "data" field.</summary>
     public const int DataFieldNumber = 1;
     private pb::ByteString data_ = pb::ByteString.Empty;
+    /// <summary>
+    /// Message payload.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pb::ByteString Data {
@@ -5203,6 +5865,10 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// Connect is the first push on unidirectional transports, it is the
+  /// equivalent of ConnectResult. See ConnectResult for field descriptions.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class Connect : pb::IMessage<Connect>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -5218,7 +5884,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[12]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[13]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5344,6 +6010,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "pong" field.</summary>
     public const int PongFieldNumber = 8;
     private bool pong_;
+    /// <summary>
+    /// Never set on unidirectional transports: the client can not send a pong.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Pong {
@@ -5763,6 +6432,18 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// Disconnect is sent when the server closes the connection.
+  ///
+  /// Code ranges:
+  ///
+  ///   [0, 2999]    reserved for client-side and transport specific needs.
+  ///   [3000, 3499] reserved by Centrifuge, client should reconnect.
+  ///   [3500, 3999] reserved by Centrifuge, terminal - client must not reconnect.
+  ///   [4000, 4499] application codes, client should reconnect.
+  ///   [4500, 4999] application codes, terminal - client must not reconnect.
+  ///   >= 5000      reserved by Centrifuge, client should reconnect.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class Disconnect : pb::IMessage<Disconnect>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -5778,7 +6459,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[13]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[14]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5813,6 +6494,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "code" field.</summary>
     public const int CodeFieldNumber = 1;
     private uint code_;
+    /// <summary>
+    /// Disconnect code, see the code ranges above.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public uint Code {
@@ -5825,6 +6509,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "reason" field.</summary>
     public const int ReasonFieldNumber = 2;
     private string reason_ = "";
+    /// <summary>
+    /// Human readable reason. Less than 127 bytes due to WebSocket close frame
+    /// limitations.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Reason {
@@ -5837,6 +6525,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "reconnect" field.</summary>
     public const int ReconnectFieldNumber = 3;
     private bool reconnect_;
+    /// <summary>
+    /// Deprecated: not set by the current server. Clients decide whether to
+    /// reconnect based on code.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Reconnect {
@@ -6035,6 +6727,10 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// Refresh is sent when connection credentials were refreshed on the server
+  /// side.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class Refresh : pb::IMessage<Refresh>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -6050,7 +6746,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[14]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[15]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6084,6 +6780,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "expires" field.</summary>
     public const int ExpiresFieldNumber = 1;
     private bool expires_;
+    /// <summary>
+    /// When set the connection expires, ttl contains time until expiration.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Expires {
@@ -6096,6 +6795,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "ttl" field.</summary>
     public const int TtlFieldNumber = 2;
     private uint ttl_;
+    /// <summary>
+    /// Seconds until the connection expires.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public uint Ttl {
@@ -6270,6 +6972,10 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// ConnectRequest authenticates a connection. It must be the first command sent
+  /// by a client.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class ConnectRequest : pb::IMessage<ConnectRequest>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -6285,7 +6991,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[15]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[16]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6312,6 +7018,9 @@ namespace Centrifugal.Centrifuge.Protocol {
       version_ = other.version_;
       headers_ = other.headers_.Clone();
       flag_ = other.flag_;
+      profile_ = other.profile_;
+      dict_ = other.dict_;
+      instance_ = other.instance_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -6324,6 +7033,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "token" field.</summary>
     public const int TokenFieldNumber = 1;
     private string token_ = "";
+    /// <summary>
+    /// Connection token (JWT in Centrifugo), optional if the server can
+    /// authenticate the connection in another way.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Token {
@@ -6336,6 +7049,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "data" field.</summary>
     public const int DataFieldNumber = 2;
     private pb::ByteString data_ = pb::ByteString.Empty;
+    /// <summary>
+    /// Optional custom data passed to the application connect handler.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pb::ByteString Data {
@@ -6350,6 +7066,12 @@ namespace Centrifugal.Centrifuge.Protocol {
     private static readonly pbc::MapField<string, global::Centrifugal.Centrifuge.Protocol.SubscribeRequest>.Codec _map_subs_codec
         = new pbc::MapField<string, global::Centrifugal.Centrifuge.Protocol.SubscribeRequest>.Codec(pb::FieldCodec.ForString(10, ""), pb::FieldCodec.ForMessage(18, global::Centrifugal.Centrifuge.Protocol.SubscribeRequest.Parser), 26);
     private readonly pbc::MapField<string, global::Centrifugal.Centrifuge.Protocol.SubscribeRequest> subs_ = new pbc::MapField<string, global::Centrifugal.Centrifuge.Protocol.SubscribeRequest>();
+    /// <summary>
+    /// Server-side subscriptions the client wants to restore, keyed by channel.
+    /// Only recover, epoch, offset and delta of each SubscribeRequest are used -
+    /// they let the server recover publications the client missed since its
+    /// last known position. The server decides which subscriptions are granted.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pbc::MapField<string, global::Centrifugal.Centrifuge.Protocol.SubscribeRequest> Subs {
@@ -6359,6 +7081,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "name" field.</summary>
     public const int NameFieldNumber = 4;
     private string name_ = "";
+    /// <summary>
+    /// Name of the client SDK or application.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Name {
@@ -6371,6 +7096,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "version" field.</summary>
     public const int VersionFieldNumber = 5;
     private string version_ = "";
+    /// <summary>
+    /// Version of the client SDK or application.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Version {
@@ -6385,6 +7113,11 @@ namespace Centrifugal.Centrifuge.Protocol {
     private static readonly pbc::MapField<string, string>.Codec _map_headers_codec
         = new pbc::MapField<string, string>.Codec(pb::FieldCodec.ForString(10, ""), pb::FieldCodec.ForString(18, ""), 50);
     private readonly pbc::MapField<string, string> headers_ = new pbc::MapField<string, string>();
+    /// <summary>
+    /// Custom headers to pass to the server. Used when a transport does not
+    /// allow setting HTTP headers (e.g. WebSocket in a browser), the application
+    /// decides how to use them.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pbc::MapField<string, string> Headers {
@@ -6395,7 +7128,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int FlagFieldNumber = 7;
     private long flag_;
     /// <summary>
-    /// Enable connection level features.
+    /// Connection level features this client supports, as a bitmask. The server
+    /// replies with the subset it enabled in ConnectResult.flag.
+    ///
+    ///   1 &lt;&lt; 0  dictionary compression, see Dictionary.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -6403,6 +7139,70 @@ namespace Centrifugal.Centrifuge.Protocol {
       get { return flag_; }
       set {
         flag_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "profile" field.</summary>
+    public const int ProfileFieldNumber = 9;
+    private string profile_ = "";
+    /// <summary>
+    /// Application context this connection belongs to - which view, screen or
+    /// client kind it is. Connections sharing a profile see traffic of a similar
+    /// shape.
+    ///
+    /// Untrusted: the server may override it, and features built on it must treat
+    /// it as a hint rather than an assertion.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Profile {
+      get { return profile_; }
+      set {
+        profile_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "dict" field.</summary>
+    public const int DictFieldNumber = 8;
+    private string dict_ = "";
+    /// <summary>
+    /// Id of the compression dictionary this client already holds, so the server
+    /// can name it instead of sending it again.
+    ///
+    /// The server answers with a Dictionary carrying only an id when it recognises
+    /// this one, and with the full content otherwise - so an unknown id is a cache
+    /// miss rather than an error.
+    ///
+    /// An id is a hash of the dictionary content, so this id and the server's copy
+    /// are byte identical by construction: a dictionary that changes gets a new id
+    /// automatically.
+    ///
+    /// Deliberately one, not a list. A client caches the last dictionary it was
+    /// given, which is the one it needs when reconnecting to the same profile. The
+    /// cost is one extra transfer per hop during a rolling deploy where nodes
+    /// disagree, which is bounded and small.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Dict {
+      get { return dict_; }
+      set {
+        dict_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "instance" field.</summary>
+    public const int InstanceFieldNumber = 1000;
+    private string instance_ = "";
+    /// <summary>
+    /// Client-persisted install id.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Instance {
+      get { return instance_; }
+      set {
+        instance_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
       }
     }
 
@@ -6428,6 +7228,9 @@ namespace Centrifugal.Centrifuge.Protocol {
       if (Version != other.Version) return false;
       if (!Headers.Equals(other.Headers)) return false;
       if (Flag != other.Flag) return false;
+      if (Profile != other.Profile) return false;
+      if (Dict != other.Dict) return false;
+      if (Instance != other.Instance) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -6442,6 +7245,9 @@ namespace Centrifugal.Centrifuge.Protocol {
       if (Version.Length != 0) hash ^= Version.GetHashCode();
       hash ^= Headers.GetHashCode();
       if (Flag != 0L) hash ^= Flag.GetHashCode();
+      if (Profile.Length != 0) hash ^= Profile.GetHashCode();
+      if (Dict.Length != 0) hash ^= Dict.GetHashCode();
+      if (Instance.Length != 0) hash ^= Instance.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -6482,6 +7288,18 @@ namespace Centrifugal.Centrifuge.Protocol {
         output.WriteRawTag(56);
         output.WriteInt64(Flag);
       }
+      if (Dict.Length != 0) {
+        output.WriteRawTag(66);
+        output.WriteString(Dict);
+      }
+      if (Profile.Length != 0) {
+        output.WriteRawTag(74);
+        output.WriteString(Profile);
+      }
+      if (Instance.Length != 0) {
+        output.WriteRawTag(194, 62);
+        output.WriteString(Instance);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -6514,6 +7332,18 @@ namespace Centrifugal.Centrifuge.Protocol {
         output.WriteRawTag(56);
         output.WriteInt64(Flag);
       }
+      if (Dict.Length != 0) {
+        output.WriteRawTag(66);
+        output.WriteString(Dict);
+      }
+      if (Profile.Length != 0) {
+        output.WriteRawTag(74);
+        output.WriteString(Profile);
+      }
+      if (Instance.Length != 0) {
+        output.WriteRawTag(194, 62);
+        output.WriteString(Instance);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -6540,6 +7370,15 @@ namespace Centrifugal.Centrifuge.Protocol {
       size += headers_.CalculateSize(_map_headers_codec);
       if (Flag != 0L) {
         size += 1 + pb::CodedOutputStream.ComputeInt64Size(Flag);
+      }
+      if (Profile.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Profile);
+      }
+      if (Dict.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Dict);
+      }
+      if (Instance.Length != 0) {
+        size += 2 + pb::CodedOutputStream.ComputeStringSize(Instance);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -6569,6 +7408,15 @@ namespace Centrifugal.Centrifuge.Protocol {
       headers_.MergeFrom(other.headers_);
       if (other.Flag != 0L) {
         Flag = other.Flag;
+      }
+      if (other.Profile.Length != 0) {
+        Profile = other.Profile;
+      }
+      if (other.Dict.Length != 0) {
+        Dict = other.Dict;
+      }
+      if (other.Instance.Length != 0) {
+        Instance = other.Instance;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -6615,6 +7463,18 @@ namespace Centrifugal.Centrifuge.Protocol {
           }
           case 56: {
             Flag = input.ReadInt64();
+            break;
+          }
+          case 66: {
+            Dict = input.ReadString();
+            break;
+          }
+          case 74: {
+            Profile = input.ReadString();
+            break;
+          }
+          case 8002: {
+            Instance = input.ReadString();
             break;
           }
         }
@@ -6664,6 +7524,18 @@ namespace Centrifugal.Centrifuge.Protocol {
             Flag = input.ReadInt64();
             break;
           }
+          case 66: {
+            Dict = input.ReadString();
+            break;
+          }
+          case 74: {
+            Profile = input.ReadString();
+            break;
+          }
+          case 8002: {
+            Instance = input.ReadString();
+            break;
+          }
         }
       }
     }
@@ -6671,6 +7543,9 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// ConnectResult is the result of a successful connect.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class ConnectResult : pb::IMessage<ConnectResult>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -6686,7 +7561,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[16]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[17]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6717,6 +7592,10 @@ namespace Centrifugal.Centrifuge.Protocol {
       session_ = other.session_;
       node_ = other.node_;
       time_ = other.time_;
+      flag_ = other.flag_;
+      dict_ = other.dict_ != null ? other.dict_.Clone() : null;
+      user_ = other.user_;
+      authClass_ = other.authClass_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -6729,6 +7608,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "client" field.</summary>
     public const int ClientFieldNumber = 1;
     private string client_ = "";
+    /// <summary>
+    /// Unique client (connection) id assigned by the server.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Client {
@@ -6741,6 +7623,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "version" field.</summary>
     public const int VersionFieldNumber = 2;
     private string version_ = "";
+    /// <summary>
+    /// Server version.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Version {
@@ -6753,6 +7638,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "expires" field.</summary>
     public const int ExpiresFieldNumber = 3;
     private bool expires_;
+    /// <summary>
+    /// When set the connection expires and the client must send RefreshRequest
+    /// with a new token before ttl elapses.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Expires {
@@ -6765,6 +7654,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "ttl" field.</summary>
     public const int TtlFieldNumber = 4;
     private uint ttl_;
+    /// <summary>
+    /// Seconds until the connection expires.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public uint Ttl {
@@ -6777,6 +7669,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "data" field.</summary>
     public const int DataFieldNumber = 5;
     private pb::ByteString data_ = pb::ByteString.Empty;
+    /// <summary>
+    /// Optional custom data returned by the application connect handler.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pb::ByteString Data {
@@ -6791,6 +7686,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     private static readonly pbc::MapField<string, global::Centrifugal.Centrifuge.Protocol.SubscribeResult>.Codec _map_subs_codec
         = new pbc::MapField<string, global::Centrifugal.Centrifuge.Protocol.SubscribeResult>.Codec(pb::FieldCodec.ForString(10, ""), pb::FieldCodec.ForMessage(18, global::Centrifugal.Centrifuge.Protocol.SubscribeResult.Parser), 50);
     private readonly pbc::MapField<string, global::Centrifugal.Centrifuge.Protocol.SubscribeResult> subs_ = new pbc::MapField<string, global::Centrifugal.Centrifuge.Protocol.SubscribeResult>();
+    /// <summary>
+    /// Server-side subscriptions of the connection, keyed by channel.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pbc::MapField<string, global::Centrifugal.Centrifuge.Protocol.SubscribeResult> Subs {
@@ -6800,6 +7698,11 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "ping" field.</summary>
     public const int PingFieldNumber = 7;
     private uint ping_;
+    /// <summary>
+    /// Server ping interval in seconds, zero when the server does not send pings.
+    /// The client may consider the connection lost if no data (including pings)
+    /// arrived from the server for noticeably longer than this interval.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public uint Ping {
@@ -6812,6 +7715,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "pong" field.</summary>
     public const int PongFieldNumber = 8;
     private bool pong_;
+    /// <summary>
+    /// When set the client must respond to every server ping (empty Reply) with
+    /// a pong (empty Command), otherwise the server closes the connection.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Pong {
@@ -6824,6 +7731,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "session" field.</summary>
     public const int SessionFieldNumber = 9;
     private string session_ = "";
+    /// <summary>
+    /// Session of the connection, set for unidirectional transports and for
+    /// bidirectional emulation, see EmulationRequest.session.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Session {
@@ -6836,6 +7747,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "node" field.</summary>
     public const int NodeFieldNumber = 10;
     private string node_ = "";
+    /// <summary>
+    /// Id of the node serving the connection, set for bidirectional emulation,
+    /// see EmulationRequest.node.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Node {
@@ -6857,6 +7772,75 @@ namespace Centrifugal.Centrifuge.Protocol {
       get { return time_; }
       set {
         time_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "flag" field.</summary>
+    public const int FlagFieldNumber = 12;
+    private long flag_;
+    /// <summary>
+    /// Connection level features the server actually enabled, using the same bits
+    /// as ConnectRequest.flag. A client can not assume a feature it advertised was
+    /// accepted - the server may have it disabled, or may decline per connection -
+    /// so this is how it finds out.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long Flag {
+      get { return flag_; }
+      set {
+        flag_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "dict" field.</summary>
+    public const int DictFieldNumber = 13;
+    private global::Centrifugal.Centrifuge.Protocol.Dictionary dict_;
+    /// <summary>
+    /// Compression dictionary for this connection, when the server enabled
+    /// dictionary compression.
+    ///
+    /// It travels in the connect reply rather than a push so there is no ordering
+    /// rule to get wrong: this frame is raw, and every frame after it is
+    /// compressed. It carries only an id when the client advertised that same id in
+    /// ConnectRequest.dict, since the client already holds the bytes.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Centrifugal.Centrifuge.Protocol.Dictionary Dict {
+      get { return dict_; }
+      set {
+        dict_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "user" field.</summary>
+    public const int UserFieldNumber = 1000;
+    private string user_ = "";
+    /// <summary>
+    /// User the connection is authenticated as.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string User {
+      get { return user_; }
+      set {
+        user_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "auth_class" field.</summary>
+    public const int AuthClassFieldNumber = 1001;
+    private string authClass_ = "";
+    /// <summary>
+    /// Authentication class of the connection.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string AuthClass {
+      get { return authClass_; }
+      set {
+        authClass_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
       }
     }
 
@@ -6886,6 +7870,10 @@ namespace Centrifugal.Centrifuge.Protocol {
       if (Session != other.Session) return false;
       if (Node != other.Node) return false;
       if (Time != other.Time) return false;
+      if (Flag != other.Flag) return false;
+      if (!object.Equals(Dict, other.Dict)) return false;
+      if (User != other.User) return false;
+      if (AuthClass != other.AuthClass) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -6904,6 +7892,10 @@ namespace Centrifugal.Centrifuge.Protocol {
       if (Session.Length != 0) hash ^= Session.GetHashCode();
       if (Node.Length != 0) hash ^= Node.GetHashCode();
       if (Time != 0L) hash ^= Time.GetHashCode();
+      if (Flag != 0L) hash ^= Flag.GetHashCode();
+      if (dict_ != null) hash ^= Dict.GetHashCode();
+      if (User.Length != 0) hash ^= User.GetHashCode();
+      if (AuthClass.Length != 0) hash ^= AuthClass.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -6963,6 +7955,22 @@ namespace Centrifugal.Centrifuge.Protocol {
         output.WriteRawTag(88);
         output.WriteInt64(Time);
       }
+      if (Flag != 0L) {
+        output.WriteRawTag(96);
+        output.WriteInt64(Flag);
+      }
+      if (dict_ != null) {
+        output.WriteRawTag(106);
+        output.WriteMessage(Dict);
+      }
+      if (User.Length != 0) {
+        output.WriteRawTag(194, 62);
+        output.WriteString(User);
+      }
+      if (AuthClass.Length != 0) {
+        output.WriteRawTag(202, 62);
+        output.WriteString(AuthClass);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -7014,6 +8022,22 @@ namespace Centrifugal.Centrifuge.Protocol {
         output.WriteRawTag(88);
         output.WriteInt64(Time);
       }
+      if (Flag != 0L) {
+        output.WriteRawTag(96);
+        output.WriteInt64(Flag);
+      }
+      if (dict_ != null) {
+        output.WriteRawTag(106);
+        output.WriteMessage(Dict);
+      }
+      if (User.Length != 0) {
+        output.WriteRawTag(194, 62);
+        output.WriteString(User);
+      }
+      if (AuthClass.Length != 0) {
+        output.WriteRawTag(202, 62);
+        output.WriteString(AuthClass);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -7054,6 +8078,18 @@ namespace Centrifugal.Centrifuge.Protocol {
       }
       if (Time != 0L) {
         size += 1 + pb::CodedOutputStream.ComputeInt64Size(Time);
+      }
+      if (Flag != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(Flag);
+      }
+      if (dict_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Dict);
+      }
+      if (User.Length != 0) {
+        size += 2 + pb::CodedOutputStream.ComputeStringSize(User);
+      }
+      if (AuthClass.Length != 0) {
+        size += 2 + pb::CodedOutputStream.ComputeStringSize(AuthClass);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -7097,6 +8133,21 @@ namespace Centrifugal.Centrifuge.Protocol {
       }
       if (other.Time != 0L) {
         Time = other.Time;
+      }
+      if (other.Flag != 0L) {
+        Flag = other.Flag;
+      }
+      if (other.dict_ != null) {
+        if (dict_ == null) {
+          Dict = new global::Centrifugal.Centrifuge.Protocol.Dictionary();
+        }
+        Dict.MergeFrom(other.Dict);
+      }
+      if (other.User.Length != 0) {
+        User = other.User;
+      }
+      if (other.AuthClass.Length != 0) {
+        AuthClass = other.AuthClass;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -7159,6 +8210,25 @@ namespace Centrifugal.Centrifuge.Protocol {
           }
           case 88: {
             Time = input.ReadInt64();
+            break;
+          }
+          case 96: {
+            Flag = input.ReadInt64();
+            break;
+          }
+          case 106: {
+            if (dict_ == null) {
+              Dict = new global::Centrifugal.Centrifuge.Protocol.Dictionary();
+            }
+            input.ReadMessage(Dict);
+            break;
+          }
+          case 8002: {
+            User = input.ReadString();
+            break;
+          }
+          case 8010: {
+            AuthClass = input.ReadString();
             break;
           }
         }
@@ -7224,6 +8294,25 @@ namespace Centrifugal.Centrifuge.Protocol {
             Time = input.ReadInt64();
             break;
           }
+          case 96: {
+            Flag = input.ReadInt64();
+            break;
+          }
+          case 106: {
+            if (dict_ == null) {
+              Dict = new global::Centrifugal.Centrifuge.Protocol.Dictionary();
+            }
+            input.ReadMessage(Dict);
+            break;
+          }
+          case 8002: {
+            User = input.ReadString();
+            break;
+          }
+          case 8010: {
+            AuthClass = input.ReadString();
+            break;
+          }
         }
       }
     }
@@ -7231,6 +8320,9 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// RefreshRequest refreshes an expiring connection with a new token.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class RefreshRequest : pb::IMessage<RefreshRequest>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -7246,7 +8338,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[17]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[18]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -7279,6 +8371,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "token" field.</summary>
     public const int TokenFieldNumber = 1;
     private string token_ = "";
+    /// <summary>
+    /// New connection token, required.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Token {
@@ -7429,6 +8524,9 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// RefreshResult is the result of a connection refresh.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class RefreshResult : pb::IMessage<RefreshResult>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -7444,7 +8542,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[18]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[19]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -7468,6 +8566,8 @@ namespace Centrifugal.Centrifuge.Protocol {
       version_ = other.version_;
       expires_ = other.expires_;
       ttl_ = other.ttl_;
+      user_ = other.user_;
+      authClass_ = other.authClass_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -7480,6 +8580,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "client" field.</summary>
     public const int ClientFieldNumber = 1;
     private string client_ = "";
+    /// <summary>
+    /// Not set by the current server.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Client {
@@ -7492,6 +8595,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "version" field.</summary>
     public const int VersionFieldNumber = 2;
     private string version_ = "";
+    /// <summary>
+    /// Not set by the current server.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Version {
@@ -7504,6 +8610,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "expires" field.</summary>
     public const int ExpiresFieldNumber = 3;
     private bool expires_;
+    /// <summary>
+    /// When set the connection still expires, ttl contains time until expiration.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Expires {
@@ -7516,12 +8625,45 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "ttl" field.</summary>
     public const int TtlFieldNumber = 4;
     private uint ttl_;
+    /// <summary>
+    /// Seconds until the connection expires.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public uint Ttl {
       get { return ttl_; }
       set {
         ttl_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "user" field.</summary>
+    public const int UserFieldNumber = 1000;
+    private string user_ = "";
+    /// <summary>
+    /// User the connection is authenticated as.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string User {
+      get { return user_; }
+      set {
+        user_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "auth_class" field.</summary>
+    public const int AuthClassFieldNumber = 1001;
+    private string authClass_ = "";
+    /// <summary>
+    /// Authentication class of the connection.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string AuthClass {
+      get { return authClass_; }
+      set {
+        authClass_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
       }
     }
 
@@ -7544,6 +8686,8 @@ namespace Centrifugal.Centrifuge.Protocol {
       if (Version != other.Version) return false;
       if (Expires != other.Expires) return false;
       if (Ttl != other.Ttl) return false;
+      if (User != other.User) return false;
+      if (AuthClass != other.AuthClass) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -7555,6 +8699,8 @@ namespace Centrifugal.Centrifuge.Protocol {
       if (Version.Length != 0) hash ^= Version.GetHashCode();
       if (Expires != false) hash ^= Expires.GetHashCode();
       if (Ttl != 0) hash ^= Ttl.GetHashCode();
+      if (User.Length != 0) hash ^= User.GetHashCode();
+      if (AuthClass.Length != 0) hash ^= AuthClass.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -7589,6 +8735,14 @@ namespace Centrifugal.Centrifuge.Protocol {
         output.WriteRawTag(32);
         output.WriteUInt32(Ttl);
       }
+      if (User.Length != 0) {
+        output.WriteRawTag(194, 62);
+        output.WriteString(User);
+      }
+      if (AuthClass.Length != 0) {
+        output.WriteRawTag(202, 62);
+        output.WriteString(AuthClass);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -7615,6 +8769,14 @@ namespace Centrifugal.Centrifuge.Protocol {
         output.WriteRawTag(32);
         output.WriteUInt32(Ttl);
       }
+      if (User.Length != 0) {
+        output.WriteRawTag(194, 62);
+        output.WriteString(User);
+      }
+      if (AuthClass.Length != 0) {
+        output.WriteRawTag(202, 62);
+        output.WriteString(AuthClass);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -7636,6 +8798,12 @@ namespace Centrifugal.Centrifuge.Protocol {
       }
       if (Ttl != 0) {
         size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Ttl);
+      }
+      if (User.Length != 0) {
+        size += 2 + pb::CodedOutputStream.ComputeStringSize(User);
+      }
+      if (AuthClass.Length != 0) {
+        size += 2 + pb::CodedOutputStream.ComputeStringSize(AuthClass);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -7660,6 +8828,12 @@ namespace Centrifugal.Centrifuge.Protocol {
       }
       if (other.Ttl != 0) {
         Ttl = other.Ttl;
+      }
+      if (other.User.Length != 0) {
+        User = other.User;
+      }
+      if (other.AuthClass.Length != 0) {
+        AuthClass = other.AuthClass;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -7694,6 +8868,14 @@ namespace Centrifugal.Centrifuge.Protocol {
           }
           case 32: {
             Ttl = input.ReadUInt32();
+            break;
+          }
+          case 8002: {
+            User = input.ReadString();
+            break;
+          }
+          case 8010: {
+            AuthClass = input.ReadString();
             break;
           }
         }
@@ -7731,6 +8913,14 @@ namespace Centrifugal.Centrifuge.Protocol {
             Ttl = input.ReadUInt32();
             break;
           }
+          case 8002: {
+            User = input.ReadString();
+            break;
+          }
+          case 8010: {
+            AuthClass = input.ReadString();
+            break;
+          }
         }
       }
     }
@@ -7738,6 +8928,11 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// SubscribeRequest subscribes the client to a channel.
+  ///
+  /// Some fields only apply to specific subscription types, see type.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class SubscribeRequest : pb::IMessage<SubscribeRequest>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -7753,7 +8948,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[19]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[20]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -7802,6 +8997,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "channel" field.</summary>
     public const int ChannelFieldNumber = 1;
     private string channel_ = "";
+    /// <summary>
+    /// Channel to subscribe to, required.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Channel {
@@ -7814,6 +9012,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "token" field.</summary>
     public const int TokenFieldNumber = 2;
     private string token_ = "";
+    /// <summary>
+    /// Optional subscription token (JWT in Centrifugo).
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Token {
@@ -7826,6 +9027,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "recover" field.</summary>
     public const int RecoverFieldNumber = 3;
     private bool recover_;
+    /// <summary>
+    /// When set the client asks the server to recover publications missed since
+    /// the stream position given in epoch and offset.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Recover {
@@ -7838,6 +9043,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "epoch" field.</summary>
     public const int EpochFieldNumber = 6;
     private string epoch_ = "";
+    /// <summary>
+    /// Stream epoch of the last known position.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Epoch {
@@ -7850,6 +9058,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "offset" field.</summary>
     public const int OffsetFieldNumber = 7;
     private ulong offset_;
+    /// <summary>
+    /// Stream offset of the last known position.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ulong Offset {
@@ -7862,6 +9073,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "data" field.</summary>
     public const int DataFieldNumber = 8;
     private pb::ByteString data_ = pb::ByteString.Empty;
+    /// <summary>
+    /// Optional custom data passed to the application subscribe handler.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pb::ByteString Data {
@@ -7874,6 +9088,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "positioned" field.</summary>
     public const int PositionedFieldNumber = 9;
     private bool positioned_;
+    /// <summary>
+    /// Hint that the client wants a positioned subscription. The final decision
+    /// is made by the server, see SubscribeResult.positioned.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Positioned {
@@ -7886,6 +9104,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "recoverable" field.</summary>
     public const int RecoverableFieldNumber = 10;
     private bool recoverable_;
+    /// <summary>
+    /// Hint that the client wants a recoverable subscription. The final decision
+    /// is made by the server, see SubscribeResult.recoverable.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Recoverable {
@@ -7898,6 +9120,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "join_leave" field.</summary>
     public const int JoinLeaveFieldNumber = 11;
     private bool joinLeave_;
+    /// <summary>
+    /// Hint that the client wants join/leave pushes. The final decision is made
+    /// by the server.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool JoinLeave {
@@ -7910,6 +9136,11 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "delta" field.</summary>
     public const int DeltaFieldNumber = 12;
     private string delta_ = "";
+    /// <summary>
+    /// Delta compression type the client wants for publications. The only
+    /// supported value is "fossil". Whether it was negotiated is reported in
+    /// SubscribeResult.delta.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Delta {
@@ -7923,7 +9154,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int TfFieldNumber = 13;
     private global::Centrifugal.Centrifuge.Protocol.FilterNode tf_;
     /// <summary>
-    /// Optional server side filter based on publication tags .
+    /// Optional server-side filter based on publication tags. Only publications
+    /// matching the filter are delivered. Must be allowed by the server, and
+    /// disables delta compression. Meant to reduce bandwidth, not as an access
+    /// control mechanism.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -7938,7 +9172,12 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int FlagFieldNumber = 14;
     private long flag_;
     /// <summary>
-    /// Enable subscription level features.
+    /// Subscription level features, as a bitmask:
+    ///
+    ///   1 &lt;&lt; 0  numeric channel id requested, see SubscribeResult.id.
+    ///   1 &lt;&lt; 1  reject unrecovered: fail the subscription with error 112
+    ///           (unrecoverable position) instead of succeeding with
+    ///           SubscribeResult.recovered unset when recovery is not possible.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -7952,6 +9191,15 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "type" field.</summary>
     public const int TypeFieldNumber = 15;
     private int type_;
+    /// <summary>
+    /// Subscription type:
+    ///
+    ///   0  stream - regular channel subscription (default).
+    ///   1  map - subscription to map state with stream of changes.
+    ///   2  map clients - map of clients present in the channel.
+    ///   3  map users - map of users present in the channel.
+    ///   4  shared poll.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int Type {
@@ -7964,6 +9212,13 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "phase" field.</summary>
     public const int PhaseFieldNumber = 16;
     private int phase_;
+    /// <summary>
+    /// Phase of a map subscription:
+    ///
+    ///   0  live - join real-time updates (default).
+    ///   1  stream - page through stream (catch-up).
+    ///   2  state - page through map state.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int Phase {
@@ -7976,6 +9231,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "cursor" field.</summary>
     public const int CursorFieldNumber = 17;
     private string cursor_ = "";
+    /// <summary>
+    /// Map subscriptions: cursor of the state page to load, from
+    /// SubscribeResult.cursor. Empty for the first page.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Cursor {
@@ -7988,6 +9247,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "limit" field.</summary>
     public const int LimitFieldNumber = 18;
     private int limit_;
+    /// <summary>
+    /// Map subscriptions: page size. Zero or negative means server default. The
+    /// server clamps it to its configured bounds.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int Limit {
@@ -8000,6 +9263,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "asc" field.</summary>
     public const int AscFieldNumber = 19;
     private bool asc_;
+    /// <summary>
+    /// Map subscriptions, state phase: when set ordered map state is returned
+    /// in ascending order, descending is the default. Ignored for unordered maps.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Asc {
@@ -8543,6 +9810,10 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// SubscribeResult is the result of a successful subscribe. It is also used to
+  /// describe server-side subscriptions in ConnectResult.subs.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class SubscribeResult : pb::IMessage<SubscribeResult>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -8558,7 +9829,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[20]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[21]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -8607,6 +9878,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "expires" field.</summary>
     public const int ExpiresFieldNumber = 1;
     private bool expires_;
+    /// <summary>
+    /// When set the subscription expires and the client must send
+    /// SubRefreshRequest with a new token before ttl elapses.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Expires {
@@ -8619,6 +9894,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "ttl" field.</summary>
     public const int TtlFieldNumber = 2;
     private uint ttl_;
+    /// <summary>
+    /// Seconds until the subscription expires.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public uint Ttl {
@@ -8631,6 +9909,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "recoverable" field.</summary>
     public const int RecoverableFieldNumber = 3;
     private bool recoverable_;
+    /// <summary>
+    /// When set the subscription supports recovery: the client should keep the
+    /// stream position and use it on resubscribe.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Recoverable {
@@ -8643,6 +9925,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "epoch" field.</summary>
     public const int EpochFieldNumber = 6;
     private string epoch_ = "";
+    /// <summary>
+    /// Current stream epoch.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Epoch {
@@ -8657,6 +9942,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     private static readonly pb::FieldCodec<global::Centrifugal.Centrifuge.Protocol.Publication> _repeated_publications_codec
         = pb::FieldCodec.ForMessage(58, global::Centrifugal.Centrifuge.Protocol.Publication.Parser);
     private readonly pbc::RepeatedField<global::Centrifugal.Centrifuge.Protocol.Publication> publications_ = new pbc::RepeatedField<global::Centrifugal.Centrifuge.Protocol.Publication>();
+    /// <summary>
+    /// Publications: recovered after the requested position, initial
+    /// publications provided by the application, or stream page for maps.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pbc::RepeatedField<global::Centrifugal.Centrifuge.Protocol.Publication> Publications {
@@ -8666,6 +9955,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "recovered" field.</summary>
     public const int RecoveredFieldNumber = 8;
     private bool recovered_;
+    /// <summary>
+    /// When set the client successfully recovered all missed publications.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Recovered {
@@ -8678,6 +9970,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "offset" field.</summary>
     public const int OffsetFieldNumber = 9;
     private ulong offset_;
+    /// <summary>
+    /// Stream offset. The current stream top, or - when publications were
+    /// recovered - the position the client advances from by applying them.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ulong Offset {
@@ -8690,6 +9986,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "positioned" field.</summary>
     public const int PositionedFieldNumber = 10;
     private bool positioned_;
+    /// <summary>
+    /// When set the client should track stream position of the subscription.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Positioned {
@@ -8702,6 +10001,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "data" field.</summary>
     public const int DataFieldNumber = 11;
     private pb::ByteString data_ = pb::ByteString.Empty;
+    /// <summary>
+    /// Optional custom data attached to the subscription by the application.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pb::ByteString Data {
@@ -8714,6 +10016,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "was_recovering" field.</summary>
     public const int WasRecoveringFieldNumber = 12;
     private bool wasRecovering_;
+    /// <summary>
+    /// When set the server attempted recovery for this subscription, check
+    /// recovered for the outcome.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool WasRecovering {
@@ -8726,6 +10032,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "delta" field.</summary>
     public const int DeltaFieldNumber = 13;
     private bool delta_;
+    /// <summary>
+    /// When set delta compression was negotiated, and Publication.delta tells
+    /// whether a publication carries a delta patch.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Delta {
@@ -8739,7 +10049,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int IdFieldNumber = 14;
     private long id_;
     /// <summary>
-    /// Optional numeric channel ID to avoid sending string channel in the following Pushes (bandwidth optimization).
+    /// Optional numeric channel id to avoid sending string channel in the
+    /// following pushes (bandwidth optimization). Set when requested with
+    /// SubscribeRequest.flag and allowed by the server, see Push.id.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -8754,7 +10066,8 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int TypeFieldNumber = 15;
     private int type_;
     /// <summary>
-    /// Server must echo back type.
+    /// Type of the subscription: 0 for stream, 1 for all map types (including
+    /// map clients and map users), 4 for shared poll.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -8769,7 +10082,8 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int PhaseFieldNumber = 16;
     private int phase_;
     /// <summary>
-    /// The result phase of the operation (LIVE = 0, STREAM = 1, STATE = 2)
+    /// The result phase of a map subscription (live = 0, stream = 1,
+    /// state = 2), see SubscribeRequest.phase.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -8784,7 +10098,8 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int CursorFieldNumber = 17;
     private string cursor_ = "";
     /// <summary>
-    /// Next page cursor (empty = last page)
+    /// Map subscriptions, state phase: cursor of the next page. Empty when this
+    /// is the last state page.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -8801,7 +10116,7 @@ namespace Centrifugal.Centrifuge.Protocol {
         = pb::FieldCodec.ForMessage(146, global::Centrifugal.Centrifuge.Protocol.Publication.Parser);
     private readonly pbc::RepeatedField<global::Centrifugal.Centrifuge.Protocol.Publication> state_ = new pbc::RepeatedField<global::Centrifugal.Centrifuge.Protocol.Publication>();
     /// <summary>
-    /// Channel state entries.
+    /// Map subscriptions: state entries.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -8813,7 +10128,8 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int PublishDebounceFieldNumber = 19;
     private uint publishDebounce_;
     /// <summary>
-    /// in ms, if >0 SDK should debounce publications to this channel. First one should not be debounced.
+    /// Interval in milliseconds. When > 0 the SDK should debounce client
+    /// publications to this channel; the first one is not debounced.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -9329,6 +10645,9 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// KeyedItem is a key the client tracks in a shared poll subscription.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class KeyedItem : pb::IMessage<KeyedItem>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -9344,7 +10663,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[21]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[22]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -9378,6 +10697,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "key" field.</summary>
     public const int KeyFieldNumber = 1;
     private string key_ = "";
+    /// <summary>
+    /// Item key.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Key {
@@ -9390,6 +10712,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "version" field.</summary>
     public const int VersionFieldNumber = 2;
     private ulong version_;
+    /// <summary>
+    /// Version of the item data the client currently holds, zero when it has
+    /// none. The server only sends data with a greater version.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ulong Version {
@@ -9564,6 +10890,9 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// TrackBatch is a set of keys to track authorized by a single signature.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class TrackBatch : pb::IMessage<TrackBatch>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -9579,7 +10908,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[22]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[23]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -9614,7 +10943,8 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int SignatureFieldNumber = 1;
     private string signature_ = "";
     /// <summary>
-    /// HMAC over (iat, expiry, user, channel, keys)
+    /// Signature issued by the application backend, an HMAC over (iat, expiry,
+    /// user, channel, keys).
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -9631,7 +10961,8 @@ namespace Centrifugal.Centrifuge.Protocol {
         = pb::FieldCodec.ForMessage(18, global::Centrifugal.Centrifuge.Protocol.KeyedItem.Parser);
     private readonly pbc::RepeatedField<global::Centrifugal.Centrifuge.Protocol.KeyedItem> items_ = new pbc::RepeatedField<global::Centrifugal.Centrifuge.Protocol.KeyedItem>();
     /// <summary>
-    /// FULL key set the signature was computed over;
+    /// Full key set the signature was computed over, with versions the client
+    /// currently holds.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -9794,6 +11125,10 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// SubRefreshRequest refreshes an expiring subscription with a new token, or
+  /// manages tracked keys of a shared poll subscription.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class SubRefreshRequest : pb::IMessage<SubRefreshRequest>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -9809,7 +11144,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[23]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[24]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -9846,6 +11181,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "channel" field.</summary>
     public const int ChannelFieldNumber = 1;
     private string channel_ = "";
+    /// <summary>
+    /// Channel of the subscription, required.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Channel {
@@ -9858,6 +11196,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "token" field.</summary>
     public const int TokenFieldNumber = 2;
     private string token_ = "";
+    /// <summary>
+    /// New subscription token, required for type 0.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Token {
@@ -9871,7 +11212,11 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int TypeFieldNumber = 3;
     private int type_;
     /// <summary>
-    /// 0=sub_refresh, 1=track, 2=untrack
+    /// Request type:
+    ///
+    ///   0  refresh subscription token (default).
+    ///   1  track keys (shared poll), see track.
+    ///   2  untrack keys (shared poll), see untrack.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -9888,7 +11233,7 @@ namespace Centrifugal.Centrifuge.Protocol {
         = pb::FieldCodec.ForMessage(34, global::Centrifugal.Centrifuge.Protocol.TrackBatch.Parser);
     private readonly pbc::RepeatedField<global::Centrifugal.Centrifuge.Protocol.TrackBatch> track_ = new pbc::RepeatedField<global::Centrifugal.Centrifuge.Protocol.TrackBatch>();
     /// <summary>
-    /// for type=1
+    /// Batches of keys to start tracking, for type 1.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -9902,7 +11247,7 @@ namespace Centrifugal.Centrifuge.Protocol {
         = pb::FieldCodec.ForString(42);
     private readonly pbc::RepeatedField<string> untrack_ = new pbc::RepeatedField<string>();
     /// <summary>
-    /// for type=2
+    /// Keys to stop tracking, for type 2. Also honoured with type 1.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -10127,6 +11472,9 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// SubRefreshResult is the result of SubRefreshRequest.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class SubRefreshResult : pb::IMessage<SubRefreshResult>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -10142,7 +11490,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[24]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[25]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -10177,6 +11525,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "expires" field.</summary>
     public const int ExpiresFieldNumber = 1;
     private bool expires_;
+    /// <summary>
+    /// When set the subscription (or tracked keys) expire.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Expires {
@@ -10190,7 +11541,8 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int TtlFieldNumber = 2;
     private uint ttl_;
     /// <summary>
-    /// for type=0: token TTL. for type=1: MIN TTL across all batches.
+    /// Seconds until expiration. For type 0 - until the subscription token
+    /// expires. For type 1 - minimal ttl across all tracked batches.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -10206,6 +11558,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     private static readonly pb::FieldCodec<global::Centrifugal.Centrifuge.Protocol.Publication> _repeated_items_codec
         = pb::FieldCodec.ForMessage(26, global::Centrifugal.Centrifuge.Protocol.Publication.Parser);
     private readonly pbc::RepeatedField<global::Centrifugal.Centrifuge.Protocol.Publication> items_ = new pbc::RepeatedField<global::Centrifugal.Centrifuge.Protocol.Publication>();
+    /// <summary>
+    /// Type 1: latest data of tracked keys for which the server has a version
+    /// newer than the client sent.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pbc::RepeatedField<global::Centrifugal.Centrifuge.Protocol.Publication> Items {
@@ -10391,6 +11747,9 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// UnsubscribeRequest unsubscribes the client from a channel.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class UnsubscribeRequest : pb::IMessage<UnsubscribeRequest>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -10406,7 +11765,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[25]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[26]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -10439,6 +11798,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "channel" field.</summary>
     public const int ChannelFieldNumber = 1;
     private string channel_ = "";
+    /// <summary>
+    /// Channel to unsubscribe from.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Channel {
@@ -10589,6 +11951,9 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// UnsubscribeResult is the result of an unsubscribe.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class UnsubscribeResult : pb::IMessage<UnsubscribeResult>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -10604,7 +11969,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[26]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[27]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -10750,6 +12115,9 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// PublishRequest publishes data to a channel.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class PublishRequest : pb::IMessage<PublishRequest>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -10765,7 +12133,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[27]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[28]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -10802,6 +12170,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "channel" field.</summary>
     public const int ChannelFieldNumber = 1;
     private string channel_ = "";
+    /// <summary>
+    /// Channel to publish to, required.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Channel {
@@ -10814,6 +12185,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "data" field.</summary>
     public const int DataFieldNumber = 2;
     private pb::ByteString data_ = pb::ByteString.Empty;
+    /// <summary>
+    /// Publication payload.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pb::ByteString Data {
@@ -10827,7 +12201,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int TypeFieldNumber = 3;
     private int type_;
     /// <summary>
-    /// 0 = regular (default), 1 = map
+    /// Publish type: 0 - regular publication (default), 1 - map publication.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -10842,7 +12216,8 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int KeyFieldNumber = 4;
     private string key_ = "";
     /// <summary>
-    /// Map publish: key to publish/remove
+    /// Map publication: key of the entry to publish or remove. Passed to the
+    /// application publish handler, which decides the final key.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -10857,7 +12232,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int RemovedFieldNumber = 5;
     private bool removed_;
     /// <summary>
-    /// Map publish: true = remove this key
+    /// Map publication: when set the entry with the key is removed.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -11105,6 +12480,9 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// PublishResult is the result of a publish.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class PublishResult : pb::IMessage<PublishResult>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -11120,7 +12498,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[28]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[29]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -11266,6 +12644,9 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// PresenceRequest asks for the presence information of a channel.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class PresenceRequest : pb::IMessage<PresenceRequest>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -11281,7 +12662,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[29]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[30]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -11314,6 +12695,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "channel" field.</summary>
     public const int ChannelFieldNumber = 1;
     private string channel_ = "";
+    /// <summary>
+    /// Channel to get presence of, required.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Channel {
@@ -11464,6 +12848,9 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// PresenceResult is the result of a presence request.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class PresenceResult : pb::IMessage<PresenceResult>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -11479,7 +12866,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[30]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[31]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -11514,6 +12901,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     private static readonly pbc::MapField<string, global::Centrifugal.Centrifuge.Protocol.ClientInfo>.Codec _map_presence_codec
         = new pbc::MapField<string, global::Centrifugal.Centrifuge.Protocol.ClientInfo>.Codec(pb::FieldCodec.ForString(10, ""), pb::FieldCodec.ForMessage(18, global::Centrifugal.Centrifuge.Protocol.ClientInfo.Parser), 10);
     private readonly pbc::MapField<string, global::Centrifugal.Centrifuge.Protocol.ClientInfo> presence_ = new pbc::MapField<string, global::Centrifugal.Centrifuge.Protocol.ClientInfo>();
+    /// <summary>
+    /// Clients present in the channel, keyed by client id.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pbc::MapField<string, global::Centrifugal.Centrifuge.Protocol.ClientInfo> Presence {
@@ -11651,6 +13041,9 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// PresenceStatsRequest asks for the presence stats of a channel.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class PresenceStatsRequest : pb::IMessage<PresenceStatsRequest>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -11666,7 +13059,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[31]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[32]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -11699,6 +13092,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "channel" field.</summary>
     public const int ChannelFieldNumber = 1;
     private string channel_ = "";
+    /// <summary>
+    /// Channel to get presence stats of, required.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Channel {
@@ -11849,6 +13245,9 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// PresenceStatsResult is the result of a presence stats request.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class PresenceStatsResult : pb::IMessage<PresenceStatsResult>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -11864,7 +13263,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[32]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[33]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -11898,6 +13297,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "num_clients" field.</summary>
     public const int NumClientsFieldNumber = 1;
     private uint numClients_;
+    /// <summary>
+    /// Number of clients (connections) in the channel.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public uint NumClients {
@@ -11910,6 +13312,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "num_users" field.</summary>
     public const int NumUsersFieldNumber = 2;
     private uint numUsers_;
+    /// <summary>
+    /// Number of unique users in the channel.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public uint NumUsers {
@@ -12084,6 +13489,9 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// StreamPosition is a position in a channel stream.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class StreamPosition : pb::IMessage<StreamPosition>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -12099,7 +13507,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[33]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[34]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -12133,6 +13541,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "offset" field.</summary>
     public const int OffsetFieldNumber = 1;
     private ulong offset_;
+    /// <summary>
+    /// Stream offset.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ulong Offset {
@@ -12145,6 +13556,10 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "epoch" field.</summary>
     public const int EpochFieldNumber = 2;
     private string epoch_ = "";
+    /// <summary>
+    /// Stream epoch. Changes when the stream is reset (e.g. history expired or
+    /// lost), offsets of different epochs are not comparable.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Epoch {
@@ -12319,6 +13734,9 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// HistoryRequest asks for the publication history of a channel.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class HistoryRequest : pb::IMessage<HistoryRequest>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -12334,7 +13752,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[34]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[35]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -12370,6 +13788,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "channel" field.</summary>
     public const int ChannelFieldNumber = 1;
     private string channel_ = "";
+    /// <summary>
+    /// Channel to get history of, required.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Channel {
@@ -12382,6 +13803,11 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "limit" field.</summary>
     public const int LimitFieldNumber = 7;
     private int limit_;
+    /// <summary>
+    /// Maximum number of publications to return. Zero returns no publications,
+    /// only the current stream position. -1 returns all publications. The server
+    /// may cap it with its configured limit.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int Limit {
@@ -12394,6 +13820,12 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "since" field.</summary>
     public const int SinceFieldNumber = 8;
     private global::Centrifugal.Centrifuge.Protocol.StreamPosition since_;
+    /// <summary>
+    /// Optional position to iterate from: publications after it are returned
+    /// (before it when reverse is set). An epoch mismatch results in error
+    /// 112 (unrecoverable position), a zero offset with reverse set - in error
+    /// 107 (bad request).
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Centrifugal.Centrifuge.Protocol.StreamPosition Since {
@@ -12406,6 +13838,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "reverse" field.</summary>
     public const int ReverseFieldNumber = 9;
     private bool reverse_;
+    /// <summary>
+    /// When set publications are returned from newest to oldest.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Reverse {
@@ -12637,6 +14072,9 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// HistoryResult is the result of a history request.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class HistoryResult : pb::IMessage<HistoryResult>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -12652,7 +14090,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[35]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[36]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -12689,6 +14127,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     private static readonly pb::FieldCodec<global::Centrifugal.Centrifuge.Protocol.Publication> _repeated_publications_codec
         = pb::FieldCodec.ForMessage(10, global::Centrifugal.Centrifuge.Protocol.Publication.Parser);
     private readonly pbc::RepeatedField<global::Centrifugal.Centrifuge.Protocol.Publication> publications_ = new pbc::RepeatedField<global::Centrifugal.Centrifuge.Protocol.Publication>();
+    /// <summary>
+    /// Publications from the stream.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pbc::RepeatedField<global::Centrifugal.Centrifuge.Protocol.Publication> Publications {
@@ -12698,6 +14139,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "epoch" field.</summary>
     public const int EpochFieldNumber = 2;
     private string epoch_ = "";
+    /// <summary>
+    /// Current stream epoch.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Epoch {
@@ -12710,6 +14154,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "offset" field.</summary>
     public const int OffsetFieldNumber = 3;
     private ulong offset_;
+    /// <summary>
+    /// Current stream top offset.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ulong Offset {
@@ -12898,6 +14345,11 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// PingRequest is not supported by the server at the moment: a command carrying
+  /// it is rejected. Connection liveness is checked with server pings (empty
+  /// Reply) and client pongs (empty Command), see ConnectResult.pong.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class PingRequest : pb::IMessage<PingRequest>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -12913,7 +14365,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[36]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[37]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -13059,6 +14511,9 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// PingResult is reserved for a response to PingRequest.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class PingResult : pb::IMessage<PingResult>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -13074,7 +14529,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[37]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[38]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -13220,6 +14675,9 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// RPCRequest is a remote procedure call handled by the application.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class RPCRequest : pb::IMessage<RPCRequest>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -13235,7 +14693,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[38]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[39]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -13257,6 +14715,13 @@ namespace Centrifugal.Centrifuge.Protocol {
     public RPCRequest(RPCRequest other) : this() {
       data_ = other.data_;
       method_ = other.method_;
+      headers_ = other.headers_.Clone();
+      msgId_ = other.msgId_;
+      ack_ = other.ack_.Clone();
+      retransmit_ = other.retransmit_;
+      after_ = other.after_.Clone();
+      withoutUpdates_ = other.withoutUpdates_;
+      cancel_ = other.cancel_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -13269,6 +14734,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "data" field.</summary>
     public const int DataFieldNumber = 1;
     private pb::ByteString data_ = pb::ByteString.Empty;
+    /// <summary>
+    /// Call payload.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pb::ByteString Data {
@@ -13281,12 +14749,117 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "method" field.</summary>
     public const int MethodFieldNumber = 2;
     private string method_ = "";
+    /// <summary>
+    /// Optional method name to route the call.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Method {
       get { return method_; }
       set {
         method_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "headers" field.</summary>
+    public const int HeadersFieldNumber = 1000;
+    private static readonly pbc::MapField<string, string>.Codec _map_headers_codec
+        = new pbc::MapField<string, string>.Codec(pb::FieldCodec.ForString(10, ""), pb::FieldCodec.ForString(18, ""), 8002);
+    private readonly pbc::MapField<string, string> headers_ = new pbc::MapField<string, string>();
+    /// <summary>
+    /// Per-call headers, forwarded by allow-list.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::MapField<string, string> Headers {
+      get { return headers_; }
+    }
+
+    /// <summary>Field number for the "msg_id" field.</summary>
+    public const int MsgIdFieldNumber = 1001;
+    private ulong msgId_;
+    /// <summary>
+    /// Client request id (fits 53 bits); 0 = no dedup or ordering.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong MsgId {
+      get { return msgId_; }
+      set {
+        msgId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "ack" field.</summary>
+    public const int AckFieldNumber = 1002;
+    private static readonly pb::FieldCodec<ulong> _repeated_ack_codec
+        = pb::FieldCodec.ForUInt64(8018);
+    private readonly pbc::RepeatedField<ulong> ack_ = new pbc::RepeatedField<ulong>();
+    /// <summary>
+    /// msg_ids whose replies were received.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::RepeatedField<ulong> Ack {
+      get { return ack_; }
+    }
+
+    /// <summary>Field number for the "retransmit" field.</summary>
+    public const int RetransmitFieldNumber = 1003;
+    private bool retransmit_;
+    /// <summary>
+    /// Resend after transport loss.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Retransmit {
+      get { return retransmit_; }
+      set {
+        retransmit_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "after" field.</summary>
+    public const int AfterFieldNumber = 1004;
+    private static readonly pb::FieldCodec<ulong> _repeated_after_codec
+        = pb::FieldCodec.ForUInt64(8034);
+    private readonly pbc::RepeatedField<ulong> after_ = new pbc::RepeatedField<ulong>();
+    /// <summary>
+    /// Run only after these msg_ids finished.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::RepeatedField<ulong> After {
+      get { return after_; }
+    }
+
+    /// <summary>Field number for the "without_updates" field.</summary>
+    public const int WithoutUpdatesFieldNumber = 1005;
+    private bool withoutUpdates_;
+    /// <summary>
+    /// Updates caused by this call are not pushed to the caller.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool WithoutUpdates {
+      get { return withoutUpdates_; }
+      set {
+        withoutUpdates_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "cancel" field.</summary>
+    public const int CancelFieldNumber = 1006;
+    private ulong cancel_;
+    /// <summary>
+    /// Cancel this msg_id; method and data are empty.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong Cancel {
+      get { return cancel_; }
+      set {
+        cancel_ = value;
       }
     }
 
@@ -13307,6 +14880,13 @@ namespace Centrifugal.Centrifuge.Protocol {
       }
       if (Data != other.Data) return false;
       if (Method != other.Method) return false;
+      if (!Headers.Equals(other.Headers)) return false;
+      if (MsgId != other.MsgId) return false;
+      if(!ack_.Equals(other.ack_)) return false;
+      if (Retransmit != other.Retransmit) return false;
+      if(!after_.Equals(other.after_)) return false;
+      if (WithoutUpdates != other.WithoutUpdates) return false;
+      if (Cancel != other.Cancel) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -13316,6 +14896,13 @@ namespace Centrifugal.Centrifuge.Protocol {
       int hash = 1;
       if (Data.Length != 0) hash ^= Data.GetHashCode();
       if (Method.Length != 0) hash ^= Method.GetHashCode();
+      hash ^= Headers.GetHashCode();
+      if (MsgId != 0UL) hash ^= MsgId.GetHashCode();
+      hash ^= ack_.GetHashCode();
+      if (Retransmit != false) hash ^= Retransmit.GetHashCode();
+      hash ^= after_.GetHashCode();
+      if (WithoutUpdates != false) hash ^= WithoutUpdates.GetHashCode();
+      if (Cancel != 0UL) hash ^= Cancel.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -13342,6 +14929,25 @@ namespace Centrifugal.Centrifuge.Protocol {
         output.WriteRawTag(18);
         output.WriteString(Method);
       }
+      headers_.WriteTo(output, _map_headers_codec);
+      if (MsgId != 0UL) {
+        output.WriteRawTag(200, 62);
+        output.WriteUInt64(MsgId);
+      }
+      ack_.WriteTo(output, _repeated_ack_codec);
+      if (Retransmit != false) {
+        output.WriteRawTag(216, 62);
+        output.WriteBool(Retransmit);
+      }
+      after_.WriteTo(output, _repeated_after_codec);
+      if (WithoutUpdates != false) {
+        output.WriteRawTag(232, 62);
+        output.WriteBool(WithoutUpdates);
+      }
+      if (Cancel != 0UL) {
+        output.WriteRawTag(240, 62);
+        output.WriteUInt64(Cancel);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -13360,6 +14966,25 @@ namespace Centrifugal.Centrifuge.Protocol {
         output.WriteRawTag(18);
         output.WriteString(Method);
       }
+      headers_.WriteTo(ref output, _map_headers_codec);
+      if (MsgId != 0UL) {
+        output.WriteRawTag(200, 62);
+        output.WriteUInt64(MsgId);
+      }
+      ack_.WriteTo(ref output, _repeated_ack_codec);
+      if (Retransmit != false) {
+        output.WriteRawTag(216, 62);
+        output.WriteBool(Retransmit);
+      }
+      after_.WriteTo(ref output, _repeated_after_codec);
+      if (WithoutUpdates != false) {
+        output.WriteRawTag(232, 62);
+        output.WriteBool(WithoutUpdates);
+      }
+      if (Cancel != 0UL) {
+        output.WriteRawTag(240, 62);
+        output.WriteUInt64(Cancel);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -13375,6 +15000,21 @@ namespace Centrifugal.Centrifuge.Protocol {
       }
       if (Method.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Method);
+      }
+      size += headers_.CalculateSize(_map_headers_codec);
+      if (MsgId != 0UL) {
+        size += 2 + pb::CodedOutputStream.ComputeUInt64Size(MsgId);
+      }
+      size += ack_.CalculateSize(_repeated_ack_codec);
+      if (Retransmit != false) {
+        size += 2 + 1;
+      }
+      size += after_.CalculateSize(_repeated_after_codec);
+      if (WithoutUpdates != false) {
+        size += 2 + 1;
+      }
+      if (Cancel != 0UL) {
+        size += 2 + pb::CodedOutputStream.ComputeUInt64Size(Cancel);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -13393,6 +15033,21 @@ namespace Centrifugal.Centrifuge.Protocol {
       }
       if (other.Method.Length != 0) {
         Method = other.Method;
+      }
+      headers_.MergeFrom(other.headers_);
+      if (other.MsgId != 0UL) {
+        MsgId = other.MsgId;
+      }
+      ack_.Add(other.ack_);
+      if (other.Retransmit != false) {
+        Retransmit = other.Retransmit;
+      }
+      after_.Add(other.after_);
+      if (other.WithoutUpdates != false) {
+        WithoutUpdates = other.WithoutUpdates;
+      }
+      if (other.Cancel != 0UL) {
+        Cancel = other.Cancel;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -13419,6 +15074,36 @@ namespace Centrifugal.Centrifuge.Protocol {
           }
           case 18: {
             Method = input.ReadString();
+            break;
+          }
+          case 8002: {
+            headers_.AddEntriesFrom(input, _map_headers_codec);
+            break;
+          }
+          case 8008: {
+            MsgId = input.ReadUInt64();
+            break;
+          }
+          case 8018:
+          case 8016: {
+            ack_.AddEntriesFrom(input, _repeated_ack_codec);
+            break;
+          }
+          case 8024: {
+            Retransmit = input.ReadBool();
+            break;
+          }
+          case 8034:
+          case 8032: {
+            after_.AddEntriesFrom(input, _repeated_after_codec);
+            break;
+          }
+          case 8040: {
+            WithoutUpdates = input.ReadBool();
+            break;
+          }
+          case 8048: {
+            Cancel = input.ReadUInt64();
             break;
           }
         }
@@ -13448,6 +15133,36 @@ namespace Centrifugal.Centrifuge.Protocol {
             Method = input.ReadString();
             break;
           }
+          case 8002: {
+            headers_.AddEntriesFrom(ref input, _map_headers_codec);
+            break;
+          }
+          case 8008: {
+            MsgId = input.ReadUInt64();
+            break;
+          }
+          case 8018:
+          case 8016: {
+            ack_.AddEntriesFrom(ref input, _repeated_ack_codec);
+            break;
+          }
+          case 8024: {
+            Retransmit = input.ReadBool();
+            break;
+          }
+          case 8034:
+          case 8032: {
+            after_.AddEntriesFrom(ref input, _repeated_after_codec);
+            break;
+          }
+          case 8040: {
+            WithoutUpdates = input.ReadBool();
+            break;
+          }
+          case 8048: {
+            Cancel = input.ReadUInt64();
+            break;
+          }
         }
       }
     }
@@ -13455,6 +15170,9 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// RPCResult is the result of an RPC call.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class RPCResult : pb::IMessage<RPCResult>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -13470,7 +15188,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[39]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[40]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -13491,6 +15209,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public RPCResult(RPCResult other) : this() {
       data_ = other.data_;
+      cached_ = other.cached_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -13503,12 +15222,30 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "data" field.</summary>
     public const int DataFieldNumber = 1;
     private pb::ByteString data_ = pb::ByteString.Empty;
+    /// <summary>
+    /// Result payload.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pb::ByteString Data {
       get { return data_; }
       set {
         data_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "cached" field.</summary>
+    public const int CachedFieldNumber = 1000;
+    private bool cached_;
+    /// <summary>
+    /// Answered from the deduplication record.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Cached {
+      get { return cached_; }
+      set {
+        cached_ = value;
       }
     }
 
@@ -13528,6 +15265,7 @@ namespace Centrifugal.Centrifuge.Protocol {
         return true;
       }
       if (Data != other.Data) return false;
+      if (Cached != other.Cached) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -13536,6 +15274,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     public override int GetHashCode() {
       int hash = 1;
       if (Data.Length != 0) hash ^= Data.GetHashCode();
+      if (Cached != false) hash ^= Cached.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -13558,6 +15297,10 @@ namespace Centrifugal.Centrifuge.Protocol {
         output.WriteRawTag(10);
         output.WriteBytes(Data);
       }
+      if (Cached != false) {
+        output.WriteRawTag(192, 62);
+        output.WriteBool(Cached);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -13572,6 +15315,10 @@ namespace Centrifugal.Centrifuge.Protocol {
         output.WriteRawTag(10);
         output.WriteBytes(Data);
       }
+      if (Cached != false) {
+        output.WriteRawTag(192, 62);
+        output.WriteBool(Cached);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -13584,6 +15331,9 @@ namespace Centrifugal.Centrifuge.Protocol {
       int size = 0;
       if (Data.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeBytesSize(Data);
+      }
+      if (Cached != false) {
+        size += 2 + 1;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -13599,6 +15349,9 @@ namespace Centrifugal.Centrifuge.Protocol {
       }
       if (other.Data.Length != 0) {
         Data = other.Data;
+      }
+      if (other.Cached != false) {
+        Cached = other.Cached;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -13621,6 +15374,10 @@ namespace Centrifugal.Centrifuge.Protocol {
             break;
           case 10: {
             Data = input.ReadBytes();
+            break;
+          }
+          case 8000: {
+            Cached = input.ReadBool();
             break;
           }
         }
@@ -13646,6 +15403,10 @@ namespace Centrifugal.Centrifuge.Protocol {
             Data = input.ReadBytes();
             break;
           }
+          case 8000: {
+            Cached = input.ReadBool();
+            break;
+          }
         }
       }
     }
@@ -13653,6 +15414,11 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// SendRequest is an asynchronous message from the client to the server
+  /// handled by the application. No Reply is sent in response, so the command
+  /// may have zero id.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class SendRequest : pb::IMessage<SendRequest>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -13668,7 +15434,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[40]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[41]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -13701,6 +15467,9 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>Field number for the "data" field.</summary>
     public const int DataFieldNumber = 1;
     private pb::ByteString data_ = pb::ByteString.Empty;
+    /// <summary>
+    /// Message payload.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pb::ByteString Data {
@@ -13851,6 +15620,10 @@ namespace Centrifugal.Centrifuge.Protocol {
 
   }
 
+  /// <summary>
+  /// FilterNode is a node of a publication tags filter expression tree, see
+  /// SubscribeRequest.tf.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class FilterNode : pb::IMessage<FilterNode>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -13866,7 +15639,7 @@ namespace Centrifugal.Centrifuge.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[41]; }
+      get { return global::Centrifugal.Centrifuge.Protocol.ClientReflection.Descriptor.MessageTypes[42]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -13907,8 +15680,8 @@ namespace Centrifugal.Centrifuge.Protocol {
     /// <summary>
     /// Operation type for this node:
     /// - "" (empty string) → leaf node (comparison)
-    /// - "and" → logical AND of child nodes
-    /// - "or"  → logical OR of child nodes
+    /// - "and" → logical AND of child nodes (at least one)
+    /// - "or"  → logical OR of child nodes (at least one)
     /// - "not" → logical NOT of a single child node
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -13924,7 +15697,8 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int KeyFieldNumber = 2;
     private string key_ = "";
     /// <summary>
-    /// Key for comparison (only valid for leaf nodes).
+    /// Tag key for comparison (only valid for leaf nodes). Required for all
+    /// comparisons except "ex" and "nex".
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -13955,6 +15729,11 @@ namespace Centrifugal.Centrifuge.Protocol {
     ///   "lte"  → numeric less than or equal val
     ///   "gt"   → numeric greater than val
     ///   "gte"  → numeric greater than or equal val
+    ///
+    /// A missing tag never matches eq, sw, ew, ct and numeric comparisons, and
+    /// always matches neq. For in and nin a missing tag is compared as an empty
+    /// string. Numeric comparisons parse both sides as decimal numbers and do not
+    /// match when either side is not a number.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -13969,7 +15748,8 @@ namespace Centrifugal.Centrifuge.Protocol {
     public const int ValFieldNumber = 4;
     private string val_ = "";
     /// <summary>
-    /// Single value used in most comparisons (e.g. "eq").
+    /// Single value used in most comparisons (e.g. "eq"). Required for all
+    /// comparisons except "in", "nin", "ex" and "nex".
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -13986,7 +15766,7 @@ namespace Centrifugal.Centrifuge.Protocol {
         = pb::FieldCodec.ForString(42);
     private readonly pbc::RepeatedField<string> vals_ = new pbc::RepeatedField<string>();
     /// <summary>
-    /// Multiple values used for set comparisons ("in", "nin").
+    /// Multiple values used for set comparisons ("in", "nin"), required for them.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
