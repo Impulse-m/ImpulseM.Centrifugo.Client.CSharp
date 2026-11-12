@@ -104,7 +104,6 @@ namespace Centrifugal.Centrifuge
         private ReadOnlyMemory<byte> _data;
         private Dictionary<string, string>? _headers;
         private uint _serverPing;
-        private LoopTimer? _serverPingTimer;
         private bool _sendPong;
         private readonly Waiters _promises;
         private int _stateTransitions;
@@ -1144,8 +1143,6 @@ namespace Centrifugal.Centrifuge
         private void OnTransportFrame(Attempt attempt, byte[][] messages)
         {
             if (attempt.Id != _transportId) return;
-            // Only data from the server proves the connection alive.
-            if (_serverPing > 0 && messages.Length > 0) WaitServerPing();
 
             foreach (var message in messages)
             {
@@ -1789,21 +1786,7 @@ namespace Centrifugal.Centrifuge
         private void WaitServerPing()
         {
             if (_state != CentrifugeClientState.Connected) return;
-            ClearServerPingTimer();
-            var delay = Utilities.PingDeadlineMilliseconds(_serverPing, _options.MaxServerPingDelay);
-            var due = Clock.NowMs + delay;
-            _serverPingTimer = LoopTimer.Start(Loop, delay, () =>
-            {
-                if (_state != CentrifugeClientState.Connected) return;
-                // A ping may have been received already, not processed yet: let it be processed first. Any
-                // data received re-arms this timer.
-                var late = Clock.NowMs - due >= LateTimerMs;
-                _serverPingTimer = LoopTimer.Start(Loop, late ? LateTimerGraceMs : 0, () =>
-                {
-                    if (_state != CentrifugeClientState.Connected) return;
-                    DisconnectInternal(CentrifugeConnectingCodes.NoPing, "no ping", true);
-                });
-            });
+            _watchdog.Start(_serverPing);
         }
 
         /// <summary>Handles a missed server ping on <paramref name="session"/> when it is still the current
@@ -1934,8 +1917,7 @@ namespace Centrifugal.Centrifuge
 
         private void ClearServerPingTimer()
         {
-            _serverPingTimer?.Cancel();
-            _serverPingTimer = null;
+            _watchdog.Cancel();
         }
 
         // ---------------------------------------------------------------------------------------------
