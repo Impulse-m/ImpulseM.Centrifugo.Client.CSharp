@@ -1,6 +1,5 @@
 // Unit tests of the connect notice list. The notices run in order, a failure skips the notices that do not
 // continue after a failure, a throwing notice is reported as unclassified, and a superseded reply stops the list.
-// No Java test is ported here: the list is a new class with no Java test of its own.
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -73,7 +72,7 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
-        /// <summary>When an application call superseded the reply, no notice runs (O-2).</summary>
+        /// <summary>When an application call superseded the reply, no notice runs.</summary>
         [Fact]
         public void Run_WhenSuperseded_RunsNothing() {
             FakeClientHost host = new FakeClientHost();
