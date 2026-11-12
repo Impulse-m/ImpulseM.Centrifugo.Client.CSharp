@@ -89,7 +89,9 @@ namespace Centrifugal.Centrifuge.Tests {
         public async Task DeltaWithoutBase_DisconnectsWithCode2() {
             CentrifugeSubscription sub = await SubscribeDeltaAsync("ch");
             TaskCompletionSource<int> disconnected = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
+            TaskCompletionSource<string> errorType = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
             client!.Disconnected += (_, e) => disconnected.TrySetResult(e.Code);
+            sub.Error += (_, e) => errorType.TrySetResult(e.Type);
             int delivered = 0;
             sub.Publication += (_, _) => Interlocked.Increment(ref delivered);
 
@@ -99,6 +101,7 @@ namespace Centrifugal.Centrifuge.Tests {
             });
 
             Assert.Equal(CentrifugeDisconnectedCodes.BadProtocol, await disconnected.Task.WaitAsync(wait));
+            Assert.Equal("publicationDecode", await errorType.Task.WaitAsync(wait));
             Assert.Equal(0, Volatile.Read(ref delivered));
         }
 

@@ -9,29 +9,32 @@ using Google.Protobuf;
 using Xunit;
 
 // Subscribe replies, token fetches, state getter, publish waits and unsubscribe of a subscription. No Java test pins these
-// rules, so each expectation comes from the subscription rules of the port brief. The resubscribe backoff is cut to
-// milliseconds so that the tests stay short. A barrier (a publish answered by the fake server) follows each step that
-// has no event of its own.
+// rules, so each expectation comes from the subscription rules of the port brief. The resubscribe retries and the publish
+// debounce windows run on the fake clock: a test fires a retry with Advance, after a barrier (a publish that the fake server
+// answers) that the failed step came before. The upstream reconnect and timeout timers stay real, and the tests that use
+// them are the ones with a Timeout or a reconnect option.
 namespace Centrifugal.Centrifuge.Tests {
 
 
     [Collection("Integration")]
-    public class SubscribeFlowTests : IAsyncLifetime {
+    public class SubscribeFlowTests : FakeServerTestBase {
         private static readonly TimeSpan wait = TimeSpan.FromSeconds(5);
-        private readonly FakeCentrifugoServer server = new FakeCentrifugoServer();
+        private readonly CommandArrivals subscribes = new CommandArrivals(wait);
         private CentrifugeClient? client;
+        private FakeStepTimerFactory timers = null!;
 
 
-        public async Task InitializeAsync() {
-            await server.StartAsync();
-        }
+        private FakeCentrifugoServer server => Server;
 
 
-        public async Task DisposeAsync() {
-            if (client != null) {
-                await client.DisposeAsync();
-            }
-            await server.DisposeAsync();
+        public override async Task InitializeAsync() {
+            await base.InitializeAsync();
+            server.BeforeCommand = cmd => {
+                if (cmd.Subscribe != null) {
+                    subscribes.Add();
+                }
+                return Task.CompletedTask;
+            };
         }
 
 
@@ -58,7 +61,7 @@ namespace Centrifugal.Centrifuge.Tests {
 
 
         private async Task ConnectAsync() {
-            client = new CentrifugeClient(server.Url, FastOptions());
+            client = NewClientWithTestClock(out timers, FastOptions());
             client.Connect();
             await client.ReadyAsync().WaitAsync(wait);
         }
@@ -66,6 +69,19 @@ namespace Centrifugal.Centrifuge.Tests {
 
         private async Task Barrier() {
             await client!.PublishAsync("barrier", ReadOnlyMemory<byte>.Empty).WaitAsync(wait);
+        }
+
+
+        // Fires the retry that the last failed step armed. The barrier comes first, so that step is finished.
+        private async Task FireRetryAsync() {
+            await Barrier();
+            timers.Advance(LastRequestedDelay());
+        }
+
+
+        private int LastRequestedDelay() {
+            IReadOnlyList<int> delays = timers.RequestedDelays;
+            return delays[delays.Count - 1];
         }
 
 
@@ -102,7 +118,7 @@ namespace Centrifugal.Centrifuge.Tests {
                 if (cmd.Subscribe == null) {
                     return null;
                 }
-                return CountCommands(c => c.Subscribe != null) == 1 ? ErrorFor(server, cmd, 100, true) : null;
+                return subscribes.Count == 1 ? ErrorFor(server, cmd, 100, true) : null;
             };
             await ConnectAsync();
             TaskCompletionSource<bool> subscribed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -110,6 +126,8 @@ namespace Centrifugal.Centrifuge.Tests {
             sub.Subscribed += (_, _) => subscribed.TrySetResult(true);
 
             sub.Subscribe();
+            await subscribes.Reached(1);
+            await FireRetryAsync();
 
             await subscribed.Task.WaitAsync(wait);
             Assert.Equal(2, CountCommands(c => c.Subscribe != null));
@@ -141,7 +159,7 @@ namespace Centrifugal.Centrifuge.Tests {
                 if (cmd.Subscribe == null) {
                     return null;
                 }
-                return CountCommands(c => c.Subscribe != null) == 1 ? ErrorFor(server, cmd, 109, false) : null;
+                return subscribes.Count == 1 ? ErrorFor(server, cmd, 109, false) : null;
             };
             await ConnectAsync();
             TaskCompletionSource<bool> subscribed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -151,6 +169,8 @@ namespace Centrifugal.Centrifuge.Tests {
             sub.Subscribed += (_, _) => subscribed.TrySetResult(true);
 
             sub.Subscribe();
+            await subscribes.Reached(1);
+            await FireRetryAsync();
 
             await subscribed.Task.WaitAsync(wait);
             Assert.Equal("t2", server.LastSubscribe()!.Token);
@@ -197,6 +217,7 @@ namespace Centrifugal.Centrifuge.Tests {
             sub.Subscribe();
 
             Assert.Equal("subscribeToken", await errorType.Task.WaitAsync(wait));
+            await FireRetryAsync();
             await subscribed.Task.WaitAsync(wait);
             Assert.Equal("t2", server.LastSubscribe()!.Token);
         }
@@ -311,12 +332,12 @@ namespace Centrifugal.Centrifuge.Tests {
 
 
         [Fact]
-        // A publish waits for the subscription, and fails with the client timeout.
+        // A publish waits for the subscription, and fails with the client timeout. The timeout is the upstream one, a real timer.
         public async Task PublishAsync_NotSubscribed_TimesOut() {
             // The subscribe is held past the client timeout: the publish waits for SUBSCRIBED and fails with the timeout. The
             // subscribe times out while connected too, so the client reconnects (see SubscribeTimeout_WhileConnected_ReconnectsWithCode3).
             server.DeferCommand(cmd => cmd.Subscribe != null);
-            client = new CentrifugeClient(server.Url, new CentrifugeClientOptions { Timeout = TimeSpan.FromMilliseconds(200) });
+            client = NewClientWithTestClock(out timers, new CentrifugeClientOptions { Timeout = TimeSpan.FromMilliseconds(200) });
             client.Connect();
             await client.ReadyAsync().WaitAsync(wait);
             CentrifugeSubscription sub = client.NewSubscription("ch");
@@ -415,7 +436,8 @@ namespace Centrifugal.Centrifuge.Tests {
             await sub.PublishAsync(new byte[] { 2 }).WaitAsync(wait);
 
             sub.Unsubscribe();
-            await Task.Delay(TimeSpan.FromMilliseconds(500));
+            // Past the window end: a window that was not cancelled would send the pending value now.
+            timers.Advance(500);
             await Barrier();
 
             Assert.Equal(1, CountCommands(c => c.Publish != null && c.Publish.Channel == "ch"));
@@ -444,7 +466,8 @@ namespace Centrifugal.Centrifuge.Tests {
 
             server.CloseConnection();
             await secondSubscribed.Task.WaitAsync(TimeSpan.FromSeconds(10));
-            await Task.Delay(TimeSpan.FromMilliseconds(500));
+            // Past the window end: a window that survived the transport loss would send the pending value now.
+            timers.Advance(500);
             await Barrier();
 
             Assert.Equal(1, CountCommands(c => c.Publish != null && c.Publish.Channel == "ch"));
@@ -455,7 +478,7 @@ namespace Centrifugal.Centrifuge.Tests {
         [Fact]
         // Code 112 with a state getter loads the state again and resubscribes, and no error event is raised.
         public async Task SubscribeError_112WithStateGetter_LoadsStateAgainWithoutEvent() {
-            server.OnCommand = cmd => cmd.Subscribe != null && CountCommands(c => c.Subscribe != null) == 1 ? ErrorFor(server, cmd, 112, false) : null;
+            server.OnCommand = cmd => cmd.Subscribe != null && subscribes.Count == 1 ? ErrorFor(server, cmd, 112, false) : null;
             await ConnectAsync();
             int stateCalls = 0;
             int errors = 0;
@@ -470,6 +493,8 @@ namespace Centrifugal.Centrifuge.Tests {
             sub.Subscribed += (_, _) => subscribed.TrySetResult(true);
 
             sub.Subscribe();
+            await subscribes.Reached(1);
+            await FireRetryAsync();
 
             await subscribed.Task.WaitAsync(wait);
             Assert.Equal(2, Volatile.Read(ref stateCalls));
@@ -498,6 +523,7 @@ namespace Centrifugal.Centrifuge.Tests {
             sub.Subscribe();
 
             Assert.Equal("getState", await errorType.Task.WaitAsync(wait));
+            await FireRetryAsync();
             await subscribed.Task.WaitAsync(wait);
             Assert.Equal(2, Volatile.Read(ref calls));
         }
@@ -506,7 +532,7 @@ namespace Centrifugal.Centrifuge.Tests {
         [Fact]
         // A temporary subscribe error waits for its backoff across a reconnect: the connect does not resubscribe at once.
         public async Task Resubscribe_WaitsForBackoffAcrossReconnect() {
-            server.OnCommand = cmd => cmd.Subscribe != null && CountCommands(c => c.Subscribe != null) == 1 ? ErrorFor(server, cmd, 100, true) : null;
+            server.OnCommand = cmd => cmd.Subscribe != null && subscribes.Count == 1 ? ErrorFor(server, cmd, 100, true) : null;
             await ConnectAsync();
             TaskCompletionSource<bool> errored = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             TaskCompletionSource<bool> reconnecting = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -534,9 +560,10 @@ namespace Centrifugal.Centrifuge.Tests {
 
         [Fact]
         // A subscribe that gets no reply within the client timeout, while connected, reconnects the client with code 3.
+        // The timeout and the reconnect are the upstream timers, so this test uses real time with the smallest options.
         public async Task SubscribeTimeout_WhileConnected_ReconnectsWithCode3() {
             server.DeferCommand(cmd => cmd.Subscribe != null);
-            client = new CentrifugeClient(server.Url, new CentrifugeClientOptions {
+            client = NewClientWithTestClock(out timers, new CentrifugeClientOptions {
                 Timeout = TimeSpan.FromMilliseconds(200),
                 MinReconnectDelay = TimeSpan.FromMilliseconds(10),
                 MaxReconnectDelay = TimeSpan.FromMilliseconds(50)
@@ -602,8 +629,8 @@ namespace Centrifugal.Centrifuge.Tests {
         [Fact]
         // The channel id of a subscribe is the id of its last subscribe: a push with an earlier id is dropped.
         public async Task PushId_RoutesById_AfterResubscribe() {
-            int subscribes = 0;
-            server.OnSubscribe = (_, _) => new SubscribeResult { Id = Interlocked.Increment(ref subscribes) == 1 ? 7 : 8 };
+            int subscribeReplies = 0;
+            server.OnSubscribe = (_, _) => new SubscribeResult { Id = Interlocked.Increment(ref subscribeReplies) == 1 ? 7 : 8 };
             await ConnectAsync();
             TaskCompletionSource<bool> firstSubscribed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             TaskCompletionSource<bool> secondSubscribed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
