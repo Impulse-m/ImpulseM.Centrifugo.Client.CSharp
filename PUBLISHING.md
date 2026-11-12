@@ -1,213 +1,126 @@
-# Publishing Centrifuge C# SDK to NuGet
+# Publishing ImpulseM.Centrifuge to nuget.org
 
-This guide explains how to publish the Centrifuge C# SDK to NuGet.org.
+The package `ImpulseM.Centrifuge` is published to [nuget.org](https://www.nuget.org/packages/ImpulseM.Centrifuge/) by the workflow `.github/workflows/release.yml`. The code namespace stays `Centrifugal.Centrifuge`. Versions are semantic versions, starting at `1.0.0`.
 
-## Prerequisites
+Nothing is published by hand in the normal flow. The workflow signs in to nuget.org through trusted publishing (OpenID Connect), so no API key is stored in the repository.
 
-1. **NuGet.org Account**
-   - Create an account at [nuget.org](https://www.nuget.org/)
-   - Verify your email address
+## One-time setup (owner)
 
-2. **API Key**
-   - Go to your [NuGet API Keys page](https://www.nuget.org/account/apikeys)
-   - Click "Create"
-   - Give it a name (e.g., "centrifuge-csharp-publish")
-   - Select "Push" scope
-   - Select "Push new packages and package versions"
-   - For package glob pattern, enter: `Centrifuge.Client*`
-   - Click "Create"
-   - **IMPORTANT**: Copy the API key immediately - you won't see it again!
+1. **nuget.org account.** The package owner signs in to nuget.org.
+2. **Trusted publishing policy.** On nuget.org, open the package (or the account, for a package that does not exist yet) and add a trusted publishing policy with:
+   - repository owner: `Impulse-m`
+   - repository: `ImpulseM.Centrifugo.Client.CSharp`
+   - workflow file: `release.yml`
+   - environment: `release`
+3. **First version.** nuget.org may not accept a policy for a package id that has no versions yet. If it does not, publish `1.0.0` once by hand, following [First release by hand](#first-release-by-hand), and create the policy right after. Every later version goes through the workflow. This has not been verified against the live service.
+4. **GitHub environment.** In the repository settings, create the environment `release`, and limit its deployment branches and tags to `main` and `v*`.
+5. **GitHub variable.** Add the repository variable `NUGET_USER` with the nuget.org profile name that owns the package. The workflow passes it to the `NuGet/login` action.
 
-3. **GitHub Repository Setup**
-   - Create a new repository: `centrifugal/centrifuge-csharp`
-   - Add your NuGet API key as a GitHub secret:
-     - Go to repository Settings → Secrets and variables → Actions
-     - Click "New repository secret"
-     - Name: `NUGET_API_KEY`
-     - Value: (paste your NuGet API key)
-     - Click "Add secret"
+No `NUGET_API_KEY` secret is needed for the workflow.
 
-## Initial Setup
+## Releasing a version
 
-### 1. Initialize Git Repository
+Run the workflow in one of two ways. The version is never read from the project file.
 
-```bash
-cd centrifuge-csharp
+- **Manual dispatch (recommended).** Open Actions, choose `release`, and enter the version without the leading `v`, for example `1.0.0` or `1.1.0-rc.1`. The run must start on `main`. The workflow creates the tag `v<version>` on the commit of the run at the end, after the package is served.
+- **Tag push.** Push a tag `v<version>` on a commit of `main`. The workflow runs the same jobs, but creates no tag, because the tag already exists. The validate job refuses a tag whose commit is not on `main`.
 
-# Initialize git
-git init
+The jobs run in this order:
 
-# Add files
-git add .
+1. **validate.** The commit must be on `main`. The version must be semver without the leading `v`. For a dispatch the tag must not exist on origin. A GitHub Release `v<version>` must not exist. A stable version must be greater than the latest stable GitHub Release.
+2. **test.** The CI workflow `test.yml` runs in full, with the integration tests against Centrifugo. Nothing is published when a test fails.
+3. **build.** `dotnet pack` runs with `-p:Version=<version>`, so the version is set without editing the project file. The `.nupkg` must contain `LICENSE` and `THIRD_PARTY_NOTICES.md` at its root. The `.snupkg` symbol package is built too.
+4. **publish.** The job stops when nuget.org already lists the version. Then it pushes the `.nupkg` and, as a separate push, the `.snupkg`. Nothing is skipped silently: the push does not use `--skip-duplicate`.
+5. **verify.** The job polls the nuget.org package index every 15 seconds for at most 10 minutes, until the version is listed.
+6. **tag.** Dispatch only. It creates the lightweight tag `v<version>` on the commit of the run and pushes it.
+7. **release.** It creates the GitHub Release `v<version>` with generated notes, marked as a pre-release when the version has a `-`, and as the latest release otherwise. It attaches the `.nupkg` and `.snupkg` files.
 
-# Commit
-git commit -m "Initial commit: Centrifuge C# SDK v1.0.0"
+### Release gate
 
-# Add remote (replace with your repository URL)
-git remote add origin https://github.com/centrifugal/centrifuge-csharp.git
+The workflow does not check these, so check them before a release starts:
 
-# Push to GitHub
-git branch -M main
-git push -u origin main
-```
+- every feature that `README.md` and the `Unreleased` section of `CHANGELOG.md` describe is in `src/`, and the public API is listed in `PublicAPI.Shipped.txt` or `PublicAPI.Unshipped.txt`;
+- the build passes with the public API analyzer, and the test workflow is green on the commit.
 
-## Publishing Workflow
+### Pre-releases
 
-### Automatic Publishing (Recommended)
+A version with a `-` suffix, for example `1.1.0-rc.1`, becomes a GitHub pre-release. nuget.org does not install it by default; a consumer asks for it with `dotnet add package ImpulseM.Centrifuge --version 1.1.0-rc.1`.
 
-Update version in Centrifuge/Centrifuge.csproj before tagging, push.
+The `.snupkg` push has not run against nuget.org yet. The first prerelease run after a change to the release workflow checks it, before any stable release.
 
-The repository is configured with GitHub Actions for automatic publishing:
+### Versions are immutable
 
-```bash
-# 2. Create and push a version tag
-git tag v1.0.0
-git push origin v1.0.0
+nuget.org does not replace a version. If a version is wrong, release the next one. A version that was pushed but failed at `verify` stays on nuget.org: the package exists, but no tag and no GitHub Release were created. Re-running the same version then fails at the publish job, and the fix is a new version. nuget.org can unlist a version by hand; an unlisted version is still reserved.
 
-# GitHub Actions will automatically:
-# - Build the project
-# - Run tests
-# - Pack the NuGet package
-# - Publish to NuGet.org
-# - Create a GitHub release
-```
+### Breaking changes
 
-### Manual Publishing
+A breaking change of the public API is named in the title or the body of the pull request, so that it reaches the release notes. The release notes are generated from the merged pull requests, not from `CHANGELOG.md`.
 
-If you prefer to publish manually:
+## First release by hand
 
-Update version in Centrifuge/Centrifuge.csproj before tagging, push.
+Use this only for the first version, when nuget.org has no trusted publishing policy for the package yet. The steps run from a clean checkout of the commit on `main` that the release is for. This path has not been verified against the live service.
+
+1. Pack the version:
 
 ```bash
-# 1. Clean and restore
-dotnet clean
-dotnet restore
-
-# 2. Build in Release mode
-dotnet build --configuration Release
-
-# 3. Run tests
-dotnet test --configuration Release
-
-# 4. Pack the NuGet package
-dotnet pack src/Centrifuge/Centrifuge.csproj --configuration Release --output ./artifacts
-
-# 5. Publish to NuGet.org
-dotnet nuget push ./artifacts/Centrifuge.Client.*.nupkg \
-    --api-key YOUR_API_KEY \
-    --source https://api.nuget.org/v3/index.json
+dotnet pack src/Centrifugal.Centrifuge/Centrifugal.Centrifuge.csproj -c Release -p:Version=1.0.0 -o artifacts
 ```
 
-## Version Management
+2. Push the package and the symbol package. Use an API key scoped to the package id `ImpulseM.Centrifuge` and the push glob `ImpulseM.Centrifuge*`, read from the environment variable `NUGET_API_KEY`. Do not write the key to a file in the repository.
 
-### Updating the Version
-
-Edit `src/Centrifuge/Centrifuge.csproj`:
-
-```xml
-<PropertyGroup>
-    <Version>1.0.1</Version>
-</PropertyGroup>
-```
-
-## Release Checklist
-
-Before each release:
-
-- [ ] All tests pass
-- [ ] Version updated in `.csproj`
-- [ ] CHANGELOG.md updated
-- [ ] README.md reviewed
-- [ ] Examples tested
-- [ ] Documentation updated
-- [ ] No debug code left
-
-## Publishing Pre-release Versions
-
-For beta or RC versions:
-
-```xml
-<PropertyGroup>
-    <Version>1.1.0-beta.1</Version>
-</PropertyGroup>
-```
-
-Then tag and push:
 ```bash
-git tag v1.1.0-beta.1
-git push origin v1.1.0-beta.1
+dotnet nuget push artifacts/ImpulseM.Centrifuge.1.0.0.nupkg --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY" --no-symbols
+dotnet nuget push artifacts/ImpulseM.Centrifuge.1.0.0.snupkg --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY"
 ```
 
-Pre-release versions won't be installed by default unless explicitly requested:
+3. Create the trusted publishing policy (step 2 of the one-time setup), then revoke the API key.
+
+4. Finish the release, because the workflow run for 1.0.0 cannot do it:
+
 ```bash
-dotnet add package Centrifuge.Client --version 1.1.0-beta.1
+git tag v1.0.0 <commit-on-main>
+git push origin refs/tags/v1.0.0
+gh release create v1.0.0 --verify-tag --generate-notes --latest artifacts/ImpulseM.Centrifuge.1.0.0.nupkg artifacts/ImpulseM.Centrifuge.1.0.0.snupkg
 ```
+
+The tag push starts a `release` run. Its publish job refuses 1.0.0 because nuget.org already lists it, so that run stops before the tag and release jobs. A failed run here is expected and changes nothing. The release is created only by the `gh release create` command above.
+
+## Local pack
+
+To check the package locally, pack it with the release version. Do not push it by hand unless the workflow cannot run.
+
+```bash
+dotnet pack src/Centrifugal.Centrifuge/Centrifugal.Centrifuge.csproj -c Release -p:Version=1.0.0 -o artifacts
+```
+
+Then inspect the package root:
+
+```bash
+unzip -Z1 artifacts/ImpulseM.Centrifuge.1.0.0.nupkg
+```
+
+## Version in the project file
+
+`src/Centrifugal.Centrifuge/Centrifugal.Centrifuge.csproj` carries a `<Version>` value for local builds. The release workflow passes the version through `-p:Version`, so the project file is not edited for a release. Keep the project value at the last released version when you change it.
+
+## Package metadata
+
+The metadata is defined in `src/Centrifugal.Centrifuge/Centrifugal.Centrifuge.csproj`. The package carries `README.md`, `icon.png`, `LICENSE` and `THIRD_PARTY_NOTICES.md` at its root, and the XML documentation and the symbol package are published with it.
 
 ## Troubleshooting
 
-### Package Already Exists
+### Version already published
 
-If you get "package already exists" error:
-- Increment the version number
-- You cannot republish the same version
+The publish job found the version on nuget.org. Choose a new version and run the workflow again.
 
-### Authentication Failed
+### Symbol package push fails after the package
 
-If authentication fails:
-- Check your API key is correct
-- Ensure API key has "Push" permissions
-- Verify package glob pattern matches "Centrifuge.Client*"
+The publish job pushes the `.nupkg` first. If the `.snupkg` push then fails, the version is on nuget.org, the tag and the release are not created, and a rerun of the workflow fails at the publish job. Do not publish a new version for this. Push the symbol package of the same version by hand, with the second command of [First release by hand](#first-release-by-hand) step 2, then create the tag and the GitHub Release with step 4 of that section.
 
-### Package Not Appearing
+### Sign-in fails
 
-After publishing:
-- It may take 10-15 minutes to index
-- Check [nuget.org/packages/Centrifuge.Client](https://www.nuget.org/packages/Centrifuge.Client)
-- Verify no errors in GitHub Actions logs
+Check, in this order: the `release` environment exists and allows the branch or tag, the variable `NUGET_USER` is set, the trusted publishing policy names this repository, this workflow file and the environment `release`.
 
-## Package Metadata
+### Package not listed after publish
 
-The package metadata is defined in `src/Centrifuge/Centrifuge.csproj`:
-
-```xml
-<PropertyGroup>
-    <PackageId>Centrifuge.Client</PackageId>
-    <Version>1.0.0</Version>
-    <Authors>Centrifugal</Authors>
-    <Company>Centrifugal</Company>
-    <Description>C# client SDK for Centrifugo and Centrifuge</Description>
-    <PackageProjectUrl>https://github.com/centrifugal/centrifuge-csharp</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/centrifugal/centrifuge-csharp</RepositoryUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageTags>centrifugo;centrifuge;websocket;real-time;messaging</PackageTags>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageIcon>icon.png</PackageIcon>
-</PropertyGroup>
-```
-
-## Monitoring
-
-After publishing:
-
-1. **NuGet.org Stats**
-   - View download stats at [nuget.org/packages/Centrifuge.Client](https://www.nuget.org/packages/Centrifuge.Client)
-   - Monitor for support requests
-
-2. **GitHub**
-   - Watch for issues
-   - Review pull requests
-   - Monitor discussions
-
-3. **CI/CD**
-   - Check GitHub Actions for build status
-   - Review any failed builds
-
-## Support
-
-For questions about publishing:
-- NuGet Documentation: https://docs.microsoft.com/en-us/nuget/
-- GitHub Actions: https://docs.github.com/en/actions
-
-For Centrifugo-specific questions:
-- Centrifugal Docs: https://centrifugal.dev/
-- GitHub Issues: https://github.com/centrifugal/centrifuge-csharp/issues
+The verify job waits 10 minutes. If it times out, the version is on nuget.org but not listed in the index yet. Check the package page on nuget.org and the job log before you decide anything; do not publish the same version again.

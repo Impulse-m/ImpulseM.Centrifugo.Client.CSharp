@@ -1,46 +1,313 @@
-name: Release
+name: release
 
 on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version without the leading v, e.g. 1.0.0 or 1.1.0-rc.1'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.event_name == 'workflow_dispatch' && format('v{0}', inputs.version) || github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  PACKAGE_ID: ImpulseM.Centrifuge
+  PROJECT: src/Centrifugal.Centrifuge/Centrifugal.Centrifuge.csproj
+  NUGET_SOURCE: https://api.nuget.org/v3/index.json
+  # The NuGet flat container index of the package id, which lists every version nuget.org serves.
+  NUGET_INDEX: https://api.nuget.org/v3-flatcontainer/impulsem.centrifuge/index.json
 
 jobs:
-  release:
+  validate:
+    name: Validate version
     runs-on: ubuntu-latest
-
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
     steps:
-    - uses: actions/checkout@v6
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          # The full history is needed to test that the commit is on main.
+          fetch-depth: 0
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v5
-      with:
-        dotnet-version: '10.0.x'
+      - name: Check that the commit is on main
+        # The environment allows every v* tag, so the commit the tag points at is checked here.
+        env:
+          RELEASE_SHA: ${{ github.sha }}
+        run: |
+          git fetch --quiet --no-tags origin '+refs/heads/main:refs/remotes/origin/main'
+          if ! git merge-base --is-ancestor "$RELEASE_SHA" origin/main; then
+            echo "::error::Commit ${RELEASE_SHA} is not on main. Release only from a commit of main."
+            exit 1
+          fi
 
-    - name: Extract version from tag
-      id: get_version
-      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      - name: Resolve and validate version
+        id: version
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+          REF_NAME: ${{ github.ref_name }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            version="$INPUT_VERSION"
+          else
+            version="${REF_NAME#v}"
+          fi
 
-    - name: Update project version
-      run: |
-        sed -i "s/<Version>.*<\/Version>/<Version>${{ steps.get_version.outputs.VERSION }}<\/Version>/" src/Centrifugal.Centrifuge/Centrifugal.Centrifuge.csproj
+          semver='^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$'
+          if ! [[ "$version" =~ $semver ]]; then
+            echo "::error::Invalid version '${version}'. Expected semver without the leading v, e.g. 1.0.0 or 1.1.0-rc.1."
+            exit 1
+          fi
 
-    - name: Restore dependencies
-      run: dotnet restore
+          tag="v${version}"
+          prerelease=false
+          if [[ "$version" == *-* ]]; then
+            prerelease=true
+          fi
 
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            remote_tag="$(git ls-remote --tags origin "refs/tags/${tag}")"
+            if [ -n "$remote_tag" ]; then
+              echo "::error::Tag ${tag} already exists on origin."
+              exit 1
+            fi
+          fi
 
-    - name: Pack
-      run: dotnet pack src/Centrifugal.Centrifuge/Centrifugal.Centrifuge.csproj --configuration Release --no-build --output ./artifacts
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "::error::GitHub Release ${tag} already exists."
+            exit 1
+          fi
 
-    - name: Publish to NuGet
-      run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+          if [ "$prerelease" = "false" ]; then
+            highest="$(gh release list --exclude-pre-releases --limit 1000 --json tagName --jq '.[].tagName' | sed 's/^v//' | sort -V | tail -n 1)"
+            if [ -n "$highest" ]; then
+              newest="$(printf '%s\n%s\n' "$highest" "$version" | sort -V | tail -n 1)"
+              if [ "$highest" = "$version" ] || [ "$newest" != "$version" ]; then
+                echo "::error::Version ${version} is not greater than the latest release v${highest}."
+                exit 1
+              fi
+            fi
+          fi
 
-    - name: Create GitHub Release
-      uses: softprops/action-gh-release@v3
-      with:
-        files: ./artifacts/*.nupkg
-        generate_release_notes: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          {
+            echo "version=${version}"
+            echo "prerelease=${prerelease}"
+          } >> "$GITHUB_OUTPUT"
+
+  test:
+    name: Test
+    needs:
+      - validate
+    permissions:
+      contents: read
+    uses: ./.github/workflows/test.yml
+
+  build:
+    name: Build package
+    needs:
+      - validate
+      - test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      VERSION: ${{ needs.validate.outputs.version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Pack
+        # The version comes from the tag through the property, the project file is not edited.
+        run: dotnet pack "$PROJECT" --configuration Release -p:Version="$VERSION" --output ./artifacts
+
+      - name: Check the licence notices in the package
+        run: |
+          shopt -s nullglob
+          packages=(artifacts/*.nupkg)
+          symbols=(artifacts/*.snupkg)
+          if [ "${#packages[@]}" -eq 0 ] || [ "${#symbols[@]}" -eq 0 ]; then
+            echo "::error::No package and symbol package were built."
+            exit 1
+          fi
+          for package in "${packages[@]}"; do
+            unzip -Z1 "$package" > "$RUNNER_TEMP/package-entries.txt"
+            for entry in LICENSE THIRD_PARTY_NOTICES.md; do
+              if ! grep -qx "$entry" "$RUNNER_TEMP/package-entries.txt"; then
+                echo "::error::${package} has no ${entry} at its root."
+                exit 1
+              fi
+            done
+          done
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-packages
+          path: |
+            artifacts/*.nupkg
+            artifacts/*.snupkg
+          if-no-files-found: error
+
+  publish:
+    name: Publish to nuget.org
+    needs:
+      - validate
+      - build
+    runs-on: ubuntu-latest
+    # The environment limits the trusted publishing token to main and v* tags (set in the repository settings).
+    environment: release
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      VERSION: ${{ needs.validate.outputs.version }}
+    steps:
+      - name: Download packages
+        uses: actions/download-artifact@v4
+        with:
+          name: release-packages
+          path: dist
+
+      - name: Refuse to overwrite an existing version
+        # nuget.org never replaces a version, so the push of an existing one would fail or be skipped silently.
+        run: |
+          code="$(curl -s -o "$RUNNER_TEMP/index.json" -w '%{http_code}' "$NUGET_INDEX" || true)"
+          case "$code" in
+            200)
+              ;;
+            404)
+              echo "${PACKAGE_ID} has no versions on nuget.org yet."
+              exit 0
+              ;;
+            *)
+              echo "::error::nuget.org answered HTTP ${code:-none} for the package index."
+              exit 1
+              ;;
+          esac
+          lower="$(printf '%s' "$VERSION" | tr '[:upper:]' '[:lower:]')"
+          if jq -e --arg v "$lower" '.versions | index($v) != null' "$RUNNER_TEMP/index.json" > /dev/null; then
+            echo "::error::Version ${VERSION} is already published on nuget.org. Package versions are immutable; bump the version."
+            exit 1
+          fi
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Sign in to nuget.org with trusted publishing
+        id: nuget_login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ vars.NUGET_USER }}
+
+      - name: Push packages and symbols
+        env:
+          NUGET_API_KEY: ${{ steps.nuget_login.outputs.NUGET_API_KEY }}
+        run: |
+          # The symbol package is pushed on its own, so that it is not pushed twice.
+          dotnet nuget push dist/*.nupkg --source "$NUGET_SOURCE" --api-key "$NUGET_API_KEY" --no-symbols
+          dotnet nuget push dist/*.snupkg --source "$NUGET_SOURCE" --api-key "$NUGET_API_KEY"
+
+  verify:
+    name: Verify the package is served
+    needs:
+      - validate
+      - publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      VERSION: ${{ needs.validate.outputs.version }}
+    steps:
+      - name: Wait for the version to be listed
+        # The index is updated after the push, so poll until nuget.org lists the version.
+        run: |
+          lower="$(printf '%s' "$VERSION" | tr '[:upper:]' '[:lower:]')"
+          deadline=$((SECONDS + 600))
+          while true; do
+            code="$(curl -s -o "$RUNNER_TEMP/index.json" -w '%{http_code}' "$NUGET_INDEX" || true)"
+            echo "Package index HTTP ${code}: ${NUGET_INDEX}"
+            if [ "$code" = "200" ] && jq -e --arg v "$lower" '.versions | index($v) != null' "$RUNNER_TEMP/index.json" > /dev/null; then
+              echo "${PACKAGE_ID} ${VERSION} is listed on nuget.org."
+              exit 0
+            fi
+            if [ "$SECONDS" -ge "$deadline" ]; then
+              echo "::error::Timed out after 10 minutes waiting for ${PACKAGE_ID} ${VERSION} in the package index (last HTTP ${code})."
+              exit 1
+            fi
+            sleep 15
+          done
+
+  tag:
+    name: Create tag
+    needs:
+      - validate
+      - build
+      - verify
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ needs.validate.outputs.version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Create and push tag
+        run: |
+          git tag "v${VERSION}" "$GITHUB_SHA"
+          git push origin "refs/tags/v${VERSION}"
+
+  release:
+    name: Create GitHub release
+    needs:
+      - validate
+      - build
+      - verify
+      - tag
+    # tag is skipped for tag pushes, which is still a valid path.
+    if: ${{ always() && needs.build.result == 'success' && needs.verify.result == 'success' && (needs.tag.result == 'success' || needs.tag.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ needs.validate.outputs.version }}
+      PRERELEASE: ${{ needs.validate.outputs.prerelease }}
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Download packages
+        uses: actions/download-artifact@v4
+        with:
+          name: release-packages
+          path: dist
+
+      - name: Create GitHub Release
+        run: |
+          args=(--verify-tag --generate-notes)
+          if [ "$PRERELEASE" = "true" ]; then
+            args+=(--prerelease)
+          else
+            args+=(--latest)
+          fi
+
+          gh release create "v${VERSION}" "${args[@]}" dist/*.nupkg dist/*.snupkg
