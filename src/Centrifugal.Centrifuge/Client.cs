@@ -534,19 +534,12 @@ namespace Centrifugal.Centrifuge
         /// <param name="data">Request data.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>RPC result.</returns>
-        public async Task<CentrifugeRpcResult> RpcAsync(string method, ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+#pragma warning disable RS0027 // The upstream overload keeps its optional token; the options overload takes the token without a default.
+        public Task<CentrifugeRpcResult> RpcAsync(string method, ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
         {
-            var reply = await CallAsync(new Command
-            {
-                Rpc = new RPCRequest
-                {
-                    Method = method,
-                    Data = ByteString.CopyFrom(data.Span)
-                }
-            }, cancellationToken).ConfigureAwait(false);
-
-            return new CentrifugeRpcResult(reply.Rpc?.Data.ToByteArray() ?? Array.Empty<byte>());
+            return RpcAsync(method, data, null, cancellationToken);
         }
+#pragma warning restore RS0027
 
         /// <summary>
         /// Sends an asynchronous message to the server; the server sends no reply. If the client is not
