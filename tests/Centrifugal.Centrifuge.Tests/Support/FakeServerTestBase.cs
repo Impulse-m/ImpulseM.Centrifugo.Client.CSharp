@@ -42,6 +42,28 @@ namespace Centrifugal.Centrifuge.Tests {
             return client;
         }
 
+
+        /// <summary>
+        /// Creates a client for the fake server whose fork timers, monotonic clock and random source the test controls.
+        /// The subscriptions, the connection refresh, the rpc session and the ping watchdog run on these timers; the
+        /// upstream timers of the client stay real. The client is not connected yet.
+        /// </summary>
+        /// <param name="timers">Receives the fake timers of the client. Advance moves the clock and fires due timers.</param>
+        /// <param name="options">The client options, or null for the defaults.</param>
+        /// <param name="random">The random source, or null for <see cref="FixedRandom.MinimumDraws"/>.</param>
+        internal CentrifugeClient NewClientWithTestClock(
+            out FakeStepTimerFactory timers,
+            CentrifugeClientOptions? options = null,
+            Random? random = null
+        ) {
+            CentrifugeClient client = NewClient(options);
+            FakeStepTimerFactory fake = new FakeStepTimerFactory(client.Loop);
+            client.UseTestClock(fake, () => fake.ElapsedMs, random ?? FixedRandom.MinimumDraws());
+            timers = fake;
+            return client;
+        }
+
+
         /// <summary>
         /// Completes with the event args of the next Connected event of the client, or fails after five seconds.
         /// </summary>

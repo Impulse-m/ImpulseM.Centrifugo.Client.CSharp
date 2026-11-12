@@ -154,7 +154,7 @@ namespace Centrifugal.Centrifuge {
             /// <summary>Monotonic milliseconds.</summary>
             public long NowMs {
                 get {
-                    return Clock.NowMs;
+                    return owner._nowMs();
                 }
             }
 

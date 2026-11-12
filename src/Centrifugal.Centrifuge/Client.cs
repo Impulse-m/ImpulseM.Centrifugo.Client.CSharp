@@ -1010,6 +1010,7 @@ namespace Centrifugal.Centrifuge
 
         private ITransport CreateTransport(CentrifugeTransportType transportType, string endpoint)
         {
+            if (_transportFactory != null) return _transportFactory(transportType, endpoint);
             switch (transportType)
             {
                 case CentrifugeTransportType.WebSocket:

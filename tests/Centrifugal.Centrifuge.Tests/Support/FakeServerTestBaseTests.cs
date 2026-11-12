@@ -27,5 +27,17 @@ namespace Centrifugal.Centrifuge.Tests {
 
             Assert.Equal(CentrifugeClientState.Disconnected, client.State);
         }
+
+        /// <summary>A client made with a test clock gives its subscriptions the fake timers and still connects.</summary>
+        [Fact]
+        public async Task NewClientWithTestClock_UsesTheFakeTimersAndConnects() {
+            CentrifugeClient client = NewClientWithTestClock(out FakeStepTimerFactory timers);
+            Task<CentrifugeConnectedEventArgs> connected = WhenConnected(client);
+
+            client.Connect();
+            await connected;
+
+            Assert.Same(timers, client.StepTimers);
+        }
     }
 }
