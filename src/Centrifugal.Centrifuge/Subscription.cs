@@ -35,8 +35,8 @@ namespace Centrifugal.Centrifuge
         /// <summary>The channel id of channel compaction, scoped to the subscribed period.</summary>
         private long _id;
         private int _resubscribeAttempts;
-        private LoopTimer? _resubscribeTimer;
-        private LoopTimer? _refreshTimer;
+        private IStepTimer? _resubscribeTimer;
+        private IStepTimer? _refreshTimer;
         private bool _deltaNegotiated;
         private byte[]? _prevValue;
         /// <summary>A subscribe flow is in progress: a callback or a subscribe command.</summary>
@@ -51,6 +51,12 @@ namespace Centrifugal.Centrifuge
         /// one is outdated.</summary>
         private int _stateTransitions;
         private readonly Waiters _promises;
+        /// <summary>The publish debounce window of the server in milliseconds, from the last subscribe. Zero is off.</summary>
+        private int _publishDebounceMillis;
+        /// <summary>The publish debounce, created by the first debounced publish.</summary>
+        private PublishDebounce? _publishDebounce;
+        /// <summary>The retry step of the token refresh and the token the server refused with 109.</summary>
+        private readonly SubscriptionRefreshRetry _refreshRetry;
 
         /// <summary>
         /// Gets the channel name.
@@ -114,6 +120,7 @@ namespace Centrifugal.Centrifuge
             _data = _options.Data.IsEmpty ? default : _options.Data.ToArray();
             _tagsFilter = _options.TagsFilter;
             _promises = new Waiters(client.Loop);
+            _refreshRetry = new SubscriptionRefreshRetry(client.RefreshRetryPolicy);
 
             if (_options.Since is { } since)
             {
@@ -231,6 +238,12 @@ namespace Centrifugal.Centrifuge
         public async Task PublishAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
         {
             await MethodCallAsync(cancellationToken).ConfigureAwait(false);
+            Task? debounced = await RoutePublishAsync(data, cancellationToken).ConfigureAwait(false);
+            if (debounced != null)
+            {
+                await debounced.ConfigureAwait(false);
+                return;
+            }
             await _client.CallAsync(new Command
             {
                 Publish = new PublishRequest
@@ -280,6 +293,32 @@ namespace Centrifugal.Centrifuge
         {
             await MethodCallAsync(cancellationToken).ConfigureAwait(false);
             return await _client.PresenceStatsAsync(Channel, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Sends the publish through the debounce window when one is on (the window comes from the subscribe reply).
+        /// Returns the task of that publish, or null when no window is on. The step hands the task out.
+        /// </summary>
+        private Task<Task?> RoutePublishAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken)
+        {
+            var route = new TaskCompletionSource<Task?>(TaskCreationOptions.RunContinuationsAsynchronously);
+            Loop.Invoke(() =>
+            {
+                if (_publishDebounceMillis <= 0)
+                {
+                    route.TrySetResult(null);
+                    return;
+                }
+                try
+                {
+                    route.TrySetResult(PublishDebounceFor().Publish(data.ToArray(), _publishDebounceMillis, cancellationToken));
+                }
+                catch (Exception ex)
+                {
+                    route.TrySetException(ex);
+                }
+            });
+            return route.Task;
         }
 
         /// <summary>Waits for the subscription to be subscribed, up to the client timeout (as centrifuge-js
@@ -358,6 +397,8 @@ namespace Centrifugal.Centrifuge
                 _offset = 0;
                 _epoch = "_";
             }
+            CancelPublishDebounce();
+            SetId(0);
         }
 
         /// <summary>The connection was lost (or a temporary unsubscribe push): to subscribing.</summary>
@@ -365,6 +406,7 @@ namespace Centrifugal.Centrifuge
 
         private void SetSubscribing(int code, string reason)
         {
+            CancelPublishDebounce();
             if (_state == CentrifugeSubscriptionState.Subscribing) return;
             if (_state == CentrifugeSubscriptionState.Subscribed) ClearSubscribedState();
             // The channel id is scoped to the subscribed period.
@@ -606,8 +648,10 @@ namespace Centrifugal.Centrifuge
             if (_state != CentrifugeSubscriptionState.Subscribing) return;
 
             ClearSubscribingState();
+            _refreshRetry.ResetStep();
+            _publishDebounceMillis = PublishDebounce.CapWindow(result.PublishDebounce);
 
-            if (result.Id != 0) SetId(result.Id);
+            SetId(result.Id);
             _deltaNegotiated = result.Delta;
             // The server's first publication after a subscribe is full: the delta chain starts over.
             _prevValue = null;
@@ -654,7 +698,7 @@ namespace Centrifugal.Centrifuge
 
             if (result.Expires && _state == CentrifugeSubscriptionState.Subscribed)
             {
-                ScheduleRefresh(Utilities.TtlToMilliseconds(result.Ttl));
+                ScheduleRefresh(TtlToFullMilliseconds(result.Ttl));
             }
         }
 
@@ -677,6 +721,7 @@ namespace Centrifugal.Centrifuge
                 ClearSubscribingState();
             }
             _inflight = false;
+            CancelPublishDebounce();
             // Replies and callbacks of a subscribe in progress must not complete a later one.
             _subscribeFlow++;
             SetId(0);
@@ -721,7 +766,8 @@ namespace Centrifugal.Centrifuge
                 {
                     if (pub.Delta)
                         data = Fossil.ApplyDelta(_prevValue ?? throw new InvalidOperationException("delta publication without a base"), data);
-                    _prevValue = data;
+                    // The base is a copy: the app may change the data it got.
+                    _prevValue = (byte[])data.Clone();
                 }
                 catch (Exception ex)
                 {
@@ -790,7 +836,7 @@ namespace Centrifugal.Centrifuge
             _resubscribeAttempts++;
             // One timer at a time.
             ClearResubscribeTimer();
-            _resubscribeTimer = LoopTimer.Start(Loop, delay, () =>
+            _resubscribeTimer = _client.StepTimers.Start(delay, () =>
             {
                 _resubscribeTimer = null;
                 if (_state == CentrifugeSubscriptionState.Subscribing) DoSubscribe();
@@ -846,12 +892,35 @@ namespace Centrifugal.Centrifuge
         private void ScheduleRefresh(int delayMs)
         {
             ClearRefreshTimer();
-            _refreshTimer = LoopTimer.Start(Loop, delayMs, () =>
+            _refreshTimer = _client.StepTimers.Start(delayMs, () =>
             {
                 _refreshTimer = null;
                 Refresh();
             });
         }
+
+        /// <summary>Arms the next token refresh retry after the retry delay of the connection's backoff.</summary>
+        private void ScheduleRefreshRetry() => ScheduleRefresh(_refreshRetry.NextDelayMillis());
+
+        /// <summary>The full token TTL in milliseconds, capped at int.MaxValue (the refresh is due at the TTL, not before).</summary>
+        internal static int TtlToFullMilliseconds(uint ttl)
+        {
+            long ms = (long)ttl * 1000;
+            return (int)Math.Min(ms, int.MaxValue);
+        }
+
+        /// <summary>The publish debounce of this subscription, created on first use.</summary>
+        private PublishDebounce PublishDebounceFor()
+        {
+            if (_publishDebounce == null)
+            {
+                _publishDebounce = new PublishDebounce(Loop, _client.StepTimers, (data, cancellationToken) => _client.PublishAsync(Channel, data, cancellationToken));
+            }
+            return _publishDebounce;
+        }
+
+        /// <summary>Stops the publish debounce window and drops its pending publish.</summary>
+        private void CancelPublishDebounce() => _publishDebounce?.Cancel();
 
         private void Refresh()
         {
@@ -867,18 +936,21 @@ namespace Centrifugal.Centrifuge
                     FailUnauthorized();
                     return;
                 }
-                _token = token!;
-                var command = new Command { SubRefresh = new SubRefreshRequest { Channel = Channel, Token = _token } };
+                string usedToken = token!;
+                // A token the server refused with 109 is not sent again while the policy stops on it.
+                if (_refreshRetry.IsRefused(usedToken)) return;
+                _token = usedToken;
+                var command = new Command { SubRefresh = new SubRefreshRequest { Channel = Channel, Token = usedToken } };
                 // A reply of the refresh of an earlier subscribed period is outdated.
                 _client.RegisterCall(command, reply =>
                 {
                     if (generation != _refreshGeneration) return;
                     if (reply.SubRefresh != null) RefreshResponse(reply.SubRefresh);
                     // A reply breaking the protocol: retried as a temporary error.
-                    else RefreshError(new CentrifugeException(CentrifugeErrorCodes.TransportClosed, "sub refresh reply without result", true));
+                    else RefreshError(new CentrifugeException(CentrifugeErrorCodes.TransportClosed, "sub refresh reply without result", true), usedToken);
                 }, (error, _) =>
                 {
-                    if (generation == _refreshGeneration) RefreshError(error);
+                    if (generation == _refreshGeneration) RefreshError(error, usedToken);
                 });
                 _client.AddCommand(command);
             }, error =>
@@ -893,7 +965,7 @@ namespace Centrifugal.Centrifuge
                 {
                     // A handler may have ended the subscription, e.g. by disconnecting the client.
                     if (generation != _refreshGeneration || _state != CentrifugeSubscriptionState.Subscribed) return;
-                    ScheduleRefresh(GetRefreshRetryDelay());
+                    ScheduleRefreshRetry();
                 });
             });
         }
@@ -901,29 +973,42 @@ namespace Centrifugal.Centrifuge
         private void RefreshResponse(SubRefreshResult result)
         {
             if (_state != CentrifugeSubscriptionState.Subscribed) return;
+            _refreshRetry.Accepted();
             ClearRefreshTimer();
-            if (result.Expires) ScheduleRefresh(Utilities.TtlToMilliseconds(result.Ttl));
+            if (result.Expires) ScheduleRefresh(TtlToFullMilliseconds(result.Ttl));
         }
 
-        private void RefreshError(CentrifugeException error)
+        /// <summary>
+        /// A refresh failed. The error is reported first. A timeout or a lost connection retries. Any other error is
+        /// classified: a retryable one retries, 103 keeps the subscription, and the rest unsubscribe with the server code.
+        /// </summary>
+        /// <param name="error">The error of the refresh.</param>
+        /// <param name="token">The token the refresh was sent with.</param>
+        private void RefreshError(CentrifugeException error, string token)
         {
             if (_state != CentrifugeSubscriptionState.Subscribed) return;
-            if (error.Code < 100 || error.Temporary)
+            EmitError("refresh", error, () =>
             {
-                EmitError("refresh", error, () =>
+                // A handler may have ended the subscription.
+                if (_state != CentrifugeSubscriptionState.Subscribed) return;
+                if (error is CentrifugeTimeoutException || error is CentrifugeConnectionLostException)
                 {
-                    if (_state != CentrifugeSubscriptionState.Subscribed) return;
-                    ScheduleRefresh(GetRefreshRetryDelay());
-                });
-            }
-            else
-            {
-                SetUnsubscribed(error.Code, error.Message, true);
-            }
+                    ScheduleRefreshRetry();
+                    return;
+                }
+                switch (_refreshRetry.OnRefusal(error, token))
+                {
+                    case SubscriptionRefreshVerdict.Retry:
+                        ScheduleRefreshRetry();
+                        break;
+                    case SubscriptionRefreshVerdict.Unsubscribe:
+                        SetUnsubscribed(error.Code, error.Message, true);
+                        break;
+                    default:
+                        break;
+                }
+            });
         }
-
-        private static int GetRefreshRetryDelay() =>
-            Utilities.CalculateBackoff(0, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(20));
 
         // Test hooks: what a server push or a timer does.
 

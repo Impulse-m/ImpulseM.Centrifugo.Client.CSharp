@@ -205,5 +205,30 @@ namespace Centrifugal.Centrifuge.Tests
             Assert.Equal("conn-token-1", LastConnectToken());
             Assert.Equal("sub-token-0", _server.LastSubscribe()!.Token);
         }
+
+        [Fact]
+        // Java: testUnsubscribe2502KeepsStaticSubTokenAndResubscribes
+        public async Task Unsubscribe2502StaticToken_KeepsToken()
+        {
+            _client = new CentrifugeClient(_server.Url, new CentrifugeClientOptions());
+            _client.Connect();
+            await _client.ReadyAsync();
+
+            var subscribedEvents = NewChannel<CentrifugeSubscribedEventArgs>();
+            var sub = _client.NewSubscription("ch", new CentrifugeSubscriptionOptions { Token = "static-token" });
+            sub.Subscribed += (_, e) => subscribedEvents.Writer.TryWrite(e);
+            sub.Subscribe();
+            await subscribedEvents.Reader.ReadAsync().AsTask().WaitAsync(TimeSpan.FromSeconds(5));
+
+            // A static token has no getter to fetch another one: the invalidated subscription sends the same token again.
+            await _server.SendPushAsync(new Push
+            {
+                Channel = "ch",
+                Unsubscribe = new Unsubscribe { Code = CentrifugeUnsubscribedCodes.StateInvalidated, Reason = "state invalidated" }
+            });
+            await subscribedEvents.Reader.ReadAsync().AsTask().WaitAsync(TimeSpan.FromSeconds(5));
+
+            Assert.Equal("static-token", _server.LastSubscribe()!.Token);
+        }
     }
 }
