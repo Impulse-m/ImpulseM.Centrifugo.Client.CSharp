@@ -36,9 +36,12 @@ namespace Centrifugal.Centrifuge {
             return WallClockMs?.Invoke() ?? DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         }
 
-        /// <summary>Stores the server clock offset of a reply when the server time is plausible (Java observeServerTime).</summary>
+        /// <summary>Stores the server clock offset of a reply when the server time is plausible.</summary>
         /// <param name="reply">The reply with the server time.</param>
         private void ObserveServerTime(Protocol.Reply reply) {
+            if (reply.Time == 0) {
+                return;
+            }
             long? offset = ProtocolExtensions.ServerTimeOffsetFrom(reply.Time, WallNowMs());
             if (offset.HasValue) {
                 Interlocked.Exchange(ref _serverTimeOffsetMillis, offset.Value);

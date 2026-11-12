@@ -3,7 +3,7 @@ using System;
 namespace Centrifugal.Centrifuge {
 
 
-    /// <summary>Submits work to the client loop once the client is open (Java submitOrIgnore and submitOrRun).</summary>
+    /// <summary>Submits work to the client loop once the client is open.</summary>
     internal static class Submission {
         /// <summary>
         /// Runs step on the loop. Dropped when the client is closed, at submit time or when it runs.

@@ -7,7 +7,7 @@ namespace Centrifugal.Centrifuge.Tests {
 
     /// <summary>
     /// Step timers whose clock the test moves. Advance fires each timer that falls due, in due order, as a step of the
-    /// loop, on the thread that advances the clock. A test waits for no real delay. Replaces ManualScheduler.java.
+    /// loop, on the thread that advances the clock. A test waits for no real delay.
     /// </summary>
     internal sealed class FakeStepTimerFactory : IStepTimerFactory {
         private readonly EventLoop loop;

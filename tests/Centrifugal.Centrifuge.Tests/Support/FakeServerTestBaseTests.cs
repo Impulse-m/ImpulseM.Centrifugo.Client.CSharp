@@ -27,12 +27,5 @@ namespace Centrifugal.Centrifuge.Tests {
 
             Assert.Equal(CentrifugeClientState.Disconnected, client.State);
         }
-
-        private static Task<CentrifugeConnectedEventArgs> WhenConnected(CentrifugeClient client) {
-            TaskCompletionSource<CentrifugeConnectedEventArgs> connected =
-                new TaskCompletionSource<CentrifugeConnectedEventArgs>(TaskCreationOptions.RunContinuationsAsynchronously);
-            client.Connected += (object? sender, CentrifugeConnectedEventArgs args) => connected.TrySetResult(args);
-            return connected.Task.WaitAsync(TimeSpan.FromSeconds(5));
-        }
     }
 }

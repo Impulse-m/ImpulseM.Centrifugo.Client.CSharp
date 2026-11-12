@@ -113,20 +113,6 @@ namespace Centrifugal.Centrifuge
         private bool _reconnectAttemptsResetPending;
         private Task _lastTransportClose = Task.CompletedTask;
 
-        // The fields of the connection auth, the rpc session and the token exchange.
-        private readonly IClientHost _host;
-        private readonly IStepTimerFactory _timers;
-        private readonly Random _random;
-        private readonly IRefreshRetryPolicy _refreshRetryPolicy;
-        private readonly ConnectionIdentity _identity;
-        private readonly ITokenExchangeHooks _tokenExchange;
-        private readonly AuthRefresh _auth;
-        private readonly RpcSession _rpcSession;
-        private readonly PingWatchdog _watchdog;
-        private volatile bool _rpcOptionsSupported = false;
-        private long _serverTimeOffsetMillis;
-        private readonly bool _hasInstance;
-
         /// <summary>The loop the state of this client and its subscriptions changes on.</summary>
         internal EventLoop Loop { get; }
 
@@ -292,16 +278,7 @@ namespace Centrifugal.Centrifuge
             _logger = GuardedLogger.Wrap(_options.Logger);
             Loop = new EventLoop(_logger, OnStepEnd);
             _promises = new Waiters(Loop);
-            _host = new HostAdapter(this);
-            _timers = new LoopTimerFactory(Loop);
-            _random = new Random();
-            _refreshRetryPolicy = new RefreshRetryPolicy(_random, 5000, 10000, (int)Math.Min(int.MaxValue, _options.TokenRetryCap.TotalMilliseconds), _options.StopOnRefusedToken);
-            _identity = new ConnectionIdentity(_host);
-            _tokenExchange = TokenExchangeFlow.Create(_host, _options.TokenExchange, _random);
-            _auth = new AuthRefresh(_host, _identity, _tokenExchange, _timers, _refreshRetryPolicy);
-            _rpcSession = new RpcSession(_host, _timers, _options.MaxPendingRpc, _random);
-            _watchdog = new PingWatchdog(_host, _timers);
-            _hasInstance = !string.IsNullOrEmpty(_options.Instance);
+            InitializeFork();
 #if NET6_0_OR_GREATER
             _jsRuntime = _options.JSRuntime ?? _globalJSRuntime;
             if (_jsRuntime == null && OperatingSystem.IsBrowser())
@@ -1206,6 +1183,10 @@ namespace Centrifugal.Centrifuge
             }
             else
             {
+                if (_tokenExchange.HoldPush(reply.Push))
+                {
+                    return;
+                }
                 HandlePush(reply.Push);
             }
         }
@@ -2026,16 +2007,6 @@ namespace Centrifugal.Centrifuge
         }
 
         private void HandlePush(Push push)
-        {
-            if (_tokenExchange.HoldPush(push))
-            {
-                return;
-            }
-            ProcessPush(push);
-        }
-
-        /// <summary>Dispatches a push: the body of HandlePush after the token exchange hold check.</summary>
-        private void ProcessPush(Push push)
         {
             var channel = push.Channel;
             if (push.Pub != null)

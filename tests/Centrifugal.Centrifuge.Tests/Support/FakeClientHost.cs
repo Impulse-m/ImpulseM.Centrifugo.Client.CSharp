@@ -128,7 +128,11 @@ namespace Centrifugal.Centrifuge.Tests {
 
 
         /// <summary>True when the state is Connected.</summary>
-        public bool IsConnected { get; set; }
+        public bool IsConnected {
+            get {
+                return State == CentrifugeClientState.Connected;
+            }
+        }
 
 
         /// <summary>True when the transport of the current attempt is open.</summary>
@@ -171,8 +175,12 @@ namespace Centrifugal.Centrifuge.Tests {
         public IRefreshRetryPolicy RefreshRetryPolicy { get; set; } = new RefreshRetryPolicy(new FixedRandom(0.0), 5000, 10000, 300000, true);
 
 
-        /// <summary>The monotonic clock of the host, in milliseconds.</summary>
-        public long NowMs { get; set; }
+        /// <summary>The monotonic clock of the host, in milliseconds: the elapsed time of the fake timers.</summary>
+        public long NowMs {
+            get {
+                return FakeTimers.ElapsedMs;
+            }
+        }
 
 
         /// <summary>The unix time in milliseconds that ServerTimeMillis returns.</summary>

@@ -158,13 +158,6 @@ namespace Centrifugal.Centrifuge.Tests {
             Assert.Equal("later", reply.Error.Metadata["retry"]);
         }
 
-        private static Task<CentrifugeConnectedEventArgs> WhenConnected(CentrifugeClient client) {
-            TaskCompletionSource<CentrifugeConnectedEventArgs> connected =
-                new TaskCompletionSource<CentrifugeConnectedEventArgs>(TaskCreationOptions.RunContinuationsAsynchronously);
-            client.Connected += (object? sender, CentrifugeConnectedEventArgs args) => connected.TrySetResult(args);
-            return connected.Task.WaitAsync(TimeSpan.FromSeconds(5));
-        }
-
         private static Task<CentrifugeDisconnectedEventArgs> WhenDisconnected(CentrifugeClient client) {
             TaskCompletionSource<CentrifugeDisconnectedEventArgs> disconnected =
                 new TaskCompletionSource<CentrifugeDisconnectedEventArgs>(TaskCreationOptions.RunContinuationsAsynchronously);

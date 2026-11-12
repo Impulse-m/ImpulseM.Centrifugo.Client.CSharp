@@ -2,7 +2,7 @@ namespace Centrifugal.Centrifuge {
 
 
     /// <summary>
-    /// The server ping watchdog (Java PingWatchdog). It closes the connection when the server stops sending pings.
+    /// The server ping watchdog. It closes the connection when the server stops sending pings.
     /// </summary>
     internal sealed class PingWatchdog {
         private readonly IClientHost host;

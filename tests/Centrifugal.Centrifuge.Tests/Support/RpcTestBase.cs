@@ -9,7 +9,6 @@ namespace Centrifugal.Centrifuge.Tests {
     /// <summary>
     /// Base of the tests of the rpc pool and of the exactly-once calls. On top of FakeServerTestBase it confirms RPC
     /// options, answers rpc commands, and gives the random sources that fix the retry delays.
-    /// Replaces RpcTestBase.java.
     /// </summary>
     public abstract class RpcTestBase : FakeServerTestBase {
         /// <summary>Makes the fake server confirm RPC options in its connect reply.</summary>

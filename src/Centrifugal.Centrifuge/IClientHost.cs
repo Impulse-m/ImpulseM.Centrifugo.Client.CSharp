@@ -45,10 +45,10 @@ namespace Centrifugal.Centrifuge {
         /// <summary>Options.Instance. Never log it or put it in an exception message.</summary>
         string Instance { get; }
 
-        /// <summary>Java refreshRequired. Set by a connect error 109 and by a connect with an empty token and a getter.</summary>
+        /// <summary>Refresh required flag. Set by a connect error 109 and by a connect with an empty token and a getter.</summary>
         bool RefreshRequired { get; set; }
 
-        /// <summary>The connection token. The setter is the Java storeToken.</summary>
+        /// <summary>The connection token. The setter stores the token.</summary>
         string ConnectionToken { get; set; }
 
         /// <summary>The retry policy shared by the connection refresh and the subscription refresh. One per client.</summary>
@@ -60,7 +60,7 @@ namespace Centrifugal.Centrifuge {
         /// <summary>Monotonic milliseconds. For deadlines and delays only, never for server time.</summary>
         long NowMs { get; }
 
-        /// <summary>Unix milliseconds: wall clock plus the server offset (Java serverTimeMillis).</summary>
+        /// <summary>Unix milliseconds: wall clock plus the server offset.</summary>
         long ServerTimeMillis();
 
         /// <summary>Next command id. Unsigned, never 0 (upstream NextCommandId).</summary>
@@ -123,7 +123,7 @@ namespace Centrifugal.Centrifuge {
         /// <summary>Disconnects with code 1 ("unauthorized") and no reconnect.</summary>
         void FailUnauthorized();
 
-        /// <summary>Asks for the connection token through the token getter (Java getToken). Answers on the loop: onToken with the token, or onError.</summary>
+        /// <summary>Asks for the connection token through the token getter. Answers on the loop: onToken with the token, or onError.</summary>
         void RequestConnectionToken(Action<string?> onToken, Action<Exception> onError);
 
         /// <summary>Plain publish of one channel, for a subscription publish debounce. Completes when written, or fails.</summary>

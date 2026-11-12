@@ -13,7 +13,7 @@ namespace Centrifugal.Centrifuge {
         /// <summary>True when a token exchange is configured. False in the null object.</summary>
         bool IsActive { get; }
 
-        /// <summary>Called once per connect attempt, before the connect command is built (Java beforeConnect).</summary>
+        /// <summary>Called once per connect attempt, before the connect command is built.</summary>
         void BeforeConnect();
 
         /// <summary>
@@ -31,13 +31,13 @@ namespace Centrifugal.Centrifuge {
         /// <summary>Called from every disconnect that reaches the teardown. terminal is true when the session ends.</summary>
         void Reset(int code, bool terminal);
 
-        /// <summary>Called when a requested refresh is accepted (Java tokenAccepted).</summary>
+        /// <summary>Called when a requested refresh is accepted.</summary>
         void TokenAccepted();
 
         /// <summary>True when the token has an expiry record that is past.</summary>
         bool IsTokenExpired(string token);
 
-        /// <summary>Renewal delay in milliseconds for a ttl in seconds (Java renewalDelayMillis). Without an exchange: Utilities.TtlToMilliseconds(ttl) (95 percent).</summary>
+        /// <summary>Renewal delay in milliseconds for a ttl in seconds. Without an exchange: Utilities.TtlToMilliseconds(ttl) (95 percent).</summary>
         int RenewalDelayMilliseconds(uint ttl);
 
         /// <summary>The renewal fetch of the timer refresh. The null object never gets it (no getter). The result is applied in a step.</summary>

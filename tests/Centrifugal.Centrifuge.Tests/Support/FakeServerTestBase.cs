@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
@@ -8,7 +9,7 @@ namespace Centrifugal.Centrifuge.Tests {
     /// <summary>
     /// Base of the tests that talk to the in-process fake server. It starts one fake server per test on the loopback
     /// interface, creates the clients of the test, and disposes them and the server afterwards.
-    /// Replaces FakeServerTestBase.java. The upstream tests keep their own setup.
+    /// The upstream tests keep their own setup.
     /// </summary>
     public abstract class FakeServerTestBase : IAsyncLifetime {
         private readonly List<CentrifugeClient> clients = new List<CentrifugeClient>();
@@ -39,6 +40,17 @@ namespace Centrifugal.Centrifuge.Tests {
             CentrifugeClient client = new CentrifugeClient(Server.Url, options ?? new CentrifugeClientOptions());
             clients.Add(client);
             return client;
+        }
+
+        /// <summary>
+        /// Completes with the event args of the next Connected event of the client, or fails after five seconds.
+        /// </summary>
+        /// <param name="client">The client to watch.</param>
+        protected static Task<CentrifugeConnectedEventArgs> WhenConnected(CentrifugeClient client) {
+            TaskCompletionSource<CentrifugeConnectedEventArgs> connected =
+                new TaskCompletionSource<CentrifugeConnectedEventArgs>(TaskCreationOptions.RunContinuationsAsynchronously);
+            client.Connected += (object? sender, CentrifugeConnectedEventArgs args) => connected.TrySetResult(args);
+            return connected.Task.WaitAsync(TimeSpan.FromSeconds(5));
         }
     }
 }

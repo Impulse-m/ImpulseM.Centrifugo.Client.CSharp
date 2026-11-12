@@ -6,7 +6,7 @@ namespace Centrifugal.Centrifuge {
         /// <summary>After the identity is recorded and the auth event is raised. always is true on connect, false on refresh.</summary>
         void OnAuth(string user, string authClass, bool always);
 
-        /// <summary>From the disconnect path, before the state is written (Java AuthRefresh.onDisconnect forward).</summary>
+        /// <summary>From the disconnect path, before the state is written.</summary>
         void OnDisconnect(int code, bool terminal);
 
         /// <summary>A refresh failed. explicitCall is true for a requested refresh, false for a timer refresh.</summary>

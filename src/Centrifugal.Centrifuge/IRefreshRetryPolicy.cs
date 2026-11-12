@@ -9,13 +9,13 @@ namespace Centrifugal.Centrifuge {
         /// <summary>Options.StopOnRefusedToken (default true).</summary>
         bool StopOnRefusedToken { get; }
 
-        /// <summary>The largest step: 30 (Java RETRY_MAX_STEP).</summary>
+        /// <summary>The largest step: 30.</summary>
         int MaxRetryStep { get; }
 
         /// <summary>Delay in whole milliseconds for a retry at this step. The formula is in RefreshRetryPolicy. The step is clamped to 0..MaxRetryStep.</summary>
         int RetryDelayMillis(int step);
 
-        /// <summary>True when the error is temporary, or its code is below 100, or its code is 109 (Java isRetryableRefresh).</summary>
+        /// <summary>True when the error is temporary, or its code is below 100, or its code is 109.</summary>
         bool IsRetryableRefresh(CentrifugeException error);
     }
 }

@@ -1,37 +1,38 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Security;
-using System.Net.Sockets;
-using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.AspNetCore.Server.Kestrel.Https;
+using Microsoft.Extensions.Logging;
 
 namespace Centrifugal.Centrifuge.Tests {
 
 
     /// <summary>
     /// A small HTTP server for the redirect tests of the rpc pool, on the loopback interface, with or without TLS. It
-    /// serves one request per connection, answers each with the Responder, and records the request paths. TLS uses the
-    /// self-signed test certificate of the Java fork (Resources\rpc-pool-test.p12, password changeit): the client
-    /// trusts exactly that certificate through CreateTrustingHandler. Replaces the MockWebServer of RpcPoolRedirectTest.java.
+    /// answers each request with the Responder, and records the request paths. TLS uses the self-signed test
+    /// certificate (Resources\rpc-pool-test.p12, password changeit): the client trusts exactly that certificate
+    /// through CreateTrustingHandler.
     /// </summary>
     public sealed class RedirectTestServer : IAsyncDisposable {
         private const string CertificatePassword = "changeit";
         private const string CertificateFile = "rpc-pool-test.p12";
 
 
-        private readonly bool useTls;
         private readonly X509Certificate2? certificate;
         private readonly List<string> paths = new List<string>();
         private readonly object gate = new object();
-        private readonly CancellationTokenSource stop = new CancellationTokenSource();
-        private TcpListener? listener;
+        private WebApplication? app;
         private Uri? uri;
 
 
@@ -40,7 +41,6 @@ namespace Centrifugal.Centrifuge.Tests {
         /// </summary>
         /// <param name="useTls">True to serve HTTPS with the test certificate.</param>
         public RedirectTestServer(bool useTls) {
-            this.useTls = useTls;
             certificate = useTls ? LoadCertificate() : null;
             Responder = (string path) => new RedirectTestResponse(404, new Dictionary<string, string>(), "not found");
         }
@@ -52,8 +52,11 @@ namespace Centrifugal.Centrifuge.Tests {
             }
         }
 
-        /// <summary>Answers a request for the path. Set it before the requests are sent.</summary>
-        public Func<string, RedirectTestResponse> Responder { get; set; }
+        /// <summary>
+        /// Answers a request for the path. Set it before the requests are sent. Returning null aborts the connection
+        /// without a response.
+        /// </summary>
+        public Func<string, RedirectTestResponse?> Responder { get; set; }
 
 
         /// <summary>The paths of the received requests, in order.</summary>
@@ -66,15 +69,21 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
         /// <summary>Starts listening on a random port of the loopback interface.</summary>
-        public Task StartAsync() {
-            TcpListener started = new TcpListener(IPAddress.Loopback, 0);
-            started.Start();
-            listener = started;
-            int port = ((IPEndPoint)started.LocalEndpoint).Port;
-            string scheme = useTls ? "https" : "http";
-            uri = new Uri(scheme + "://127.0.0.1:" + port.ToString(CultureInfo.InvariantCulture) + "/");
-            _ = AcceptLoopAsync(started, stop.Token);
-            return Task.CompletedTask;
+        public async Task StartAsync() {
+            WebApplicationBuilder builder = WebApplication.CreateBuilder();
+            builder.Logging.ClearProviders();
+            X509Certificate2? serverCertificate = certificate;
+            builder.WebHost.ConfigureKestrel(options => {
+                options.Listen(IPAddress.Loopback, 0, listen => {
+                    if (serverCertificate != null) {
+                        listen.UseHttps(serverCertificate);
+                    }
+                });
+            });
+            app = builder.Build();
+            app.Run(HandleAsync);
+            await app.StartAsync();
+            uri = new Uri(app.Urls.First());
         }
 
         /// <summary>
@@ -93,11 +102,13 @@ namespace Centrifugal.Centrifuge.Tests {
             return handler;
         }
 
-        /// <summary>Stops listening. Connections being served finish on their own.</summary>
-        public ValueTask DisposeAsync() {
-            stop.Cancel();
-            listener?.Stop();
-            return ValueTask.CompletedTask;
+        /// <summary>Stops the server. Requests being served finish on their own.</summary>
+        public async ValueTask DisposeAsync() {
+            if (app == null) {
+                return;
+            }
+            await app.StopAsync();
+            await app.DisposeAsync();
         }
 
         private static X509Certificate2 LoadCertificate() {
@@ -105,97 +116,23 @@ namespace Centrifugal.Centrifuge.Tests {
             return X509CertificateLoader.LoadPkcs12FromFile(path, CertificatePassword);
         }
 
-        private async Task AcceptLoopAsync(TcpListener tcpListener, CancellationToken token) {
-            while (!token.IsCancellationRequested) {
-                TcpClient client;
-                try {
-                    client = await tcpListener.AcceptTcpClientAsync(token);
-                } catch (Exception ex) when (ex is OperationCanceledException or ObjectDisposedException or SocketException) {
-                    return;
-                }
-                _ = HandleConnectionAsync(client);
+        private async Task HandleAsync(HttpContext context) {
+            string path = context.Request.Path.ToString() + context.Request.QueryString.ToString();
+            lock (gate) {
+                paths.Add(path);
             }
-        }
-
-        private async Task HandleConnectionAsync(TcpClient client) {
-            using (client) {
-                try {
-                    Stream stream = client.GetStream();
-                    if (useTls) {
-                        SslStream secure = new SslStream(stream, false);
-                        await secure.AuthenticateAsServerAsync(new SslServerAuthenticationOptions { ServerCertificate = certificate });
-                        stream = secure;
-                    }
-                    string head = await ReadHeadAsync(stream);
-                    await ReadBodyAsync(stream, ContentLength(head));
-                    string path = PathOf(head);
-                    lock (gate) {
-                        paths.Add(path);
-                    }
-                    await WriteResponseAsync(stream, Responder(path));
-                } catch (Exception ex) when (ex is IOException or SocketException or AuthenticationException or ObjectDisposedException) {
-                    // A client that gave up on the connection: nothing to answer.
-                }
+            RedirectTestResponse? response = Responder(path);
+            if (response == null) {
+                context.Abort();
+                return;
             }
-        }
-
-        private static async Task WriteResponseAsync(Stream stream, RedirectTestResponse response) {
-            byte[] payload = Encoding.UTF8.GetBytes(response.Body);
-            StringBuilder builder = new StringBuilder();
-            builder.Append("HTTP/1.1 ").Append(response.Status.ToString(CultureInfo.InvariantCulture)).Append(" Test\r\n");
+            context.Response.StatusCode = response.Status;
             foreach (KeyValuePair<string, string> header in response.Headers) {
-                builder.Append(header.Key).Append(": ").Append(header.Value).Append("\r\n");
+                context.Response.Headers[header.Key] = header.Value;
             }
-            builder.Append("Content-Length: ").Append(payload.Length.ToString(CultureInfo.InvariantCulture));
-            builder.Append("\r\nConnection: close\r\n\r\n");
-            await stream.WriteAsync(Encoding.ASCII.GetBytes(builder.ToString()));
-            await stream.WriteAsync(payload);
-            await stream.FlushAsync();
-        }
-
-        // Reads the request head, up to and including the blank line.
-        private static async Task<string> ReadHeadAsync(Stream stream) {
-            List<byte> bytes = new List<byte>();
-            byte[] one = new byte[1];
-            while (true) {
-                int read = await stream.ReadAsync(one.AsMemory(0, 1));
-                if (read == 0) {
-                    break;
-                }
-                bytes.Add(one[0]);
-                int count = bytes.Count;
-                if (count >= 4 && bytes[count - 4] == '\r' && bytes[count - 3] == '\n' && bytes[count - 2] == '\r' && bytes[count - 1] == '\n') {
-                    break;
-                }
-            }
-            return Encoding.ASCII.GetString(bytes.ToArray());
-        }
-
-        private static async Task ReadBodyAsync(Stream stream, int length) {
-            byte[] buffer = new byte[length];
-            int offset = 0;
-            while (offset < length) {
-                int read = await stream.ReadAsync(buffer.AsMemory(offset, length - offset));
-                if (read == 0) {
-                    break;
-                }
-                offset += read;
-            }
-        }
-
-        private static int ContentLength(string head) {
-            foreach (string line in head.Split("\r\n")) {
-                if (line.StartsWith("content-length:", StringComparison.OrdinalIgnoreCase)) {
-                    string value = line.Substring("content-length:".Length).Trim();
-                    return int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int length) ? length : 0;
-                }
-            }
-            return 0;
-        }
-
-        private static string PathOf(string head) {
-            string[] parts = head.Split(' ');
-            return parts.Length > 1 ? parts[1] : string.Empty;
+            byte[] payload = Encoding.UTF8.GetBytes(response.Body);
+            context.Response.ContentLength = payload.Length;
+            await context.Response.Body.WriteAsync(payload);
         }
     }
 }

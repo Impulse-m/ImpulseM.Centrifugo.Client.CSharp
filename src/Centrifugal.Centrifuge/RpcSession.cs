@@ -4,7 +4,7 @@ namespace Centrifugal.Centrifuge {
 
 
     /// <summary>
-    /// The rpc calls of the client with per-call options (Java RpcSession). Every command id comes from
+    /// The rpc calls of the client with per-call options. Every command id comes from
     /// IClientHost.NextCommandId.
     /// </summary>
     internal sealed class RpcSession {

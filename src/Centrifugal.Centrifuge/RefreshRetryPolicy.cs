@@ -7,6 +7,12 @@ namespace Centrifugal.Centrifuge {
     internal sealed class RefreshRetryPolicy : IRefreshRetryPolicy {
         private const int MaxStep = 30;
 
+        // Error codes below this one are client-side codes, which a refresh retries.
+        private const int ClientCodeLimit = 100;
+
+        // The connect error code that asks for a token refresh, which a refresh retries.
+        private const int RefreshRequiredCode = 109;
+
 
         private readonly Random random;
         private readonly int minMillis;
@@ -44,7 +50,7 @@ namespace Centrifugal.Centrifuge {
             }
         }
 
-        /// <summary>The largest step: 30 (Java RETRY_MAX_STEP).</summary>
+        /// <summary>The largest step: 30.</summary>
         public int MaxRetryStep {
             get {
                 return MaxStep;
@@ -65,10 +71,10 @@ namespace Centrifugal.Centrifuge {
             return (int)Math.Min((long)ceiling, minMillis + jitter);
         }
 
-        /// <summary>True when the error is temporary, or its code is below 100, or its code is 109 (Java isRetryableRefresh).</summary>
+        /// <summary>True when the error is temporary, or its code is below 100, or its code is 109.</summary>
         /// <param name="error">The refresh error.</param>
         public bool IsRetryableRefresh(CentrifugeException error) {
-            return error.Temporary || error.Code < 100 || error.Code == 109;
+            return error.Temporary || error.Code < ClientCodeLimit || error.Code == RefreshRequiredCode;
         }
 
         private int CeilingMillis(int effectiveStep) {

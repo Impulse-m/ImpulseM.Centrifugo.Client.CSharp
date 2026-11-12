@@ -7,7 +7,7 @@ namespace Centrifugal.Centrifuge {
 
 
     /// <summary>
-    /// Replaces the Java TokenExchange. The application supplies the storage and the exchange of the refresh token.
+    /// The application supplies the storage and the exchange of the refresh token.
     /// Set through CentrifugeClientOptions.TokenExchange; exclusive with GetToken.
     /// </summary>
     public abstract class CentrifugeTokenExchange {

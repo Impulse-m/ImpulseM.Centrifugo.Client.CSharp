@@ -15,8 +15,8 @@
     <!-- Package Information -->
     <PackageId>ImpulseM.Centrifuge</PackageId>
     <Version>0.1.0</Version>
-    <Authors>Centrifugal Labs;ImpulseM</Authors>
-    <Company>Centrifugal Labs;ImpulseM</Company>
+    <Authors>Centrifugal Labs</Authors>
+    <Company>Centrifugal Labs</Company>
     <Description>
       Official C# client SDK to communicate with Centrifugo and Centrifuge-based server from multiple environments.
       Supports Protobuf communication over WebSocket (primary) and HTTP-streaming (bidirectional emulation).

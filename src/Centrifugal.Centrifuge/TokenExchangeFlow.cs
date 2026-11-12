@@ -4,7 +4,7 @@ namespace Centrifugal.Centrifuge {
 
 
     /// <summary>
-    /// The factory of the token exchange hooks of one client (Java TokenExchangeFlow). The only static entry point.
+    /// The factory of the token exchange hooks of one client. The only static entry point.
     /// Returns the null object when no exchange is set.
     /// </summary>
     internal static class TokenExchangeFlow {

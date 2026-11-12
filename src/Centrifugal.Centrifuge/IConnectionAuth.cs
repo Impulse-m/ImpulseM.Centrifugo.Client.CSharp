@@ -5,7 +5,7 @@ namespace Centrifugal.Centrifuge {
 
     /// <summary>What the rpc pool token source and the token exchange read from the connection auth state. Implemented by AuthRefresh.</summary>
     internal interface IConnectionAuth {
-        /// <summary>The token at the last identity confirmation (Java confirmedToken). Empty when none.</summary>
+        /// <summary>The token at the last identity confirmation. Empty when none.</summary>
         string ConfirmedToken { get; }
 
         /// <summary>The last confirmed user. Not cleared on disconnect.</summary>
@@ -17,7 +17,7 @@ namespace Centrifugal.Centrifuge {
         /// <summary>A token exchange or a token getter is set.</summary>
         bool CanRenew { get; }
 
-        /// <summary>A requested refresh is in flight or queued (Java isInFlight).</summary>
+        /// <summary>A requested refresh is in flight or queued.</summary>
         bool IsInFlight { get; }
 
         /// <summary>Counts every accepted refresh call and every accepted token.</summary>
@@ -30,7 +30,7 @@ namespace Centrifugal.Centrifuge {
         bool RenewNow();
 
         /// <summary>
-        /// Creates the rpc pool token source on first use (Java tokenSource()) and hands it the identity sink.
+        /// Creates the rpc pool token source on first use and hands it the identity sink.
         /// A client that no pool uses never calls this.
         /// </summary>
         IRpcPoolTokenSource AcquireTokenSource();

@@ -113,7 +113,7 @@ namespace Centrifugal.Centrifuge {
             }
 
 
-            /// <summary>Java refreshRequired.</summary>
+            /// <summary>True when a connection token refresh is required.</summary>
             public bool RefreshRequired {
                 get {
                     return owner._refreshRequired;
@@ -248,7 +248,7 @@ namespace Centrifugal.Centrifuge {
 
             /// <summary>Dispatches a push that the token exchange held.</summary>
             public void DispatchHeldPush(Protocol.Push push) {
-                owner.ProcessPush(push);
+                owner.HandlePush(push);
             }
 
 

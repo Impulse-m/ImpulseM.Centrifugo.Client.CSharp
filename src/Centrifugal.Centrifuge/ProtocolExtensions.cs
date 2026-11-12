@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 namespace Centrifugal.Centrifuge {
 
 
-    /// <summary>Extension wire rules of the fork (Java Extensions). Pure functions and constants.</summary>
+    /// <summary>Extension wire rules of the fork. Pure functions and constants.</summary>
     internal static class ProtocolExtensions {
         /// <summary>Metadata key of the retry signal on an error reply.</summary>
         public const string RetryMetadataKey = "x-centrifugo-retry";
@@ -22,7 +22,7 @@ namespace Centrifugal.Centrifuge {
         public const long MaxServerTimeSkewMillis = 365L * 24L * 60L * 60L * 1000L;
 
 
-        private static readonly Regex instancePattern =new Regex("^[A-Za-z0-9_-]{22,64}\\z", RegexOptions.CultureInvariant);
+        private static readonly Regex instancePattern = new Regex("^[A-Za-z0-9_-]{22,64}\\z", RegexOptions.CultureInvariant);
 
 
         /// <summary>Whole-string match of the instance rule. Null is invalid.</summary>
@@ -33,7 +33,7 @@ namespace Centrifugal.Centrifuge {
 
         /// <summary>
         /// Offset of the server clock: serverTime - localTime. Null when serverTime is 0, or when it is more than
-        /// MaxServerTimeSkewMillis away from localTime (Java serverTimeOffsetFrom).
+        /// MaxServerTimeSkewMillis away from localTime.
         /// </summary>
         /// <param name="serverTime">The server time in Unix milliseconds.</param>
         /// <param name="localTime">The local wall clock in Unix milliseconds.</param>

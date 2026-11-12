@@ -5,7 +5,6 @@ namespace Centrifugal.Centrifuge.Tests {
 
     /// <summary>
     /// A random source whose draws are always the same value, so a test chooses the delay of each retry.
-    /// Replaces the random source of RpcTestBase.java (maximumDraws, lowestDraws).
     /// </summary>
     public sealed class FixedRandom : Random {
         private readonly double value;

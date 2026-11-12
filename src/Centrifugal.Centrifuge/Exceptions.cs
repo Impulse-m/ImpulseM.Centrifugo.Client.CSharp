@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Centrifugal.Centrifuge
 {
@@ -33,6 +34,10 @@ namespace Centrifugal.Centrifuge
         /// </summary>
         public IReadOnlyDictionary<string, string> Metadata { get; }
 
+        // The metadata of every exception without any: one empty read-only dictionary, shared.
+        private static readonly IReadOnlyDictionary<string, string> _emptyMetadata =
+            new ReadOnlyDictionary<string, string>(new Dictionary<string, string>());
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CentrifugeException"/> class.
         /// </summary>
@@ -58,17 +63,13 @@ namespace Centrifugal.Centrifuge
             Temporary = temporary;
             AppCode = appCode;
             AppType = appType ?? string.Empty;
-            IReadOnlyDictionary<string, string> copy = metadata == null
-                ? new Dictionary<string, string>()
-                : new Dictionary<string, string>(metadata);
-            Metadata = copy;
+            Metadata = metadata == null ? _emptyMetadata : new Dictionary<string, string>(metadata);
         }
 
         /// <summary>Wraps the error carried by a server reply.</summary>
         internal static CentrifugeException FromReply(Protocol.Error error)
         {
-            Dictionary<string, string> metadata = new Dictionary<string, string>(error.Metadata);
-            return new CentrifugeException((int)error.Code, error.Message, error.Temporary, null, error.AppCode, error.AppType, metadata);
+            return new CentrifugeException((int)error.Code, error.Message, error.Temporary, null, error.AppCode, error.AppType, error.Metadata);
         }
     }
 

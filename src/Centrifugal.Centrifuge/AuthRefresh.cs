@@ -4,7 +4,7 @@ namespace Centrifugal.Centrifuge {
 
 
     /// <summary>
-    /// The connection token refresh (Java AuthRefresh). Implements the state the token source and the token exchange
+    /// The connection token refresh. Implements the state the token source and the token exchange
     /// read (IConnectionAuth). The refresh timer and the refresh call are not started until the refresh path is written.
     /// </summary>
     internal sealed class AuthRefresh : IConnectionAuth {
