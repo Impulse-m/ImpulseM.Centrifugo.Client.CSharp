@@ -1,10 +1,18 @@
-// Ported from the Java fork's OptionsExactlyOnceTest (8 tests, the value part of the options): all 8 ported under the Java
-// names, kept in a comment on each test. The instance is refused by the setter, as in Java; the Java name "refused at
-// create" is kept for the test that checks the refusal.
-// Gap tests (no Java test pins them): the header replace and order rules, the header snapshot, the timeout without an
-// upper bound, and the snapshot a call takes of its options.
-// The connect flag, the capability and the per-call wire checks of the Java RpcOptionsTest are not in this file: they
-// belong to the connect capability and rpc slices.
+// Not ported: connectRequestAdvertisesRpcOptionsBit: the connect request advertises the handshake flag, not an option.
+// Not ported: capabilityIsOnWhenConnectReplyHasRpcOptionsBit: the capability is read from the connect reply, a connection detail.
+// Not ported: capabilityIsOnWhenRpcOptionsBitComesWithOtherBits: the capability is read from the connect reply flags, a connection detail.
+// Not ported: capabilityIsOffWhenConnectReplyHasNoRpcOptionsBit: the capability is read from the connect reply flags, a connection detail.
+// Not ported: capabilityIsOffWhenConnectReplyHasNoFlag: the capability is read from the connect reply flags, a connection detail.
+// Not ported: capabilityIsClearedOnReconnectUntilConnectReplyConfirmsIt: the capability across a reconnect is a connection detail.
+// Not ported: capabilityIsClearedOnDisconnect: the capability after a disconnect is a connection detail.
+// Not ported: capabilitySnapshotDoesNotChangeAfterwards: the capability snapshot across a disconnect is a connection detail.
+// Not ported: rpcWithHeadersIsSentAndResultDelivered: the wire frame of a call with headers is a wire-format check.
+// Not ported: rpcWithHeadersFailsWithoutCapabilityAndIsNotSent: the wire refusal of headers without the capability is a wire check.
+// Not ported: plainRpcWorksWithoutCapability: the wire frame of a plain call is a wire-format check.
+// Not ported: plainRpcWorksWithCapability: the wire frame of a plain call is a wire-format check.
+// Not ported: emptyOptionsAreAPlainCallWithoutCapability: the wire frame of an empty option set is a wire-format check.
+// Not ported: rpcWithHeadersQueuedWhileConnectingIsSentWhenConnectReplyConfirmsIt: a call queued during connect is a wire-timing check.
+// Not ported: rpcWithHeadersQueuedWhileConnectingFailsWhenConnectReplyDoesNotConfirmIt: a call queued during connect is a wire-timing check.
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -50,6 +58,7 @@ namespace Centrifugal.Centrifuge.Tests {
 
 
         // Java: invalidInstanceIsRefusedAtCreate
+        // The instance is refused by its setter before any client is created, and the value is kept unchanged.
         [Fact]
         public void Instance_InvalidValues_AreRefusedBeforeAnyClientIsCreated() {
             string tooLong = "abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyzabcde";
@@ -64,7 +73,8 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
-        // Java: timeoutIsReadBackAndDefaultsToZero (the Java zero default is the null of the TimeSpan option)
+        // Java: timeoutIsReadBackAndDefaultsToZero
+        // The default is null, which means the client timeout.
         [Fact]
         public void Timeout_IsReadBackAndDefaultsToNull() {
             CentrifugeRpcOptions defaults = new CentrifugeRpcOptions();
@@ -95,7 +105,7 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
-        // Gap: the per-call timeout has no upper bound (rule R8, the Java behaviour; the JS refusal is not ported).
+        // The per-call timeout has no upper bound: a call may outlast the client timeout.
         [Fact]
         public void Timeout_AboveTheClientTimeout_IsAccepted() {
             CentrifugeRpcOptions options = new CentrifugeRpcOptions {
@@ -124,7 +134,7 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
-        // Gap: a repeated header key replaces the value and keeps the key's first position (rule R9).
+        // A repeated header key replaces the value and keeps the key's first position.
         [Fact]
         public void WithHeader_RepeatedKey_ReplacesTheValueAndKeepsItsPosition() {
             CentrifugeRpcOptions options = new CentrifugeRpcOptions()
@@ -141,7 +151,7 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
-        // Gap: headers come back in the order they were added (rule R9).
+        // Headers come back in the order they were added.
         [Fact]
         public void Headers_AreReturnedInTheOrderTheyWereAdded() {
             CentrifugeRpcOptions options = new CentrifugeRpcOptions()
@@ -153,7 +163,7 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
-        // Gap: a null header key or value is refused at the call (rule R9).
+        // A null header key or value is refused when it is added, so no call is made with it.
         [Fact]
         public void WithHeader_NullKeyOrValue_IsRefused() {
             CentrifugeRpcOptions options = new CentrifugeRpcOptions();
@@ -164,7 +174,7 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
-        // Gap: a headers dictionary already returned is a snapshot and does not change with later WithHeader calls.
+        // A headers dictionary already returned is a snapshot and does not change with later WithHeader calls.
         [Fact]
         public void Headers_ReturnedDictionary_IsASnapshot() {
             CentrifugeRpcOptions options = new CentrifugeRpcOptions().WithHeader("a", "1");
@@ -177,7 +187,7 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
-        // Gap: a call takes a snapshot of its options, so a later change by the caller does not reach it.
+        // A call takes a snapshot of its options, so a later change by the caller does not reach it.
         [Fact]
         public void Snapshot_LaterChangesDoNotReachTheCopy() {
             CentrifugeRpcOptions options = new CentrifugeRpcOptions {

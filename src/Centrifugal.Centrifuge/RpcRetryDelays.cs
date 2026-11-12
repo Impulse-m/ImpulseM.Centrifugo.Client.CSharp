@@ -26,8 +26,7 @@ namespace Centrifugal.Centrifuge {
         /// <returns>The delay of the resend.</returns>
         internal static TimeSpan LaterDelay(Random random, int resends, TimeSpan remaining) {
             long remainingMs = remaining.Ticks / TimeSpan.TicksPerMillisecond;
-            long boundMs = Math.Max(0L, Math.Min((long)LaterBaseMillis << resends, remainingMs));
-            long drawnMs = random.Next((int)boundMs + 1);
+            long drawnMs = Backoff.CappedJitter(random, LaterBaseMillis, resends, remainingMs);
             return TimeSpan.FromMilliseconds(drawnMs);
         }
     }

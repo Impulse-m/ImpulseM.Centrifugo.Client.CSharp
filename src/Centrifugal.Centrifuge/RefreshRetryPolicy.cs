@@ -66,8 +66,7 @@ namespace Centrifugal.Centrifuge {
             int clamped = Math.Clamp(step, 0, MaxStep);
             int effectiveStep = capMillis > maxMillis ? clamped : 0;
             int ceiling = CeilingMillis(effectiveStep);
-            long spread = Math.Min((long)ceiling, (long)minMillis << effectiveStep);
-            long jitter = (long)(random.NextDouble() * (spread + 1));
+            long jitter = Backoff.CappedJitter(random, minMillis, effectiveStep, ceiling);
             return (int)Math.Min((long)ceiling, minMillis + jitter);
         }
 
@@ -78,8 +77,7 @@ namespace Centrifugal.Centrifuge {
         }
 
         private int CeilingMillis(int effectiveStep) {
-            long grown = (long)maxMillis << effectiveStep;
-            return (int)Math.Max((long)maxMillis, Math.Min((long)capMillis, grown));
+            return (int)Math.Max((long)maxMillis, Backoff.CappedExponential(maxMillis, effectiveStep, capMillis));
         }
     }
 }
