@@ -34,8 +34,9 @@ namespace Centrifugal.Centrifuge.Tests {
 
         [Fact]
         // Java: subscriptionRefreshRetryUsesTheFormula
-        // The real policy with bounds 10000 and 20000 ms and cap 300000, and the top draw: the first retry waits the ceiling
-        // of step 0, the second the ceiling of step 1.
+        // The real policy with bounds of 10000 and 20000 ms and cap 300000, and the top draw: the first retry waits the
+        // ceiling of step 0, and the second waits 10 s plus 20 s: the minimum plus the top of its spread, under the
+        // step-1 ceiling of 40 s.
         public void Retry_UsesPolicyDelay() {
             RefreshRetryPolicy policy = new RefreshRetryPolicy(FixedRandom.MaximumDraws(), 10000, 20000, 300000, true);
             SubscriptionRefreshRetry retry = new SubscriptionRefreshRetry(policy);

@@ -1,5 +1,3 @@
-// Ported from the Java fork's LaterDelayTest (7 tests). Status: all 7 ported under the Java names, kept in a comment on
-// each test. Nanoseconds of the Java test are TimeSpan values here.
 using System;
 using Xunit;
 
@@ -29,7 +27,7 @@ namespace Centrifugal.Centrifuge.Tests {
         // Java: theLowestDrawGivesNoDelay
         [Fact]
         public void LaterDelay_LowestDraw_GivesNoDelay() {
-            BoundRandom lowest = new BoundRandom(bound => 0);
+            FixedRandom lowest = new FixedRandom(bound => 0);
 
             Assert.Equal(TimeSpan.Zero, RpcRetryDelays.LaterDelay(lowest, 2, TimeSpan.MaxValue));
         }
@@ -39,7 +37,7 @@ namespace Centrifugal.Centrifuge.Tests {
         // The cap limits the range of the draw: with 300 ms left, the third resend draws over 301 values, not 1001.
         [Fact]
         public void LaterDelay_DrawRange_IsCappedAtTheRemainingDeadline() {
-            BoundRandom capped = new BoundRandom(bound => 0);
+            FixedRandom capped = new FixedRandom(bound => 0);
 
             RpcRetryDelays.LaterDelay(capped, 2, TimeSpan.FromMilliseconds(300));
 
@@ -51,7 +49,7 @@ namespace Centrifugal.Centrifuge.Tests {
         // The intermediate draw is kept as drawn when it lies inside the capped range.
         [Fact]
         public void LaterDelay_IntermediateDraw_IsNotChangedByTheCap() {
-            BoundRandom middle = new BoundRandom(bound => 150);
+            FixedRandom middle = new FixedRandom(bound => 150);
 
             Assert.Equal(TimeSpan.FromMilliseconds(150), RpcRetryDelays.LaterDelay(middle, 2, TimeSpan.FromMilliseconds(300)));
         }
@@ -76,7 +74,7 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
-        // Gap: the budget and the base of the later resends (rule R48).
+        // The budget is three later resends and the base is a quarter second.
         [Fact]
         public void Constants_AreThreeLaterResendsOfAQuarterSecondBase() {
             Assert.Equal(3, RpcRetryDelays.LaterResends);
@@ -86,42 +84,15 @@ namespace Centrifugal.Centrifuge.Tests {
 
         // A random source which always returns the largest value of the range.
         private static Random Maximum() {
-            return new BoundRandom(bound => bound - 1);
+            return new FixedRandom(bound => bound - 1);
         }
 
 
         // The bound of the draw of the given later resend, as the random source was asked for it.
         private static int DrawBoundOf(int resends) {
-            BoundRandom recorder = new BoundRandom(bound => 0);
+            FixedRandom recorder = new FixedRandom(bound => 0);
             RpcRetryDelays.LaterDelay(recorder, resends, TimeSpan.MaxValue);
             return recorder.LastBound;
-        }
-
-
-        // A random source whose draw is given by a function of the bound, which records the bound of the last draw.
-        private sealed class BoundRandom : Random {
-            private readonly Func<int, int> draw;
-
-
-            /// <summary>
-            /// Creates the source.
-            /// </summary>
-            /// <param name="draw">Returns the draw for an exclusive upper bound.</param>
-            public BoundRandom(Func<int, int> draw) {
-                this.draw = draw;
-            }
-
-
-            /// <summary>The bound of the last draw.</summary>
-            public int LastBound { get; private set; }
-
-
-            /// <summary>Returns the draw of the function and records the bound.</summary>
-            /// <param name="maxValue">The exclusive upper bound of the draw.</param>
-            public override int Next(int maxValue) {
-                LastBound = maxValue;
-                return draw(maxValue);
-            }
         }
     }
 }

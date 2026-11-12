@@ -6,9 +6,10 @@ namespace Centrifugal.Centrifuge {
     /// <summary>
     /// Issues the msg_ids of the rpc calls. A msg_id is the server-corrected unix second shifted left by
     /// <see cref="SequenceBits"/>, with a sequence in the low bits, so it fits 53 bits. The sequence of a second starts at
-    /// the lane, which is drawn at construction and on a re-sync, so two generators which share an instance rarely issue the same msg_id. A backward correction of
-    /// the clock holds the time part, so the msg_ids stay unique within the scope. <see cref="Resync"/> may lower the
-    /// time part when the server refused a msg_id as outside its window. Used on the client loop only.
+    /// the lane, which is drawn at construction and on a re-sync, so two generators which share an instance rarely issue
+    /// the same msg_id. A backward correction of the clock holds the time part, so the msg_ids stay unique within the
+    /// scope. <see cref="Resync"/> may lower the time part when the server refused a msg_id as outside its window. Used on
+    /// the client loop only.
     /// </summary>
     internal sealed class MsgIdGenerator {
         /// <summary>Bits of the sequence part of a msg_id.</summary>
@@ -58,7 +59,7 @@ namespace Centrifugal.Centrifuge {
             if (seconds == lastSeconds) {
                 seq = lastSeq + 1;
             } else {
-                // The lane is not redrawn at a new second: a second that follows keeps the lane (Java laterSecondRestartsAtTheLane).
+                // The lane is not redrawn at a new second: a second that follows keeps the lane.
                 seq = lane;
             }
             if (seq >= SequenceLimit) {

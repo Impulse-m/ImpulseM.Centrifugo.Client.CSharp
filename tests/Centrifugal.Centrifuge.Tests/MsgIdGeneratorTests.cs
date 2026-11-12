@@ -1,5 +1,3 @@
-// Ported from the Java fork's MsgIdGeneratorTest (14 tests). Status: all 14 ported under the Java names, kept in a comment
-// on each test. The lanes are scripted, so every msg_id is known.
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -209,7 +207,7 @@ namespace Centrifugal.Centrifuge.Tests {
         // Java: laneIsDrawnFromTheNineteenBitsRange
         [Fact]
         public void Constructor_LaneIsDrawnFromTheNineteenBitsRange() {
-            HighestRandom highest = new HighestRandom();
+            FixedRandom highest = new FixedRandom(bound => bound - 1);
 
             ulong highestLane = new MsgIdGenerator(highest).Next(ServerMillis) & ((ulong)MsgIdGenerator.SequenceLimit - 1UL);
 
@@ -219,8 +217,8 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
-        // Gap: a time before the Unix epoch counts as the epoch, so the time part is never negative (the unsigned shift
-        // would wrap). Java has no such input rule; the case is outside the server's clock range.
+        // A time before the Unix epoch counts as the epoch, so the time part is never negative: a negative value would wrap
+        // in the unsigned shift.
         [Fact]
         public void Next_TimeBeforeTheEpoch_CountsAsTheEpoch() {
             MsgIdGenerator generator = new MsgIdGenerator(Lanes(9));
@@ -233,45 +231,7 @@ namespace Centrifugal.Centrifuge.Tests {
 
         // A random source which returns the values in order, one per draw of a lane.
         private static Random Lanes(params int[] values) {
-            return new ScriptedRandom(values);
-        }
-
-
-        // The random source of the lanes: the values are returned in order, one per draw.
-        private sealed class ScriptedRandom : Random {
-            private readonly int[] values;
-            private int index;
-
-
-            /// <summary>
-            /// Creates the source.
-            /// </summary>
-            /// <param name="values">The values returned by the draws, in order.</param>
-            public ScriptedRandom(int[] values) {
-                this.values = values;
-            }
-
-
-            /// <summary>Returns the next scripted value.</summary>
-            /// <param name="maxValue">The exclusive upper bound of the draw.</param>
-            public override int Next(int maxValue) {
-                return values[index++];
-            }
-        }
-
-
-        // A random source which returns the top of each range and records the bound of the last draw.
-        private sealed class HighestRandom : Random {
-            /// <summary>The bound of the last draw.</summary>
-            public int LastBound { get; private set; }
-
-
-            /// <summary>Returns bound minus one and records the bound.</summary>
-            /// <param name="maxValue">The exclusive upper bound of the draw.</param>
-            public override int Next(int maxValue) {
-                LastBound = maxValue;
-                return maxValue - 1;
-            }
+            return FixedRandom.Scripted(values);
         }
     }
 }
