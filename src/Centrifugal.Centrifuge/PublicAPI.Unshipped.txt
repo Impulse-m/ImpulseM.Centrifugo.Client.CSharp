@@ -10,6 +10,7 @@ Centrifugal.Centrifuge.CentrifugeAuthResult.Expires.get -> bool
 Centrifugal.Centrifuge.CentrifugeAuthResult.Ttl.get -> uint
 Centrifugal.Centrifuge.CentrifugeAuthResult.User.get -> string!
 Centrifugal.Centrifuge.CentrifugeClient.Auth -> System.EventHandler<Centrifugal.Centrifuge.CentrifugeAuthEventArgs!>?
+Centrifugal.Centrifuge.CentrifugeClient.CloseAsync(System.TimeSpan awaitTermination, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
 Centrifugal.Centrifuge.CentrifugeClient.Capabilities.get -> Centrifugal.Centrifuge.CentrifugeClientCapabilities!
 Centrifugal.Centrifuge.CentrifugeClientCapabilities
 Centrifugal.Centrifuge.CentrifugeClientCapabilities.RpcOptionsSupported.get -> bool
