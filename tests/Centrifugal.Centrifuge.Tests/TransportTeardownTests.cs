@@ -1,5 +1,5 @@
-// Ported from Java TransportTeardownTest (4 tests). The Java tests use real sockets: a TCP relay that can blackhole a live
-// link (CountingRelay), and a server that accepts TCP and never answers. The silent server is private to this file.
+// Teardown tests on real sockets: a TCP relay that can blackhole a live link (CountingRelay), and a server that accepts
+// TCP and never answers. The silent server is private to this file.
 // Waits are waits for events, for relay state or for a socket close, each with a timeout. No fixed delays.
 using System;
 using System.Collections.Generic;
@@ -24,8 +24,8 @@ namespace Centrifugal.Centrifuge.Tests {
         /// <summary>After "no ping" on a dead link, the client reconnects within its backoff, not after the peer's close.</summary>
         [Fact]
         // Java: testReconnectAfterNoPingDoesNotWaitForPeerClose
-        // Renamed: the fake server answers the close frame, so the dead link of the Java test (answerClose = false) is not
-        // reproduced. The assertion kept is the Java one: two connections, each within 5 s.
+        // The fake server answers the close frame, so the dead link of the Java test (no answer to the close) is not
+        // reproduced. The test checks two connections, each within 5 s.
         public async Task ReconnectAfterNoPingReconnectsWithinFiveSeconds() {
             Server.ConnectResult.Ping = 1;
             CentrifugeClient client = NewClient(new CentrifugeClientOptions {
@@ -82,8 +82,8 @@ namespace Centrifugal.Centrifuge.Tests {
         /// <summary>A WebSocket handshake that the server never answers fails after the client timeout, and the client tries again.</summary>
         [Fact]
         // Java: testHungHandshakeFailsAfterClientTimeout
-        // Java asserts a TimeoutException. The upstream C# client raises a CentrifugeException with code TransportClosed,
-        // which the fork keeps, so only the error type name and the message are asserted here.
+        // The upstream rule is kept: the client raises a CentrifugeException with code TransportClosed, not a TimeoutException,
+        // so only the error type name and the message are asserted here.
         public async Task HungHandshakeFailsAfterClientTimeout() {
             using SilentServer silent = new SilentServer();
             CentrifugeClient client = new CentrifugeClient("ws://127.0.0.1:" + silent.Port + "/connection/websocket", new CentrifugeClientOptions {

@@ -1,6 +1,6 @@
-// Client-level ping tests on the fake server: the pong to a server ping (Java PingWatchdogTest.serverPingStillGetsItsPong),
-// the no-ping hook that ignores an old transport (rule R42), and the option check (rule R41). The watchdog timing is
-// tested on the fake step timers in PingWatchdogTests, because the client's own timers are real.
+// Client-level ping tests on the fake server: the pong to a server ping, the no-ping hook that ignores an old transport,
+// and the option check. The watchdog timing is tested on the fake step timers in PingWatchdogTests, because the client's
+// own timers are real.
 using System;
 using System.Collections.Generic;
 using System.Threading.Channels;

@@ -1,6 +1,6 @@
-// Ported from Java ConnectFailureHandlingTest (2 tests). The Java tests check the executor thread of the callbacks; the
-// C# client runs its callbacks as steps of one loop, so the port checks the error type and the absence of a connect
-// error after disconnect() instead of the thread.
+// Connect failure tests. The Java tests check the executor thread of the callbacks; the C# client runs its callbacks as
+// steps of one loop, so these tests check the error type and the absence of a connect error after disconnect() instead
+// of the thread.
 using System;
 using System.Threading.Channels;
 using System.Threading.Tasks;

@@ -58,7 +58,16 @@ jobs:
           fi
 
           # merge-tree prints the tree id, then conflicted paths until the first empty line.
-          merge_out=$(git merge-tree --write-tree --name-only HEAD "${upstream_ref}" || true)
+          # Exit code 0 means a clean merge, 1 means conflicts; any other code is a failed run.
+          merge_rc=0
+          merge_out=$(git merge-tree --write-tree --name-only HEAD "${upstream_ref}") || merge_rc=$?
+          case "${merge_rc}" in
+            0|1) ;;
+            *)
+              echo "git merge-tree failed with exit code ${merge_rc}; the conflict check did not run." >&2
+              exit 1
+              ;;
+          esac
           conflicts=$(printf '%s\n' "${merge_out}" | tail -n +2 | sed '/^$/,$d')
           if [ -z "${conflicts}" ]; then
             conflicts_md="None: upstream merges cleanly."
