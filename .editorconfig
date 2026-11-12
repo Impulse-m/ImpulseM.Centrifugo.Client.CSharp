@@ -30,3 +30,10 @@ csharp_style_namespace_declarations = block_scoped:warning
 # Using directives preferences
 dotnet_sort_system_directives_first = true
 dotnet_separate_import_directive_groups = false
+
+# Generated protobuf code (src/Centrifugal.Centrifuge/Protocol): its public members are not tracked in
+# PublicAPI.Shipped.txt / PublicAPI.Unshipped.txt, and its reference types are oblivious (RS0041).
+# dotnet format does not write generated code, so the public API files cannot list it.
+[src/Centrifugal.Centrifuge/Protocol/*.cs]
+dotnet_diagnostic.RS0016.severity = none
+dotnet_diagnostic.RS0041.severity = none

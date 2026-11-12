@@ -1,8 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <!-- Multi-target for modern .NET and Unity support -->
-    <TargetFrameworks>netstandard2.1;net6.0;net8.0;net9.0;net10.0</TargetFrameworks>
+    <TargetFramework>net10.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -14,16 +13,16 @@
     <AssemblyName>Centrifugal.Centrifuge</AssemblyName>
 
     <!-- Package Information -->
-    <PackageId>Centrifugal.Centrifuge</PackageId>
+    <PackageId>ImpulseM.Centrifuge</PackageId>
     <Version>0.1.0</Version>
-    <Authors>Centrifugal Labs</Authors>
-    <Company>Centrifugal Labs</Company>
+    <Authors>Centrifugal Labs;ImpulseM</Authors>
+    <Company>Centrifugal Labs;ImpulseM</Company>
     <Description>
       Official C# client SDK to communicate with Centrifugo and Centrifuge-based server from multiple environments.
       Supports Protobuf communication over WebSocket (primary) and HTTP-streaming (bidirectional emulation).
     </Description>
-    <PackageProjectUrl>https://github.com/centrifugal/centrifuge-csharp</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/centrifugal/centrifuge-csharp</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Impulse-m/ImpulseM.Centrifugo.Client.CSharp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Impulse-m/ImpulseM.Centrifugo.Client.CSharp</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>centrifugo;centrifuge;websocket;real-time;messaging;protobuf;streaming</PackageTags>
@@ -52,22 +51,26 @@
     <!-- Logging abstractions for idiomatic .NET logging support -->
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
 
-    <!-- DI abstractions for Blazor WASM support (not needed for netstandard2.1/Unity) -->
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0"
-                      Condition="'$(TargetFramework)' != 'netstandard2.1'" />
+    <!-- DI abstractions for Blazor WASM support -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
 
-    <!-- For .NET Standard 2.1, add compatibility packages -->
-    <PackageReference Include="System.Threading.Channels" Version="8.0.0"
-                      Condition="'$(TargetFramework)' == 'netstandard2.1'" />
+    <!-- JSInterop for Blazor WASM support -->
+    <PackageReference Include="Microsoft.JSInterop" Version="6.0.0" />
 
-    <!-- JSInterop for Blazor WASM support (not needed for netstandard2.1/Unity) -->
-    <PackageReference Include="Microsoft.JSInterop" Version="6.0.0"
-                      Condition="'$(TargetFramework)' != 'netstandard2.1'" />
+    <!-- Public API surface check: PublicAPI.Shipped.txt and PublicAPI.Unshipped.txt -->
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="PublicAPI.Shipped.txt" />
+    <AdditionalFiles Include="PublicAPI.Unshipped.txt" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="../../README.md" Pack="true" PackagePath="/" />
     <None Include="../../icon.png" Pack="true" PackagePath="/" Condition="Exists('../../icon.png')" />
+    <None Include="../../LICENSE" Pack="true" PackagePath="/" Condition="Exists('../../LICENSE')" />
+    <None Include="../../THIRD_PARTY_NOTICES.md" Pack="true" PackagePath="/" Condition="Exists('../../THIRD_PARTY_NOTICES.md')" />
   </ItemGroup>
 
   <!-- NO Content Include for wwwroot -->

@@ -1,0 +1,312 @@
+#nullable enable
+Centrifugal.Centrifuge.CentrifugeClient
+Centrifugal.Centrifuge.CentrifugeClient.CentrifugeClient(Centrifugal.Centrifuge.CentrifugeTransportEndpoint![]! transportEndpoints, Centrifugal.Centrifuge.CentrifugeClientOptions? options = null) -> void
+Centrifugal.Centrifuge.CentrifugeClient.CentrifugeClient(string! endpoint, Centrifugal.Centrifuge.CentrifugeClientOptions? options = null) -> void
+Centrifugal.Centrifuge.CentrifugeClient.Connect() -> void
+Centrifugal.Centrifuge.CentrifugeClient.Connected -> System.EventHandler<Centrifugal.Centrifuge.CentrifugeConnectedEventArgs!>?
+Centrifugal.Centrifuge.CentrifugeClient.Connecting -> System.EventHandler<Centrifugal.Centrifuge.CentrifugeConnectingEventArgs!>?
+Centrifugal.Centrifuge.CentrifugeClient.Disconnect() -> void
+Centrifugal.Centrifuge.CentrifugeClient.Disconnected -> System.EventHandler<Centrifugal.Centrifuge.CentrifugeDisconnectedEventArgs!>?
+Centrifugal.Centrifuge.CentrifugeClient.Dispose() -> void
+Centrifugal.Centrifuge.CentrifugeClient.DisposeAsync() -> System.Threading.Tasks.ValueTask
+Centrifugal.Centrifuge.CentrifugeClient.Error -> System.EventHandler<Centrifugal.Centrifuge.CentrifugeErrorEventArgs!>?
+Centrifugal.Centrifuge.CentrifugeClient.GetSubscription(string! channel) -> Centrifugal.Centrifuge.CentrifugeSubscription?
+Centrifugal.Centrifuge.CentrifugeClient.HistoryAsync(string! channel, Centrifugal.Centrifuge.CentrifugeHistoryOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Centrifugal.Centrifuge.CentrifugeHistoryResult!>!
+Centrifugal.Centrifuge.CentrifugeClient.Join -> System.EventHandler<Centrifugal.Centrifuge.CentrifugeJoinEventArgs!>?
+Centrifugal.Centrifuge.CentrifugeClient.Leave -> System.EventHandler<Centrifugal.Centrifuge.CentrifugeLeaveEventArgs!>?
+Centrifugal.Centrifuge.CentrifugeClient.Message -> System.EventHandler<Centrifugal.Centrifuge.CentrifugeMessageEventArgs!>?
+Centrifugal.Centrifuge.CentrifugeClient.NewSubscription(string! channel, Centrifugal.Centrifuge.CentrifugeSubscriptionOptions? options = null) -> Centrifugal.Centrifuge.CentrifugeSubscription!
+Centrifugal.Centrifuge.CentrifugeClient.PresenceAsync(string! channel, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Centrifugal.Centrifuge.CentrifugePresenceResult!>!
+Centrifugal.Centrifuge.CentrifugeClient.PresenceStatsAsync(string! channel, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Centrifugal.Centrifuge.CentrifugePresenceStatsResult!>!
+Centrifugal.Centrifuge.CentrifugeClient.Publication -> System.EventHandler<Centrifugal.Centrifuge.CentrifugePublicationEventArgs!>?
+Centrifugal.Centrifuge.CentrifugeClient.PublishAsync(string! channel, System.ReadOnlyMemory<byte> data, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Centrifugal.Centrifuge.CentrifugeClient.ReadyAsync(System.TimeSpan? timeout = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Centrifugal.Centrifuge.CentrifugeClient.RemoveSubscription(Centrifugal.Centrifuge.CentrifugeSubscription! subscription) -> void
+Centrifugal.Centrifuge.CentrifugeClient.RpcAsync(string! method, System.ReadOnlyMemory<byte> data, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Centrifugal.Centrifuge.CentrifugeRpcResult!>!
+Centrifugal.Centrifuge.CentrifugeClient.SendAsync(System.ReadOnlyMemory<byte> data, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Centrifugal.Centrifuge.CentrifugeClient.ServerSubscribed -> System.EventHandler<Centrifugal.Centrifuge.CentrifugeServerSubscribedEventArgs!>?
+Centrifugal.Centrifuge.CentrifugeClient.ServerSubscribing -> System.EventHandler<Centrifugal.Centrifuge.CentrifugeServerSubscribingEventArgs!>?
+Centrifugal.Centrifuge.CentrifugeClient.ServerUnsubscribed -> System.EventHandler<Centrifugal.Centrifuge.CentrifugeServerUnsubscribedEventArgs!>?
+Centrifugal.Centrifuge.CentrifugeClient.SetData(System.ReadOnlyMemory<byte> data) -> void
+Centrifugal.Centrifuge.CentrifugeClient.SetHeaders(System.Collections.Generic.Dictionary<string!, string!>? headers) -> void
+Centrifugal.Centrifuge.CentrifugeClient.SetToken(string? token) -> void
+Centrifugal.Centrifuge.CentrifugeClient.State.get -> Centrifugal.Centrifuge.CentrifugeClientState
+Centrifugal.Centrifuge.CentrifugeClient.StateChanged -> System.EventHandler<Centrifugal.Centrifuge.CentrifugeStateEventArgs!>?
+Centrifugal.Centrifuge.CentrifugeClient.Subscriptions.get -> System.Collections.Generic.IReadOnlyDictionary<string!, Centrifugal.Centrifuge.CentrifugeSubscription!>!
+Centrifugal.Centrifuge.CentrifugeClientInfo
+Centrifugal.Centrifuge.CentrifugeClientInfo.CentrifugeClientInfo() -> void
+Centrifugal.Centrifuge.CentrifugeClientInfo.CentrifugeClientInfo(string! user, string! client, System.ReadOnlyMemory<byte> connInfo = default(System.ReadOnlyMemory<byte>), System.ReadOnlyMemory<byte> chanInfo = default(System.ReadOnlyMemory<byte>)) -> void
+Centrifugal.Centrifuge.CentrifugeClientInfo.ChanInfo.get -> System.ReadOnlyMemory<byte>
+Centrifugal.Centrifuge.CentrifugeClientInfo.Client.get -> string!
+Centrifugal.Centrifuge.CentrifugeClientInfo.ConnInfo.get -> System.ReadOnlyMemory<byte>
+Centrifugal.Centrifuge.CentrifugeClientInfo.User.get -> string!
+Centrifugal.Centrifuge.CentrifugeClientOptions
+Centrifugal.Centrifuge.CentrifugeClientOptions.CentrifugeClientOptions() -> void
+Centrifugal.Centrifuge.CentrifugeClientOptions.Data.get -> System.ReadOnlyMemory<byte>
+Centrifugal.Centrifuge.CentrifugeClientOptions.Data.set -> void
+Centrifugal.Centrifuge.CentrifugeClientOptions.EmulationEndpoint.get -> string?
+Centrifugal.Centrifuge.CentrifugeClientOptions.EmulationEndpoint.set -> void
+Centrifugal.Centrifuge.CentrifugeClientOptions.GetToken.get -> System.Func<System.Threading.Tasks.Task<string!>!>?
+Centrifugal.Centrifuge.CentrifugeClientOptions.GetToken.set -> void
+Centrifugal.Centrifuge.CentrifugeClientOptions.Headers.get -> System.Collections.Generic.Dictionary<string!, string!>?
+Centrifugal.Centrifuge.CentrifugeClientOptions.Headers.set -> void
+Centrifugal.Centrifuge.CentrifugeClientOptions.JSRuntime.get -> Microsoft.JSInterop.IJSRuntime?
+Centrifugal.Centrifuge.CentrifugeClientOptions.JSRuntime.set -> void
+Centrifugal.Centrifuge.CentrifugeClientOptions.Logger.get -> Microsoft.Extensions.Logging.ILogger?
+Centrifugal.Centrifuge.CentrifugeClientOptions.Logger.set -> void
+Centrifugal.Centrifuge.CentrifugeClientOptions.MaxReconnectDelay.get -> System.TimeSpan
+Centrifugal.Centrifuge.CentrifugeClientOptions.MaxReconnectDelay.set -> void
+Centrifugal.Centrifuge.CentrifugeClientOptions.MaxServerPingDelay.get -> System.TimeSpan
+Centrifugal.Centrifuge.CentrifugeClientOptions.MaxServerPingDelay.set -> void
+Centrifugal.Centrifuge.CentrifugeClientOptions.MinReconnectDelay.get -> System.TimeSpan
+Centrifugal.Centrifuge.CentrifugeClientOptions.MinReconnectDelay.set -> void
+Centrifugal.Centrifuge.CentrifugeClientOptions.Name.get -> string!
+Centrifugal.Centrifuge.CentrifugeClientOptions.Name.set -> void
+Centrifugal.Centrifuge.CentrifugeClientOptions.Timeout.get -> System.TimeSpan
+Centrifugal.Centrifuge.CentrifugeClientOptions.Timeout.set -> void
+Centrifugal.Centrifuge.CentrifugeClientOptions.Token.get -> string?
+Centrifugal.Centrifuge.CentrifugeClientOptions.Token.set -> void
+Centrifugal.Centrifuge.CentrifugeClientOptions.Validate() -> void
+Centrifugal.Centrifuge.CentrifugeClientOptions.Version.get -> string!
+Centrifugal.Centrifuge.CentrifugeClientOptions.Version.set -> void
+Centrifugal.Centrifuge.CentrifugeClientState
+Centrifugal.Centrifuge.CentrifugeClientState.Connected = 2 -> Centrifugal.Centrifuge.CentrifugeClientState
+Centrifugal.Centrifuge.CentrifugeClientState.Connecting = 1 -> Centrifugal.Centrifuge.CentrifugeClientState
+Centrifugal.Centrifuge.CentrifugeClientState.Disconnected = 0 -> Centrifugal.Centrifuge.CentrifugeClientState
+Centrifugal.Centrifuge.CentrifugeConfigurationException
+Centrifugal.Centrifuge.CentrifugeConfigurationException.CentrifugeConfigurationException(string! message) -> void
+Centrifugal.Centrifuge.CentrifugeConnectedEventArgs
+Centrifugal.Centrifuge.CentrifugeConnectedEventArgs.CentrifugeConnectedEventArgs(string! clientId, string! transport, System.ReadOnlyMemory<byte> data = default(System.ReadOnlyMemory<byte>)) -> void
+Centrifugal.Centrifuge.CentrifugeConnectedEventArgs.ClientId.get -> string!
+Centrifugal.Centrifuge.CentrifugeConnectedEventArgs.Data.get -> System.ReadOnlyMemory<byte>
+Centrifugal.Centrifuge.CentrifugeConnectedEventArgs.Transport.get -> string!
+Centrifugal.Centrifuge.CentrifugeConnectingCodes
+Centrifugal.Centrifuge.CentrifugeConnectingEventArgs
+Centrifugal.Centrifuge.CentrifugeConnectingEventArgs.CentrifugeConnectingEventArgs(int code, string! reason) -> void
+Centrifugal.Centrifuge.CentrifugeConnectingEventArgs.Code.get -> int
+Centrifugal.Centrifuge.CentrifugeConnectingEventArgs.Reason.get -> string!
+Centrifugal.Centrifuge.CentrifugeDisconnectedCodes
+Centrifugal.Centrifuge.CentrifugeDisconnectedEventArgs
+Centrifugal.Centrifuge.CentrifugeDisconnectedEventArgs.CentrifugeDisconnectedEventArgs(int code, string! reason) -> void
+Centrifugal.Centrifuge.CentrifugeDisconnectedEventArgs.Code.get -> int
+Centrifugal.Centrifuge.CentrifugeDisconnectedEventArgs.Reason.get -> string!
+Centrifugal.Centrifuge.CentrifugeDuplicateSubscriptionException
+Centrifugal.Centrifuge.CentrifugeDuplicateSubscriptionException.CentrifugeDuplicateSubscriptionException(string! channel) -> void
+Centrifugal.Centrifuge.CentrifugeDuplicateSubscriptionException.Channel.get -> string!
+Centrifugal.Centrifuge.CentrifugeErrorCodes
+Centrifugal.Centrifuge.CentrifugeErrorEventArgs
+Centrifugal.Centrifuge.CentrifugeErrorEventArgs.CentrifugeErrorEventArgs(string! type, int code, string! message, bool temporary = false, System.Exception? exception = null) -> void
+Centrifugal.Centrifuge.CentrifugeErrorEventArgs.Code.get -> int
+Centrifugal.Centrifuge.CentrifugeErrorEventArgs.Exception.get -> System.Exception?
+Centrifugal.Centrifuge.CentrifugeErrorEventArgs.Message.get -> string!
+Centrifugal.Centrifuge.CentrifugeErrorEventArgs.Temporary.get -> bool
+Centrifugal.Centrifuge.CentrifugeErrorEventArgs.Type.get -> string!
+Centrifugal.Centrifuge.CentrifugeException
+Centrifugal.Centrifuge.CentrifugeException.CentrifugeException(int code, string! message, bool temporary = false, System.Exception? innerException = null) -> void
+Centrifugal.Centrifuge.CentrifugeException.Code.get -> int
+Centrifugal.Centrifuge.CentrifugeException.Temporary.get -> bool
+Centrifugal.Centrifuge.CentrifugeFilterNode
+Centrifugal.Centrifuge.CentrifugeFilterNodeBuilder
+Centrifugal.Centrifuge.CentrifugeGetStateException
+Centrifugal.Centrifuge.CentrifugeGetStateException.CentrifugeGetStateException(System.Exception! innerException) -> void
+Centrifugal.Centrifuge.CentrifugeHistoryOptions
+Centrifugal.Centrifuge.CentrifugeHistoryOptions.CentrifugeHistoryOptions() -> void
+Centrifugal.Centrifuge.CentrifugeHistoryOptions.Limit.get -> int?
+Centrifugal.Centrifuge.CentrifugeHistoryOptions.Limit.set -> void
+Centrifugal.Centrifuge.CentrifugeHistoryOptions.Reverse.get -> bool
+Centrifugal.Centrifuge.CentrifugeHistoryOptions.Reverse.set -> void
+Centrifugal.Centrifuge.CentrifugeHistoryOptions.Since.get -> Centrifugal.Centrifuge.CentrifugeStreamPosition?
+Centrifugal.Centrifuge.CentrifugeHistoryOptions.Since.set -> void
+Centrifugal.Centrifuge.CentrifugeHistoryResult
+Centrifugal.Centrifuge.CentrifugeHistoryResult.CentrifugeHistoryResult(Centrifugal.Centrifuge.CentrifugePublicationEventArgs![]! publications, string! epoch, ulong offset) -> void
+Centrifugal.Centrifuge.CentrifugeHistoryResult.Epoch.get -> string!
+Centrifugal.Centrifuge.CentrifugeHistoryResult.Offset.get -> ulong
+Centrifugal.Centrifuge.CentrifugeHistoryResult.Publications.get -> Centrifugal.Centrifuge.CentrifugePublicationEventArgs![]!
+Centrifugal.Centrifuge.CentrifugeJoinEventArgs
+Centrifugal.Centrifuge.CentrifugeJoinEventArgs.CentrifugeJoinEventArgs(string! channel, Centrifugal.Centrifuge.CentrifugeClientInfo info) -> void
+Centrifugal.Centrifuge.CentrifugeJoinEventArgs.Channel.get -> string!
+Centrifugal.Centrifuge.CentrifugeJoinEventArgs.Info.get -> Centrifugal.Centrifuge.CentrifugeClientInfo
+Centrifugal.Centrifuge.CentrifugeLeaveEventArgs
+Centrifugal.Centrifuge.CentrifugeLeaveEventArgs.CentrifugeLeaveEventArgs(string! channel, Centrifugal.Centrifuge.CentrifugeClientInfo info) -> void
+Centrifugal.Centrifuge.CentrifugeLeaveEventArgs.Channel.get -> string!
+Centrifugal.Centrifuge.CentrifugeLeaveEventArgs.Info.get -> Centrifugal.Centrifuge.CentrifugeClientInfo
+Centrifugal.Centrifuge.CentrifugeMessageEventArgs
+Centrifugal.Centrifuge.CentrifugeMessageEventArgs.CentrifugeMessageEventArgs(System.ReadOnlyMemory<byte> data) -> void
+Centrifugal.Centrifuge.CentrifugeMessageEventArgs.Data.get -> System.ReadOnlyMemory<byte>
+Centrifugal.Centrifuge.CentrifugePresenceResult
+Centrifugal.Centrifuge.CentrifugePresenceResult.CentrifugePresenceResult(System.Collections.Generic.IReadOnlyDictionary<string!, Centrifugal.Centrifuge.CentrifugeClientInfo>! clients) -> void
+Centrifugal.Centrifuge.CentrifugePresenceResult.Clients.get -> System.Collections.Generic.IReadOnlyDictionary<string!, Centrifugal.Centrifuge.CentrifugeClientInfo>!
+Centrifugal.Centrifuge.CentrifugePresenceStatsResult
+Centrifugal.Centrifuge.CentrifugePresenceStatsResult.CentrifugePresenceStatsResult(uint numClients, uint numUsers) -> void
+Centrifugal.Centrifuge.CentrifugePresenceStatsResult.NumClients.get -> uint
+Centrifugal.Centrifuge.CentrifugePresenceStatsResult.NumUsers.get -> uint
+Centrifugal.Centrifuge.CentrifugePublicationEventArgs
+Centrifugal.Centrifuge.CentrifugePublicationEventArgs.CentrifugePublicationEventArgs(string! channel, System.ReadOnlyMemory<byte> data, Centrifugal.Centrifuge.CentrifugeClientInfo? info = null, ulong? offset = null, System.Collections.Generic.IReadOnlyDictionary<string!, string!>? tags = null) -> void
+Centrifugal.Centrifuge.CentrifugePublicationEventArgs.Channel.get -> string!
+Centrifugal.Centrifuge.CentrifugePublicationEventArgs.Data.get -> System.ReadOnlyMemory<byte>
+Centrifugal.Centrifuge.CentrifugePublicationEventArgs.Info.get -> Centrifugal.Centrifuge.CentrifugeClientInfo?
+Centrifugal.Centrifuge.CentrifugePublicationEventArgs.Offset.get -> ulong?
+Centrifugal.Centrifuge.CentrifugePublicationEventArgs.Tags.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>?
+Centrifugal.Centrifuge.CentrifugeRpcResult
+Centrifugal.Centrifuge.CentrifugeRpcResult.CentrifugeRpcResult(System.ReadOnlyMemory<byte> data) -> void
+Centrifugal.Centrifuge.CentrifugeRpcResult.Data.get -> System.ReadOnlyMemory<byte>
+Centrifugal.Centrifuge.CentrifugeServerSubscribedEventArgs
+Centrifugal.Centrifuge.CentrifugeServerSubscribedEventArgs.CentrifugeServerSubscribedEventArgs(string! channel, bool wasRecovering, bool recovered, bool recoverable, bool positioned, Centrifugal.Centrifuge.CentrifugeStreamPosition? streamPosition = null, System.ReadOnlyMemory<byte> data = default(System.ReadOnlyMemory<byte>)) -> void
+Centrifugal.Centrifuge.CentrifugeServerSubscribedEventArgs.Channel.get -> string!
+Centrifugal.Centrifuge.CentrifugeServerSubscribedEventArgs.Data.get -> System.ReadOnlyMemory<byte>
+Centrifugal.Centrifuge.CentrifugeServerSubscribedEventArgs.Positioned.get -> bool
+Centrifugal.Centrifuge.CentrifugeServerSubscribedEventArgs.Recoverable.get -> bool
+Centrifugal.Centrifuge.CentrifugeServerSubscribedEventArgs.Recovered.get -> bool
+Centrifugal.Centrifuge.CentrifugeServerSubscribedEventArgs.StreamPosition.get -> Centrifugal.Centrifuge.CentrifugeStreamPosition?
+Centrifugal.Centrifuge.CentrifugeServerSubscribedEventArgs.WasRecovering.get -> bool
+Centrifugal.Centrifuge.CentrifugeServerSubscribingEventArgs
+Centrifugal.Centrifuge.CentrifugeServerSubscribingEventArgs.CentrifugeServerSubscribingEventArgs(string! channel) -> void
+Centrifugal.Centrifuge.CentrifugeServerSubscribingEventArgs.Channel.get -> string!
+Centrifugal.Centrifuge.CentrifugeServerUnsubscribedEventArgs
+Centrifugal.Centrifuge.CentrifugeServerUnsubscribedEventArgs.CentrifugeServerUnsubscribedEventArgs(string! channel) -> void
+Centrifugal.Centrifuge.CentrifugeServerUnsubscribedEventArgs.Channel.get -> string!
+Centrifugal.Centrifuge.CentrifugeStateEventArgs
+Centrifugal.Centrifuge.CentrifugeStateEventArgs.CentrifugeStateEventArgs(Centrifugal.Centrifuge.CentrifugeClientState oldState, Centrifugal.Centrifuge.CentrifugeClientState newState) -> void
+Centrifugal.Centrifuge.CentrifugeStateEventArgs.NewState.get -> Centrifugal.Centrifuge.CentrifugeClientState
+Centrifugal.Centrifuge.CentrifugeStateEventArgs.OldState.get -> Centrifugal.Centrifuge.CentrifugeClientState
+Centrifugal.Centrifuge.CentrifugeStreamPosition
+Centrifugal.Centrifuge.CentrifugeStreamPosition.CentrifugeStreamPosition() -> void
+Centrifugal.Centrifuge.CentrifugeStreamPosition.CentrifugeStreamPosition(ulong offset, string! epoch) -> void
+Centrifugal.Centrifuge.CentrifugeStreamPosition.Epoch.get -> string!
+Centrifugal.Centrifuge.CentrifugeStreamPosition.Offset.get -> ulong
+Centrifugal.Centrifuge.CentrifugeSubscribedEventArgs
+Centrifugal.Centrifuge.CentrifugeSubscribedEventArgs.CentrifugeSubscribedEventArgs(bool wasRecovering, bool recovered, bool recoverable, bool positioned, Centrifugal.Centrifuge.CentrifugeStreamPosition? streamPosition = null, System.ReadOnlyMemory<byte> data = default(System.ReadOnlyMemory<byte>)) -> void
+Centrifugal.Centrifuge.CentrifugeSubscribedEventArgs.Data.get -> System.ReadOnlyMemory<byte>
+Centrifugal.Centrifuge.CentrifugeSubscribedEventArgs.Positioned.get -> bool
+Centrifugal.Centrifuge.CentrifugeSubscribedEventArgs.Recoverable.get -> bool
+Centrifugal.Centrifuge.CentrifugeSubscribedEventArgs.Recovered.get -> bool
+Centrifugal.Centrifuge.CentrifugeSubscribedEventArgs.StreamPosition.get -> Centrifugal.Centrifuge.CentrifugeStreamPosition?
+Centrifugal.Centrifuge.CentrifugeSubscribedEventArgs.WasRecovering.get -> bool
+Centrifugal.Centrifuge.CentrifugeSubscribingCodes
+Centrifugal.Centrifuge.CentrifugeSubscribingEventArgs
+Centrifugal.Centrifuge.CentrifugeSubscribingEventArgs.CentrifugeSubscribingEventArgs(int code, string! reason) -> void
+Centrifugal.Centrifuge.CentrifugeSubscribingEventArgs.Code.get -> int
+Centrifugal.Centrifuge.CentrifugeSubscribingEventArgs.Reason.get -> string!
+Centrifugal.Centrifuge.CentrifugeSubscription
+Centrifugal.Centrifuge.CentrifugeSubscription.Channel.get -> string!
+Centrifugal.Centrifuge.CentrifugeSubscription.Dispose() -> void
+Centrifugal.Centrifuge.CentrifugeSubscription.Error -> System.EventHandler<Centrifugal.Centrifuge.CentrifugeErrorEventArgs!>?
+Centrifugal.Centrifuge.CentrifugeSubscription.HistoryAsync(Centrifugal.Centrifuge.CentrifugeHistoryOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Centrifugal.Centrifuge.CentrifugeHistoryResult!>!
+Centrifugal.Centrifuge.CentrifugeSubscription.Join -> System.EventHandler<Centrifugal.Centrifuge.CentrifugeJoinEventArgs!>?
+Centrifugal.Centrifuge.CentrifugeSubscription.Leave -> System.EventHandler<Centrifugal.Centrifuge.CentrifugeLeaveEventArgs!>?
+Centrifugal.Centrifuge.CentrifugeSubscription.PresenceAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Centrifugal.Centrifuge.CentrifugePresenceResult!>!
+Centrifugal.Centrifuge.CentrifugeSubscription.PresenceStatsAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Centrifugal.Centrifuge.CentrifugePresenceStatsResult!>!
+Centrifugal.Centrifuge.CentrifugeSubscription.Publication -> System.EventHandler<Centrifugal.Centrifuge.CentrifugePublicationEventArgs!>?
+Centrifugal.Centrifuge.CentrifugeSubscription.PublishAsync(System.ReadOnlyMemory<byte> data, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Centrifugal.Centrifuge.CentrifugeSubscription.ReadyAsync(System.TimeSpan? timeout = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Centrifugal.Centrifuge.CentrifugeSubscription.SetData(System.ReadOnlyMemory<byte> data) -> void
+Centrifugal.Centrifuge.CentrifugeSubscription.SetTagsFilter(Centrifugal.Centrifuge.CentrifugeFilterNode? tagsFilter) -> void
+Centrifugal.Centrifuge.CentrifugeSubscription.State.get -> Centrifugal.Centrifuge.CentrifugeSubscriptionState
+Centrifugal.Centrifuge.CentrifugeSubscription.StateChanged -> System.EventHandler<Centrifugal.Centrifuge.CentrifugeSubscriptionStateEventArgs!>?
+Centrifugal.Centrifuge.CentrifugeSubscription.Subscribe() -> void
+Centrifugal.Centrifuge.CentrifugeSubscription.Subscribed -> System.EventHandler<Centrifugal.Centrifuge.CentrifugeSubscribedEventArgs!>?
+Centrifugal.Centrifuge.CentrifugeSubscription.Subscribing -> System.EventHandler<Centrifugal.Centrifuge.CentrifugeSubscribingEventArgs!>?
+Centrifugal.Centrifuge.CentrifugeSubscription.Unsubscribe() -> void
+Centrifugal.Centrifuge.CentrifugeSubscription.Unsubscribed -> System.EventHandler<Centrifugal.Centrifuge.CentrifugeUnsubscribedEventArgs!>?
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.CentrifugeSubscriptionOptions() -> void
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.Data.get -> System.ReadOnlyMemory<byte>
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.Data.set -> void
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.Delta.get -> string?
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.Delta.set -> void
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.GetState.get -> System.Func<string!, System.Threading.Tasks.Task<Centrifugal.Centrifuge.CentrifugeStreamPosition>!>?
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.GetState.set -> void
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.GetToken.get -> System.Func<string!, System.Threading.Tasks.Task<string!>!>?
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.GetToken.set -> void
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.JoinLeave.get -> bool
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.JoinLeave.set -> void
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.MaxResubscribeDelay.get -> System.TimeSpan
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.MaxResubscribeDelay.set -> void
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.MinResubscribeDelay.get -> System.TimeSpan
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.MinResubscribeDelay.set -> void
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.Positioned.get -> bool
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.Positioned.set -> void
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.Recoverable.get -> bool
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.Recoverable.set -> void
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.Since.get -> Centrifugal.Centrifuge.CentrifugeStreamPosition?
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.Since.set -> void
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.TagsFilter.get -> Centrifugal.Centrifuge.CentrifugeFilterNode?
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.TagsFilter.set -> void
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.Token.get -> string?
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.Token.set -> void
+Centrifugal.Centrifuge.CentrifugeSubscriptionOptions.Validate() -> void
+Centrifugal.Centrifuge.CentrifugeSubscriptionState
+Centrifugal.Centrifuge.CentrifugeSubscriptionState.Subscribed = 2 -> Centrifugal.Centrifuge.CentrifugeSubscriptionState
+Centrifugal.Centrifuge.CentrifugeSubscriptionState.Subscribing = 1 -> Centrifugal.Centrifuge.CentrifugeSubscriptionState
+Centrifugal.Centrifuge.CentrifugeSubscriptionState.Unsubscribed = 0 -> Centrifugal.Centrifuge.CentrifugeSubscriptionState
+Centrifugal.Centrifuge.CentrifugeSubscriptionStateEventArgs
+Centrifugal.Centrifuge.CentrifugeSubscriptionStateEventArgs.CentrifugeSubscriptionStateEventArgs(Centrifugal.Centrifuge.CentrifugeSubscriptionState oldState, Centrifugal.Centrifuge.CentrifugeSubscriptionState newState) -> void
+Centrifugal.Centrifuge.CentrifugeSubscriptionStateEventArgs.NewState.get -> Centrifugal.Centrifuge.CentrifugeSubscriptionState
+Centrifugal.Centrifuge.CentrifugeSubscriptionStateEventArgs.OldState.get -> Centrifugal.Centrifuge.CentrifugeSubscriptionState
+Centrifugal.Centrifuge.CentrifugeTimeoutException
+Centrifugal.Centrifuge.CentrifugeTimeoutException.CentrifugeTimeoutException(string! message = "Operation timeout") -> void
+Centrifugal.Centrifuge.CentrifugeTransportEndpoint
+Centrifugal.Centrifuge.CentrifugeTransportEndpoint.CentrifugeTransportEndpoint(Centrifugal.Centrifuge.CentrifugeTransportType transport, string! endpoint) -> void
+Centrifugal.Centrifuge.CentrifugeTransportEndpoint.Endpoint.get -> string!
+Centrifugal.Centrifuge.CentrifugeTransportEndpoint.Endpoint.set -> void
+Centrifugal.Centrifuge.CentrifugeTransportEndpoint.Transport.get -> Centrifugal.Centrifuge.CentrifugeTransportType
+Centrifugal.Centrifuge.CentrifugeTransportEndpoint.Transport.set -> void
+Centrifugal.Centrifuge.CentrifugeTransportType
+Centrifugal.Centrifuge.CentrifugeTransportType.HttpStream = 1 -> Centrifugal.Centrifuge.CentrifugeTransportType
+Centrifugal.Centrifuge.CentrifugeTransportType.WebSocket = 0 -> Centrifugal.Centrifuge.CentrifugeTransportType
+Centrifugal.Centrifuge.CentrifugeUnauthorizedException
+Centrifugal.Centrifuge.CentrifugeUnauthorizedException.CentrifugeUnauthorizedException(string! message = "Unauthorized") -> void
+Centrifugal.Centrifuge.CentrifugeUnsubscribedCodes
+Centrifugal.Centrifuge.CentrifugeUnsubscribedEventArgs
+Centrifugal.Centrifuge.CentrifugeUnsubscribedEventArgs.CentrifugeUnsubscribedEventArgs(int code, string! reason) -> void
+Centrifugal.Centrifuge.CentrifugeUnsubscribedEventArgs.Code.get -> int
+Centrifugal.Centrifuge.CentrifugeUnsubscribedEventArgs.Reason.get -> string!
+Centrifugal.Centrifuge.ServiceCollectionExtensions
+const Centrifugal.Centrifuge.CentrifugeConnectingCodes.ConnectCalled = 0 -> int
+const Centrifugal.Centrifuge.CentrifugeConnectingCodes.NoPing = 2 -> int
+const Centrifugal.Centrifuge.CentrifugeConnectingCodes.SubscribeTimeout = 3 -> int
+const Centrifugal.Centrifuge.CentrifugeConnectingCodes.TransportClosed = 1 -> int
+const Centrifugal.Centrifuge.CentrifugeConnectingCodes.UnsubscribeError = 4 -> int
+const Centrifugal.Centrifuge.CentrifugeDisconnectedCodes.BadProtocol = 2 -> int
+const Centrifugal.Centrifuge.CentrifugeDisconnectedCodes.DisconnectCalled = 0 -> int
+const Centrifugal.Centrifuge.CentrifugeDisconnectedCodes.MessageSizeLimit = 3 -> int
+const Centrifugal.Centrifuge.CentrifugeDisconnectedCodes.StateInvalidated = 3014 -> int
+const Centrifugal.Centrifuge.CentrifugeDisconnectedCodes.Unauthorized = 1 -> int
+const Centrifugal.Centrifuge.CentrifugeErrorCodes.BadConfiguration = 12 -> int
+const Centrifugal.Centrifuge.CentrifugeErrorCodes.ClientClosed = 4 -> int
+const Centrifugal.Centrifuge.CentrifugeErrorCodes.ClientConnectToken = 5 -> int
+const Centrifugal.Centrifuge.CentrifugeErrorCodes.ClientDisconnected = 3 -> int
+const Centrifugal.Centrifuge.CentrifugeErrorCodes.ClientRefreshToken = 6 -> int
+const Centrifugal.Centrifuge.CentrifugeErrorCodes.ConnectionClosed = 11 -> int
+const Centrifugal.Centrifuge.CentrifugeErrorCodes.SubscriptionGetState = 13 -> int
+const Centrifugal.Centrifuge.CentrifugeErrorCodes.SubscriptionRefreshToken = 9 -> int
+const Centrifugal.Centrifuge.CentrifugeErrorCodes.SubscriptionSubscribeToken = 8 -> int
+const Centrifugal.Centrifuge.CentrifugeErrorCodes.SubscriptionUnsubscribed = 7 -> int
+const Centrifugal.Centrifuge.CentrifugeErrorCodes.Timeout = 1 -> int
+const Centrifugal.Centrifuge.CentrifugeErrorCodes.TransportClosed = 2 -> int
+const Centrifugal.Centrifuge.CentrifugeErrorCodes.TransportWriteError = 10 -> int
+const Centrifugal.Centrifuge.CentrifugeErrorCodes.UnrecoverablePosition = 112 -> int
+const Centrifugal.Centrifuge.CentrifugeSubscribingCodes.SubscribeCalled = 0 -> int
+const Centrifugal.Centrifuge.CentrifugeSubscribingCodes.TransportClosed = 1 -> int
+const Centrifugal.Centrifuge.CentrifugeUnsubscribedCodes.ClientClosed = 2 -> int
+const Centrifugal.Centrifuge.CentrifugeUnsubscribedCodes.StateInvalidated = 2502 -> int
+const Centrifugal.Centrifuge.CentrifugeUnsubscribedCodes.Unauthorized = 1 -> int
+const Centrifugal.Centrifuge.CentrifugeUnsubscribedCodes.UnsubscribeCalled = 0 -> int
+static Centrifugal.Centrifuge.CentrifugeClient.InitializeBrowserInterop(Microsoft.JSInterop.IJSRuntime! jsRuntime) -> void
+static Centrifugal.Centrifuge.CentrifugeFilterNodeBuilder.And(params Centrifugal.Centrifuge.CentrifugeFilterNode![]! nodes) -> Centrifugal.Centrifuge.CentrifugeFilterNode!
+static Centrifugal.Centrifuge.CentrifugeFilterNodeBuilder.Contains(string! key, string! substring) -> Centrifugal.Centrifuge.CentrifugeFilterNode!
+static Centrifugal.Centrifuge.CentrifugeFilterNodeBuilder.EndsWith(string! key, string! suffix) -> Centrifugal.Centrifuge.CentrifugeFilterNode!
+static Centrifugal.Centrifuge.CentrifugeFilterNodeBuilder.Eq(string! key, string! value) -> Centrifugal.Centrifuge.CentrifugeFilterNode!
+static Centrifugal.Centrifuge.CentrifugeFilterNodeBuilder.Ex(string! key) -> Centrifugal.Centrifuge.CentrifugeFilterNode!
+static Centrifugal.Centrifuge.CentrifugeFilterNodeBuilder.Gt(string! key, string! value) -> Centrifugal.Centrifuge.CentrifugeFilterNode!
+static Centrifugal.Centrifuge.CentrifugeFilterNodeBuilder.Gte(string! key, string! value) -> Centrifugal.Centrifuge.CentrifugeFilterNode!
+static Centrifugal.Centrifuge.CentrifugeFilterNodeBuilder.In(string! key, params string![]! values) -> Centrifugal.Centrifuge.CentrifugeFilterNode!
+static Centrifugal.Centrifuge.CentrifugeFilterNodeBuilder.Lt(string! key, string! value) -> Centrifugal.Centrifuge.CentrifugeFilterNode!
+static Centrifugal.Centrifuge.CentrifugeFilterNodeBuilder.Lte(string! key, string! value) -> Centrifugal.Centrifuge.CentrifugeFilterNode!
+static Centrifugal.Centrifuge.CentrifugeFilterNodeBuilder.Neq(string! key, string! value) -> Centrifugal.Centrifuge.CentrifugeFilterNode!
+static Centrifugal.Centrifuge.CentrifugeFilterNodeBuilder.Nex(string! key) -> Centrifugal.Centrifuge.CentrifugeFilterNode!
+static Centrifugal.Centrifuge.CentrifugeFilterNodeBuilder.Nin(string! key, params string![]! values) -> Centrifugal.Centrifuge.CentrifugeFilterNode!
+static Centrifugal.Centrifuge.CentrifugeFilterNodeBuilder.Not(Centrifugal.Centrifuge.CentrifugeFilterNode! filterNode) -> Centrifugal.Centrifuge.CentrifugeFilterNode!
+static Centrifugal.Centrifuge.CentrifugeFilterNodeBuilder.Or(params Centrifugal.Centrifuge.CentrifugeFilterNode![]! nodes) -> Centrifugal.Centrifuge.CentrifugeFilterNode!
+static Centrifugal.Centrifuge.CentrifugeFilterNodeBuilder.StartsWith(string! key, string! prefix) -> Centrifugal.Centrifuge.CentrifugeFilterNode!
+static Centrifugal.Centrifuge.ServiceCollectionExtensions.AddCentrifugeClient(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!

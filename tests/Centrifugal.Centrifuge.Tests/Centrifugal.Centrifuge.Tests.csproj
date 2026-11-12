@@ -27,6 +27,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Resources\rpc-pool-test.p12" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Kestrel for the in-process fake server used by channel compaction tests
          (HttpListener WebSockets are Windows-only). -->
     <FrameworkReference Include="Microsoft.AspNetCore.App" />

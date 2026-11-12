@@ -1,7 +1,7 @@
 .PHONY: proto
 proto:
 	@echo "Regenerating protobuf code from client.proto..."
-	protoc --csharp_out=src/Centrifugal.Centrifuge/Protocol --proto_path=. client.proto
+	protoc --csharp_out=src/Centrifugal.Centrifuge/Protocol --proto_path=../ImpulseM.Centrifugo.Protocol ../ImpulseM.Centrifugo.Protocol/client.proto
 	@mv src/Centrifugal.Centrifuge/Protocol/Client.cs src/Centrifugal.Centrifuge/Protocol/Client.g.cs
 	@echo "Protobuf code regenerated successfully at src/Centrifugal.Centrifuge/Protocol/Client.g.cs"
 
@@ -51,7 +51,7 @@ help:
 	@echo "  test-unit            - Run unit tests only (excludes integration tests)"
 	@echo "  clean                - Clean build artifacts"
 	@echo "  restore              - Restore NuGet packages"
-	@echo "  proto                - Regenerate C# protobuf code from client.proto"
+	@echo "  proto                - Regenerate C# protobuf code from the fork client.proto"
 	@echo "  run-example          - Run the console example program"
 	@echo "  run-blazor-example   - Run the Blazor WebAssembly example (port 5050)"
 	@echo "  help                 - Show this help message"
