@@ -89,11 +89,27 @@ namespace Centrifugal.Centrifuge
         public ReadOnlyMemory<byte> Data { get; }
 
         /// <summary>
+        /// Gets whether the server answered from its cache (the reply carried the cached flag).
+        /// </summary>
+        public bool Cached { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CentrifugeRpcResult"/> class.
         /// </summary>
         public CentrifugeRpcResult(ReadOnlyMemory<byte> data)
+            : this(data, false)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CentrifugeRpcResult"/> class.
+        /// </summary>
+        /// <param name="data">The result data.</param>
+        /// <param name="cached">Whether the server answered from its cache.</param>
+        public CentrifugeRpcResult(ReadOnlyMemory<byte> data, bool cached)
         {
             Data = data;
+            Cached = cached;
         }
     }
 }

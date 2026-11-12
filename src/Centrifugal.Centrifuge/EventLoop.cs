@@ -35,14 +35,18 @@ namespace Centrifugal.Centrifuge
         private bool _running;
         private bool _drainScheduled;
         private int _ownerThread;
+        private readonly Action<Exception>? _onStepFailure;
 
         /// <param name="logger">Logs an exception a step throws (a bug): the loop goes on.</param>
         /// <param name="afterStep">Runs at the end of each step, still on the loop (e.g. to write the commands
         /// the step queued as one frame).</param>
-        public EventLoop(ILogger? logger, Action? afterStep)
+        /// <param name="onStepFailure">Receives an exception a step throws, after it is logged. Null keeps the log only.
+        /// The step does not disconnect: the receiver decides.</param>
+        public EventLoop(ILogger? logger, Action? afterStep, Action<Exception>? onStepFailure = null)
         {
             _logger = logger;
             _afterStep = afterStep;
+            _onStepFailure = onStepFailure;
         }
 
         /// <summary>Whether the current thread runs a step of this loop.</summary>
@@ -185,6 +189,14 @@ namespace Centrifugal.Centrifuge
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Centrifuge event loop step failed");
+                try
+                {
+                    _onStepFailure?.Invoke(ex);
+                }
+                catch (Exception reportError)
+                {
+                    _logger?.LogError(reportError, "Centrifuge step failure report failed");
+                }
             }
         }
     }
@@ -194,7 +206,7 @@ namespace Centrifugal.Centrifuge
     /// callback doesn't run, also when the timer already fired and its step waits in the queue (as
     /// clearTimeout in JS).
     /// </summary>
-    internal sealed class LoopTimer
+    internal sealed class LoopTimer : IStepTimer
     {
         private readonly Timer _timer;
         /// <summary>Fired or cancelled; touched in steps only.</summary>

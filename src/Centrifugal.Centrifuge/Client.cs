@@ -30,7 +30,7 @@ namespace Centrifugal.Centrifuge
     /// holds.
     /// </para>
     /// </remarks>
-    public class CentrifugeClient : IDisposable, IAsyncDisposable
+    public partial class CentrifugeClient : IDisposable, IAsyncDisposable
     {
         /// <summary>Maximum size of a frame of commands (15KB): a batch reaching it is written at once, more
         /// commands go in further frames.</summary>
@@ -112,6 +112,20 @@ namespace Centrifugal.Centrifuge
         private int _abortedTransportId;
         private bool _reconnectAttemptsResetPending;
         private Task _lastTransportClose = Task.CompletedTask;
+
+        // The fields of the connection auth, the rpc session and the token exchange.
+        private readonly IClientHost _host;
+        private readonly IStepTimerFactory _timers;
+        private readonly Random _random;
+        private readonly IRefreshRetryPolicy _refreshRetryPolicy;
+        private readonly ConnectionIdentity _identity;
+        private readonly ITokenExchangeHooks _tokenExchange;
+        private readonly AuthRefresh _auth;
+        private readonly RpcSession _rpcSession;
+        private readonly PingWatchdog _watchdog;
+        private volatile bool _rpcOptionsSupported = false;
+        private long _serverTimeOffsetMillis;
+        private readonly bool _hasInstance;
 
         /// <summary>The loop the state of this client and its subscriptions changes on.</summary>
         internal EventLoop Loop { get; }
@@ -278,6 +292,16 @@ namespace Centrifugal.Centrifuge
             _logger = GuardedLogger.Wrap(_options.Logger);
             Loop = new EventLoop(_logger, OnStepEnd);
             _promises = new Waiters(Loop);
+            _host = new HostAdapter(this);
+            _timers = new LoopTimerFactory(Loop);
+            _random = new Random();
+            _refreshRetryPolicy = new RefreshRetryPolicy(_random, 5000, 10000, (int)Math.Min(int.MaxValue, _options.TokenRetryCap.TotalMilliseconds), _options.StopOnRefusedToken);
+            _identity = new ConnectionIdentity(_host);
+            _tokenExchange = TokenExchangeFlow.Create(_host, _options.TokenExchange, _random);
+            _auth = new AuthRefresh(_host, _identity, _tokenExchange, _timers, _refreshRetryPolicy);
+            _rpcSession = new RpcSession(_host, _timers, _options.MaxPendingRpc, _random);
+            _watchdog = new PingWatchdog(_host, _timers);
+            _hasInstance = !string.IsNullOrEmpty(_options.Instance);
 #if NET6_0_OR_GREATER
             _jsRuntime = _options.JSRuntime ?? _globalJSRuntime;
             if (_jsRuntime == null && OperatingSystem.IsBrowser())
@@ -373,7 +397,11 @@ namespace Centrifugal.Centrifuge
         /// </summary>
         public void Disconnect()
         {
-            Loop.Invoke(() => DisconnectInternal(CentrifugeDisconnectedCodes.DisconnectCalled, "disconnect called", false));
+            Loop.Invoke(() =>
+            {
+                _auth.InvalidateTimerFetch();
+                DisconnectInternal(CentrifugeDisconnectedCodes.DisconnectCalled, "disconnect called", false);
+            });
         }
 
         /// <summary>
@@ -488,6 +516,7 @@ namespace Centrifugal.Centrifuge
         {
             Loop.Invoke(() =>
             {
+                _auth.InvalidateTimerFetch();
                 _token = token ?? string.Empty;
                 if (_options.GetToken == null) _refreshRequired = false;
             });
@@ -784,10 +813,11 @@ namespace Centrifugal.Centrifuge
             if (!_transportClosed) return;
 
             _reconnecting = true;
+            _auth.BeforeConnect();
             // A disconnect while the token is loading aborts this attempt: a new one is scheduled by the
             // disconnect, so the continuation must not act on it.
             var disconnects = _disconnects;
-            var needTokenRefresh = _refreshRequired || (_token.Length == 0 && _options.GetToken != null);
+            var needTokenRefresh = !_tokenExchange.IsActive && (_refreshRequired || (_token.Length == 0 && _options.GetToken != null));
             if (!needTokenRefresh)
             {
                 InitializeTransport();
@@ -906,6 +936,7 @@ namespace Centrifugal.Centrifuge
 
         private void InitializeTransport()
         {
+            _rpcOptionsSupported = false;
             CentrifugeTransportType type;
             string endpoint;
             if (_transportEndpoints != null)
@@ -1164,6 +1195,7 @@ namespace Centrifugal.Centrifuge
 
         private void DispatchReply(Reply reply)
         {
+            _watchdog.MarkReply();
             if (reply.Id > 0)
             {
                 HandleReply(reply);
@@ -1220,6 +1252,8 @@ namespace Centrifugal.Centrifuge
                 Name = _options.Name,
                 Version = _options.Version
             };
+            request.Flag = ConnectCapabilities.RpcOptionsFlag;
+            if (_hasInstance) request.Instance = _options.Instance;
             if (!_data.IsEmpty) request.Data = ByteString.CopyFrom(_data.Span);
             if (_headers != null)
             {
@@ -1307,6 +1341,9 @@ namespace Centrifugal.Centrifuge
 
             if (_state == CentrifugeClientState.Connected) return;
 
+            _rpcOptionsSupported = ConnectCapabilities.HasFlag(result.Flag, ConnectCapabilities.RpcOptionsFlag);
+            if (_tokenExchange.InterceptConnect(result)) return;
+
             _clientId = result.Client;
             _connection++;
             // Before the events: a handler's commands go to the emulation session of this connection.
@@ -1320,9 +1357,12 @@ namespace Centrifugal.Centrifuge
             if (result.Expires) ScheduleRefresh(Utilities.TtlToMilliseconds(result.Ttl));
 
             SendSubscribeCommands();
+            _host.FlushRpc();
 
-            Raise(Connected, new CentrifugeConnectedEventArgs(result.Client, _transport?.Name ?? string.Empty, result.Data.ToByteArray()), "connected");
+            Raise(Connected, new CentrifugeConnectedEventArgs(result.Client, _transport?.Name ?? string.Empty, result.Data.ToByteArray(), result.User, result.AuthClass), "connected");
             if (TransitionSuperseded(transition)) return;
+            // The identity failure is not reported yet: the connect notice list that runs this step is not written.
+            Exception? identityFailure = _identity.OnConnectIdentity(result);
 
             _promises.ResolveAll();
 
@@ -1390,6 +1430,7 @@ namespace Centrifugal.Centrifuge
         {
             if (code == CentrifugeDisconnectedCodes.StateInvalidated)
             {
+                _auth.InvalidateTimerFetch();
                 // State invalidated (a Disconnect push or a close code): the next connect gets a fresh token when
                 // GetToken can, and every position is made unrecoverable — before the subscriptions move to
                 // subscribing below.
@@ -1411,12 +1452,15 @@ namespace Centrifugal.Centrifuge
             {
                 // Calls made while disconnected wait for a connection: Disconnect() ends that wait.
                 if (!reconnect) _promises.RejectAll(DisconnectedError());
+                if (!reconnect) _rpcSession.OnTransportLost(false);
                 return;
             }
+            _auth.OnDisconnect(code, !reconnect);
             var previousState = _state;
             var newState = reconnect ? CentrifugeClientState.Connecting : CentrifugeClientState.Disconnected;
 
             _transportIsOpen = false;
+            _rpcOptionsSupported = false;
             _reconnecting = false;
             if (previousState == CentrifugeClientState.Connecting) ClearReconnectTimer();
             ClearConnectTimer();
@@ -1458,6 +1502,7 @@ namespace Centrifugal.Centrifuge
                         sub.MoveToSubscribing(CentrifugeSubscribingCodes.TransportClosed, "transport closed");
                 }
             }
+            _rpcSession.OnTransportLost(reconnect);
             // A handler of the events above may have changed the state again: this transition is outdated
             // then, and its event would arrive out of order.
             if (transition != 0 && !TransitionSuperseded(transition))
@@ -1708,7 +1753,13 @@ namespace Centrifugal.Centrifuge
         private void HandleReply(Reply reply)
         {
             ResetReconnectAttemptsIfPending();
-            if (!_calls.TryGetValue(reply.Id, out var call)) return;
+            if (!_calls.TryGetValue(reply.Id, out var call))
+            {
+                // Not a legacy call: the rpc session may own it (its own id table).
+                if (_rpcSession.OnReply(reply)) ObserveServerTime(reply);
+                return;
+            }
+            ObserveServerTime(reply);
             _calls.Remove(reply.Id);
             call.Timer?.Cancel();
             if (reply.Error != null)
@@ -1976,6 +2027,16 @@ namespace Centrifugal.Centrifuge
 
         private void HandlePush(Push push)
         {
+            if (_tokenExchange.HoldPush(push))
+            {
+                return;
+            }
+            ProcessPush(push);
+        }
+
+        /// <summary>Dispatches a push: the body of HandlePush after the token exchange hold check.</summary>
+        private void ProcessPush(Push push)
+        {
             var channel = push.Channel;
             if (push.Pub != null)
             {
@@ -2189,6 +2250,7 @@ namespace Centrifugal.Centrifuge
             var closed = new TaskCompletionSource<Task>(TaskCreationOptions.RunContinuationsAsynchronously);
             Loop.Invoke(() =>
             {
+                _auth.InvalidateTimerFetch();
                 // Removed before its Unsubscribed event: a handler may create a new subscription of the channel.
                 foreach (var sub in _subscriptions.Values.ToList())
                 {
@@ -2196,6 +2258,8 @@ namespace Centrifugal.Centrifuge
                     sub.CloseForClient();
                 }
                 DisconnectInternal(CentrifugeDisconnectedCodes.DisconnectCalled, "disconnect called", false);
+                _rpcSession.OnClose();
+                _auth.FailWaiting();
                 var transportClose = _lastTransportClose;
                 Loop.Complete(() => closed.TrySetResult(transportClose));
             });

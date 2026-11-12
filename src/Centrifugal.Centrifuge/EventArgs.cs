@@ -74,13 +74,35 @@ namespace Centrifugal.Centrifuge
         public ReadOnlyMemory<byte> Data { get; }
 
         /// <summary>
+        /// Gets the user ID the server confirmed for this connection (empty when none).
+        /// </summary>
+        public string User { get; }
+
+        /// <summary>
+        /// Gets the auth class the server confirmed for this connection (empty when none).
+        /// </summary>
+        public string AuthClass { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CentrifugeConnectedEventArgs"/> class.
         /// </summary>
-        public CentrifugeConnectedEventArgs(string clientId, string transport, ReadOnlyMemory<byte> data = default)
+        /// <param name="clientId">The client ID assigned by the server.</param>
+        /// <param name="transport">The transport name.</param>
+        /// <param name="data">The optional connection data from the server.</param>
+        /// <param name="user">The user ID the server confirmed.</param>
+        /// <param name="authClass">The auth class the server confirmed.</param>
+        public CentrifugeConnectedEventArgs(
+            string clientId,
+            string transport,
+            ReadOnlyMemory<byte> data = default,
+            string user = "",
+            string authClass = "")
         {
             ClientId = clientId ?? string.Empty;
             Transport = transport ?? string.Empty;
             Data = data;
+            User = user ?? string.Empty;
+            AuthClass = authClass ?? string.Empty;
         }
     }
 

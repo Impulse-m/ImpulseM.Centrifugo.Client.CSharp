@@ -1,0 +1,69 @@
+#nullable enable
+*REMOVED*Centrifugal.Centrifuge.CentrifugeConnectedEventArgs.CentrifugeConnectedEventArgs(string! clientId, string! transport, System.ReadOnlyMemory<byte> data = default(System.ReadOnlyMemory<byte>)) -> void
+Centrifugal.Centrifuge.CentrifugeAuthEventArgs
+Centrifugal.Centrifuge.CentrifugeAuthEventArgs.AuthClass.get -> string!
+Centrifugal.Centrifuge.CentrifugeAuthEventArgs.CentrifugeAuthEventArgs(string? user, string? authClass) -> void
+Centrifugal.Centrifuge.CentrifugeAuthEventArgs.User.get -> string!
+Centrifugal.Centrifuge.CentrifugeAuthResult
+Centrifugal.Centrifuge.CentrifugeAuthResult.AuthClass.get -> string!
+Centrifugal.Centrifuge.CentrifugeAuthResult.Expires.get -> bool
+Centrifugal.Centrifuge.CentrifugeAuthResult.Ttl.get -> uint
+Centrifugal.Centrifuge.CentrifugeAuthResult.User.get -> string!
+Centrifugal.Centrifuge.CentrifugeClient.Auth -> System.EventHandler<Centrifugal.Centrifuge.CentrifugeAuthEventArgs!>?
+Centrifugal.Centrifuge.CentrifugeClient.Capabilities.get -> Centrifugal.Centrifuge.CentrifugeClientCapabilities!
+Centrifugal.Centrifuge.CentrifugeClientCapabilities
+Centrifugal.Centrifuge.CentrifugeClientCapabilities.RpcOptionsSupported.get -> bool
+Centrifugal.Centrifuge.CentrifugeClientOptions.Instance.get -> string!
+Centrifugal.Centrifuge.CentrifugeClientOptions.Instance.set -> void
+Centrifugal.Centrifuge.CentrifugeClientOptions.MaxPendingRpc.get -> int
+Centrifugal.Centrifuge.CentrifugeClientOptions.MaxPendingRpc.set -> void
+Centrifugal.Centrifuge.CentrifugeClientOptions.StopOnRefusedToken.get -> bool
+Centrifugal.Centrifuge.CentrifugeClientOptions.StopOnRefusedToken.set -> void
+Centrifugal.Centrifuge.CentrifugeClientOptions.TokenExchange.get -> Centrifugal.Centrifuge.CentrifugeTokenExchange?
+Centrifugal.Centrifuge.CentrifugeClientOptions.TokenExchange.set -> void
+Centrifugal.Centrifuge.CentrifugeClientOptions.TokenRetryCap.get -> System.TimeSpan
+Centrifugal.Centrifuge.CentrifugeClientOptions.TokenRetryCap.set -> void
+Centrifugal.Centrifuge.CentrifugeConnectedEventArgs.AuthClass.get -> string!
+Centrifugal.Centrifuge.CentrifugeConnectedEventArgs.CentrifugeConnectedEventArgs(string! clientId, string! transport, System.ReadOnlyMemory<byte> data = default(System.ReadOnlyMemory<byte>), string! user = "", string! authClass = "") -> void
+Centrifugal.Centrifuge.CentrifugeConnectedEventArgs.User.get -> string!
+Centrifugal.Centrifuge.CentrifugeException.AppCode.get -> int
+Centrifugal.Centrifuge.CentrifugeException.AppType.get -> string!
+Centrifugal.Centrifuge.CentrifugeException.Metadata.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
+Centrifugal.Centrifuge.CentrifugeRpcResult.Cached.get -> bool
+Centrifugal.Centrifuge.CentrifugeRpcResult.CentrifugeRpcResult(System.ReadOnlyMemory<byte> data, bool cached) -> void
+Centrifugal.Centrifuge.CentrifugeTokenExchange
+Centrifugal.Centrifuge.CentrifugeTokenExchange.CentrifugeTokenExchange() -> void
+abstract Centrifugal.Centrifuge.CentrifugeTokenExchange.ExchangeAsync(Centrifugal.Centrifuge.CentrifugeTokenExchangeEvent! exchangeEvent, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Centrifugal.Centrifuge.CentrifugeTokenExchangeResult!>!
+abstract Centrifugal.Centrifuge.CentrifugeTokenExchange.Load() -> string?
+abstract Centrifugal.Centrifuge.CentrifugeTokenExchange.Store(string! refreshToken) -> void
+virtual Centrifugal.Centrifuge.CentrifugeTokenExchange.EarlyRenewal.get -> bool
+virtual Centrifugal.Centrifuge.CentrifugeTokenExchange.GraceSeconds.get -> int
+virtual Centrifugal.Centrifuge.CentrifugeTokenExchange.RefusalTypes.get -> System.Collections.Generic.IReadOnlyCollection<string!>!
+Centrifugal.Centrifuge.CentrifugeTokenExchangeEvent
+Centrifugal.Centrifuge.CentrifugeTokenExchangeEvent.RefreshToken.get -> string!
+Centrifugal.Centrifuge.CentrifugeTokenExchangeEvent.RpcAsync(string! method, System.ReadOnlyMemory<byte> data, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Centrifugal.Centrifuge.CentrifugeRpcResult!>!
+Centrifugal.Centrifuge.CentrifugeTokenExchangeRefusedException
+Centrifugal.Centrifuge.CentrifugeTokenExchangeRefusedException.ServerError.get -> Centrifugal.Centrifuge.CentrifugeException!
+Centrifugal.Centrifuge.CentrifugeTokenExchangeResult
+Centrifugal.Centrifuge.CentrifugeTokenExchangeResult.CentrifugeTokenExchangeResult(string! token, string? refreshToken, int graceSeconds = -1) -> void
+Centrifugal.Centrifuge.CentrifugeTokenExchangeResult.GraceSeconds.get -> int
+Centrifugal.Centrifuge.CentrifugeTokenExchangeResult.RefreshToken.get -> string?
+Centrifugal.Centrifuge.CentrifugeTokenExchangeResult.Token.get -> string!
+Centrifugal.Centrifuge.CentrifugeUnclassifiedException
+Centrifugal.Centrifuge.CentrifugeUnclassifiedException.CentrifugeUnclassifiedException(System.Exception! cause) -> void
+Centrifugal.Centrifuge.CentrifugeUnclassifiedException.Error.get -> System.Exception!
+Centrifugal.Centrifuge.CentrifugeRpcPoolStats
+Centrifugal.Centrifuge.CentrifugeRpcPoolStats.CentrifugeRpcPoolStats() -> void
+Centrifugal.Centrifuge.CentrifugeRpcPoolStats.CentrifugeRpcPoolStats(int Connections, int Inflight, int Queued, int Redirects) -> void
+Centrifugal.Centrifuge.CentrifugeRpcPoolStats.Connections.get -> int
+Centrifugal.Centrifuge.CentrifugeRpcPoolStats.Connections.init -> void
+Centrifugal.Centrifuge.CentrifugeRpcPoolStats.Inflight.get -> int
+Centrifugal.Centrifuge.CentrifugeRpcPoolStats.Inflight.init -> void
+Centrifugal.Centrifuge.CentrifugeRpcPoolStats.Queued.get -> int
+Centrifugal.Centrifuge.CentrifugeRpcPoolStats.Queued.init -> void
+Centrifugal.Centrifuge.CentrifugeRpcPoolStats.Redirects.get -> int
+Centrifugal.Centrifuge.CentrifugeRpcPoolStats.Redirects.init -> void
+const Centrifugal.Centrifuge.CentrifugeErrorCodes.Cancelled = 17 -> int
+const Centrifugal.Centrifuge.CentrifugeErrorCodes.LimitExceeded = 16 -> int
+const Centrifugal.Centrifuge.CentrifugeErrorCodes.RedirectFailed = 18 -> int
+const Centrifugal.Centrifuge.CentrifugeErrorCodes.Unsupported = 15 -> int
