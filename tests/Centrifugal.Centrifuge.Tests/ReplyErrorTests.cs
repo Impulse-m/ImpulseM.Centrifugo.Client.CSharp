@@ -2,9 +2,9 @@
 // - nullApplicationFieldsAreTreatedAsAbsent: ported (NullApplicationFields_AreTreatedAsAbsent)
 // - replyErrorCarriesApplicationFields: ported (ReplyError_CarriesApplicationFields)
 // - replyErrorApplicationFieldsAreEmptyWhenAbsent: ported (ReplyError_ApplicationFieldsEmpty_WhenAbsent)
-// - replyErrorMetadataIsUnmodifiable: not ported yet. The metadata copy in Exceptions.cs (foundation file, the lead
-//   assigns the fix) is a mutable Dictionary behind an IReadOnlyDictionary, so a cast to IDictionary can change it.
+// - replyErrorMetadataIsUnmodifiable: ported (ReplyError_Metadata_IsReadOnly)
 using System;
+using System.Collections.Generic;
 using Centrifugal.Centrifuge.Protocol;
 using Xunit;
 
@@ -61,6 +61,33 @@ namespace Centrifugal.Centrifuge.Tests {
             Assert.Equal(0, error.AppCode);
             Assert.Equal(string.Empty, error.AppType);
             Assert.Empty(error.Metadata);
+        }
+
+        // No Java test pins the client-local codes (the Java ReplyError constants); the values are the wire contract of the fork.
+        /// <summary>The client-local codes are 15 (unsupported), 16 (limit exceeded) and 17 (cancelled), which the server never sends.</summary>
+        [Fact]
+        public void ClientLocalCodes_Values() {
+            Assert.Equal(15, CentrifugeErrorCodes.Unsupported);
+            Assert.Equal(16, CentrifugeErrorCodes.LimitExceeded);
+            Assert.Equal(17, CentrifugeErrorCodes.Cancelled);
+        }
+
+        // Java: replyErrorMetadataIsUnmodifiable
+        /// <summary>The metadata of a reply error is a read-only copy: a write through the dictionary interface fails and the count stays.</summary>
+        [Fact]
+        public void ReplyError_Metadata_IsReadOnly() {
+            Protocol.Error source = new Protocol.Error {
+                Code = 1000,
+                Message = "rejected",
+            };
+            source.Metadata["reason"] = "demo";
+
+            CentrifugeException error = CentrifugeException.FromReply(source);
+            IDictionary<string, string> writable = (IDictionary<string, string>)error.Metadata;
+
+            Assert.Throws<NotSupportedException>(() => writable.Add("other", "value"));
+            Assert.Single(error.Metadata);
+            Assert.Equal("demo", error.Metadata["reason"]);
         }
     }
 }

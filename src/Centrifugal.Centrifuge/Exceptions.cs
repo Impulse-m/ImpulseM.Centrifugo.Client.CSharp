@@ -63,7 +63,9 @@ namespace Centrifugal.Centrifuge
             Temporary = temporary;
             AppCode = appCode;
             AppType = appType ?? string.Empty;
-            Metadata = metadata == null ? _emptyMetadata : new Dictionary<string, string>(metadata);
+            Metadata = metadata == null
+                ? _emptyMetadata
+                : new ReadOnlyDictionary<string, string>(new Dictionary<string, string>(metadata));
         }
 
         /// <summary>Wraps the error carried by a server reply.</summary>

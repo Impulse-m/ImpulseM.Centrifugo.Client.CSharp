@@ -225,7 +225,8 @@ namespace Centrifugal.Centrifuge {
 
             /// <summary>Raises the auth event through the notice path.</summary>
             public Exception? RaiseAuth(CentrifugeAuthEventArgs args) {
-                return EventDispatch.Raise(owner, owner.Auth, args, "auth", owner.Error, owner._logger);
+                // On the connect path the caller reports the failure (as unclassified), so no report here.
+                return EventDispatch.Raise(owner, owner.Auth, args, "auth", owner._connectAuthRaise ? null : owner.Error, owner._logger);
             }
 
 
