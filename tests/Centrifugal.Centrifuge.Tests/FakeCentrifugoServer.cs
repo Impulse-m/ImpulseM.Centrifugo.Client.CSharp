@@ -48,7 +48,7 @@ namespace Centrifugal.Centrifuge.Tests
     ///   server.Received / server.LastSubscribe()
     /// </code>
     /// </summary>
-    internal sealed class FakeCentrifugoServer : IAsyncDisposable
+    internal sealed partial class FakeCentrifugoServer : IAsyncDisposable
     {
         private WebApplication? _app;
         private readonly object _lock = new();
@@ -235,25 +235,15 @@ namespace Centrifugal.Centrifuge.Tests
                 }
             }
 
-            if (cmd.Connect != null)
+            if (HoldIfDeferred(ws, cmd))
             {
-                await SendAsync(ws, new Reply { Id = cmd.Id, Connect = ConnectResult });
+                return;
             }
-            else if (cmd.Subscribe != null)
+
+            Reply? defaultReply = DefaultReply(cmd);
+            if (defaultReply != null)
             {
-                var result = OnSubscribe != null
-                    ? OnSubscribe(cmd.Subscribe.Channel, cmd.Subscribe)
-                    : new SubscribeResult();
-                await SendAsync(ws, new Reply { Id = cmd.Id, Subscribe = result });
-            }
-            else if (cmd.Unsubscribe != null)
-            {
-                await SendAsync(ws, new Reply { Id = cmd.Id, Unsubscribe = new UnsubscribeResult() });
-            }
-            else if (cmd.Id != 0)
-            {
-                // Reply to anything else with an empty result to avoid client timeouts.
-                await SendAsync(ws, new Reply { Id = cmd.Id });
+                await SendAsync(ws, defaultReply);
             }
         }
 
