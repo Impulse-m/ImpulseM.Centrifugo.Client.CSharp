@@ -4,10 +4,9 @@ using System.Threading.Tasks;
 using Centrifugal.Centrifuge.Protocol;
 using Xunit;
 
-// The resubscribe backoff of a subscription, against the fake server, on the fake clock. Ported from ResubscribeBackoffTest.java
-// (1 test): testBackoffResetsAfterSuccessfulSubscribe -> Resubscribe_BackoffResetsAfterSuccessfulSubscribe. The numbers are the
-// Java ones: 11 failed subscribes, one success, then 7 failed subscribes whose retries must add up to at most 3 seconds.
-// Each retry is a fake timer; the test fires it with Advance, so no test waits for real time.
+// The resubscribe backoff of a subscription, against the fake server, on the fake clock: 11 failed subscribes, one success,
+// then 7 failed subscribes whose retries must add up to at most 3 seconds. Each retry is a fake timer; the test fires it
+// with Advance, so no test waits for real time.
 namespace Centrifugal.Centrifuge.Tests {
 
 
@@ -55,8 +54,9 @@ namespace Centrifugal.Centrifuge.Tests {
 
 
         [Fact]
-        // Java: testBackoffResetsAfterSuccessfulSubscribe. With the step reset by the successful subscribe, the retries are spaced
-        // by at most 1 + 2^k ms for k = 0..6, so all seven land within the window. Without the reset the step carries on from 11.
+        // Java: testBackoffResetsAfterSuccessfulSubscribe
+        // With the step reset by the successful subscribe, the retries are spaced by at most 1 + 2^k ms for k = 0..6, so all
+        // seven land within the window. Without the reset the step carries on from 11.
         public async Task Resubscribe_BackoffResetsAfterSuccessfulSubscribe() {
             Server.OnCommand = cmd => {
                 if (cmd.Subscribe == null) {

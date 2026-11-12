@@ -2,11 +2,10 @@ using System;
 using System.Threading.Tasks;
 using Xunit;
 
-// Removal of a subscription from its client. No server is needed: the client is never connected.
-// Ported from RemoveSubscriptionTest.java (2 tests): testRemovingOldSubscriptionAgainKeepsNewOne -> RemoveOld_KeepsNewSubscription,
-// testSubscribeOnRemovedSubscriptionThrows -> Subscribe_AfterRemoval_ThrowsObjectDisposed (the exception is ObjectDisposedException,
-// the upstream C# type). From ClientTest.java, 2 of 10 tests: testRemoveSubscription and testNewSubscriptionAfterRemoval are
-// ported as ChannelFree_AfterRemoval. The other 8 ClientTest tests (construction, endpoints, OkHttp) belong to other areas.
+// Removal of a subscription from its client. No server is needed: the client is never connected. Subscribing a removed
+// subscription throws ObjectDisposedException, the upstream C# type.
+// The other 8 ClientTest tests cover the client (construction, endpoints and OkHttp), not the removal, and are not ported here.
+// ChannelFree_AfterRemoval also covers the Java test testNewSubscriptionAfterRemoval.
 namespace Centrifugal.Centrifuge.Tests {
 
 
@@ -44,7 +43,8 @@ namespace Centrifugal.Centrifuge.Tests {
 
 
         [Fact]
-        // Java: testRemoveSubscription and testNewSubscriptionAfterRemoval (ClientTest.java)
+        // Java: testRemoveSubscription
+        // The channel is free for a new subscription after the removal.
         public async Task ChannelFree_AfterRemoval() {
             CentrifugeClient client = NewClient();
             CentrifugeSubscription sub = client.NewSubscription("ch");

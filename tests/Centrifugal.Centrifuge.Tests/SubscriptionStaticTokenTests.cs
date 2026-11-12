@@ -4,10 +4,11 @@ using System.Threading.Tasks;
 using Centrifugal.Centrifuge.Protocol;
 using Xunit;
 
-// A subscription with a static token. Ported from StaticTokenTest.java (4 tests): testExpiredStaticSubscriptionTokenUnsubscribesUnauthorized
-// is ported here as Subscribe_109WithoutGetter_UnsubscribesUnauthorized. testStateInvalidationKeepsStaticToken and
-// testStateInvalidationReconnectsAnonymousClient belong to the connection token area. testSetTokenAfterExpiredTokenWithoutGetter
-// is a connection token test and is not ported in this file.
+// A subscription with a static token: when the server expires it and there is no GetToken, the subscription unsubscribes
+// as unauthorized.
+// Not ported: testStateInvalidationKeepsStaticToken: it tests the connection token, not the subscription token.
+// Not ported: testStateInvalidationReconnectsAnonymousClient: it tests the connection token, not the subscription token.
+// Not ported: testSetTokenAfterExpiredTokenWithoutGetter: it tests the connection token, not the subscription token.
 namespace Centrifugal.Centrifuge.Tests {
 
 

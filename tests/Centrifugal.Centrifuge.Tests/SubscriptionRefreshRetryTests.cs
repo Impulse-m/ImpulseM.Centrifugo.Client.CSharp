@@ -3,14 +3,7 @@ using System.Linq;
 using Xunit;
 
 // Unit tests of the subscription refresh retry (SubscriptionRefreshRetry) with a stub policy. Retry_UsesPolicyDelay uses the
-// real RefreshRetryPolicy with the Java bounds, because the fork's own bounds (5000 and 10000 ms, O-12) are not the Java ones.
-// Ported from SubscriptionRefreshRetryTest.java (6 tests):
-// subscriptionRefreshRetryUsesTheFormula -> Retry_UsesPolicyDelay,
-// subscriptionRefreshAcceptedResetsTheRetryStep -> Accepted_ResetsStep,
-// subscriptionRefreshRefusedWith109IsRetried -> OnRefusal_109_RetriesAndRemembersToken,
-// subscriptionRefreshWith103KeepsTheConnection -> OnRefusal_103_Keeps (its timed part is in SubscriptionRefreshTests),
-// subscriptionRefreshCodeBelow100IsRetried -> OnRefusal_CodeBelow100_Retries,
-// subscriptionRefreshDoesNotResendARefusedToken -> IsRefused_RefusedTokenIsNotSentAgain (its timed part is in SubscriptionRefreshTests).
+// real RefreshRetryPolicy with its bounds of 10000 and 20000 ms. The timed parts of the refusals are in SubscriptionRefreshTests.
 namespace Centrifugal.Centrifuge.Tests {
 
 
@@ -40,8 +33,9 @@ namespace Centrifugal.Centrifuge.Tests {
 
 
         [Fact]
-        // Java: subscriptionRefreshRetryUsesTheFormula. The real policy with the Java bounds (10000 and 20000 ms, cap 300000)
-        // and the top draw: the first retry waits the ceiling of step 0, the second the ceiling of step 1.
+        // Java: subscriptionRefreshRetryUsesTheFormula
+        // The real policy with bounds 10000 and 20000 ms and cap 300000, and the top draw: the first retry waits the ceiling
+        // of step 0, the second the ceiling of step 1.
         public void Retry_UsesPolicyDelay() {
             RefreshRetryPolicy policy = new RefreshRetryPolicy(FixedRandom.MaximumDraws(), 10000, 20000, 300000, true);
             SubscriptionRefreshRetry retry = new SubscriptionRefreshRetry(policy);
@@ -149,7 +143,8 @@ namespace Centrifugal.Centrifuge.Tests {
 
 
         [Fact]
-        // Java: subscriptionRefreshDoesNotResendARefusedToken (the policy check)
+        // Java: subscriptionRefreshDoesNotResendARefusedToken
+        // The policy check: a refused token is not sent again.
         public void IsRefused_RefusedTokenIsNotSentAgain() {
             SubscriptionRefreshRetry retry = new SubscriptionRefreshRetry(new StubPolicy());
             retry.OnRefusal(new CentrifugeException(109, "token expired"), "t1");
