@@ -20,12 +20,6 @@ namespace Centrifugal.Centrifuge {
             }
         }
 
-        /// <summary>The retry policy of this client (internal, used by the subscriptions).</summary>
-        internal IRefreshRetryPolicy RefreshRetryPolicy {
-            get {
-                return _refreshRetryPolicy;
-            }
-        }
 
         /// <summary>The wall clock for server time. Null in production (DateTimeOffset.UtcNow). Tests set it before connecting.</summary>
         internal Func<long>? WallClockMs { get; set; }
