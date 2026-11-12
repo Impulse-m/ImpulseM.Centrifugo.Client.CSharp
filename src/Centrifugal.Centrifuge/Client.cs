@@ -64,6 +64,9 @@ namespace Centrifugal.Centrifuge
         // Everything below belongs to the loop: read and written in its steps only.
 
         private bool _transportIsOpen;
+        /// <summary>The current transport raised its Opened event (emulation included). A transport that never opened
+        /// is cancelled at once when it is dropped; an opened one gets its close frame and the grace.</summary>
+        private bool _transportOpened;
         private int _currentTransportIndex;
         private bool _triedAllTransports;
         /// <summary>A transport proved to reach the server: fallback mode stops moving to the next endpoint
@@ -110,6 +113,9 @@ namespace Centrifugal.Centrifuge
         private int _disconnects;
         private int _abortedTransportId;
         private bool _reconnectAttemptsResetPending;
+        /// <summary>Set while the identity notice of a connect reply raises the auth event: its failure is then
+        /// returned to the notice list instead of being reported under the auth type.</summary>
+        private bool _connectAuthRaise;
 
         /// <summary>The loop the state of this client and its subscriptions changes on.</summary>
         internal EventLoop Loop { get; }
@@ -946,6 +952,7 @@ namespace Centrifugal.Centrifuge
             var id = ++_transportId;
             var attempt = new Attempt(id, transport);
             _transport = transport;
+            _transportOpened = false;
             _writer = new TransportWriter(transport, (frame, error) => Loop.Execute(() => OnFrameWritten(attempt, frame, error)), _options.Timeout);
             _emulationEndpoint = transport.UsesEmulation ? EmulationEndpointFor(endpoint) : null;
 
@@ -1063,6 +1070,7 @@ namespace Centrifugal.Centrifuge
             }
             ClearConnectTimer();
             attempt.WasOpen = true;
+            _transportOpened = true;
             if (attempt.Transport.UsesEmulation) return;
             _transportIsOpen = true;
             // A socket that opened keeps its transport: a slow first connect reply must not move the client to
@@ -1353,15 +1361,53 @@ namespace Centrifugal.Centrifuge
             if (result.Ping > 0) WaitServerPing();
 
             var notices = new ConnectNotices(_host, transition);
-            notices.Add(() => _host.RaiseNotice(Connected, new CentrifugeConnectedEventArgs(result.Client,
-                _transport?.Name ?? string.Empty, result.Data.ToByteArray(), result.User, result.AuthClass), "connected"), false);
+            notices.Add(() => RaiseConnectNotice(Connected, new CentrifugeConnectedEventArgs(result.Client,
+                _transport?.Name ?? string.Empty, result.Data.ToByteArray(), result.User, result.AuthClass)), false);
             // Runs after a failing Connected handler (as Java does): the identity is recorded either way.
-            notices.Add(() => _identity.OnConnectIdentity(result), true);
+            notices.Add(() => ReportConnectFailure(ConnectIdentityNotice(result)), true);
             AddServerSubNotices(notices, result.Subs);
 
             var failure = notices.Run();
             if (failure != null && !TransitionSuperseded(transition)) HandlerFailed(failure);
             if (!TransitionSuperseded(transition)) _promises.ResolveAll();
+        }
+
+        /// <summary>
+        /// Reports a failure of a connect notice as an error of type "unclassified", wrapping the handler's exception.
+        /// Returns the failure unchanged; the connect path disconnects once after the list ran.
+        /// </summary>
+        /// <param name="failure">The handler failure, or null.</param>
+        private Exception? ReportConnectFailure(Exception? failure)
+        {
+            if (failure != null) EmitErrorEvent("unclassified", new CentrifugeUnclassifiedException(failure));
+            return failure;
+        }
+
+        /// <summary>
+        /// Raises one handler of the connect notice list. A failure is reported as "unclassified" (see <see cref="ReportConnectFailure"/>),
+        /// not under the handler's own event type, and returned.
+        /// </summary>
+        private Exception? RaiseConnectNotice<TArgs>(EventHandler<TArgs>? handler, TArgs args)
+        {
+            return ReportConnectFailure(EventDispatch.Raise(this, handler, args, "connect", null, _logger));
+        }
+
+        /// <summary>
+        /// The identity notice of a connect reply. The auth event is raised without its own error report, so the
+        /// failure of its handler is reported once, as "unclassified", by the caller.
+        /// </summary>
+        /// <param name="result">The connect reply.</param>
+        private Exception? ConnectIdentityNotice(ConnectResult result)
+        {
+            _connectAuthRaise = true;
+            try
+            {
+                return _identity.OnConnectIdentity(result);
+            }
+            finally
+            {
+                _connectAuthRaise = false;
+            }
         }
 
         /// <summary>
@@ -1378,8 +1424,8 @@ namespace Centrifugal.Centrifuge
                 notices.Add(() =>
                 {
                     _serverSubs[channel] = new ServerSubscription(sub.Offset, sub.Epoch, sub.Recoverable) { Subscribed = true };
-                    return _host.RaiseNotice(ServerSubscribed, ServerSubscribedArgs(channel, sub.WasRecovering, sub.Recovered,
-                        sub.Recoverable, sub.Positioned, sub.Offset, sub.Epoch, sub.Data), "serverSubscribed");
+                    return RaiseConnectNotice(ServerSubscribed, ServerSubscribedArgs(channel, sub.WasRecovering, sub.Recovered,
+                        sub.Recoverable, sub.Positioned, sub.Offset, sub.Epoch, sub.Data));
                 }, false);
             }
 
@@ -1390,7 +1436,7 @@ namespace Centrifugal.Centrifuge
                 foreach (var pub in kvp.Value.Publications)
                 {
                     var publication = pub;
-                    notices.Add(() => RaiseServerPublication(channel, publication), true);
+                    notices.Add(() => RaiseServerPublication(channel, publication, true), true);
                 }
             }
 
@@ -1401,7 +1447,7 @@ namespace Centrifugal.Centrifuge
                 notices.Add(() =>
                 {
                     _serverSubs.Remove(removed);
-                    return _host.RaiseNotice(ServerUnsubscribed, new CentrifugeServerUnsubscribedEventArgs(removed), "serverUnsubscribed");
+                    return RaiseConnectNotice(ServerUnsubscribed, new CentrifugeServerUnsubscribedEventArgs(removed));
                 }, false);
             }
         }
@@ -1521,6 +1567,7 @@ namespace Centrifugal.Centrifuge
             var previousState = _state;
             var newState = reconnect ? CentrifugeClientState.Connecting : CentrifugeClientState.Disconnected;
 
+            bool transportOpened = _transportOpened;
             _transportIsOpen = false;
             _rpcOptionsSupported = false;
             _reconnecting = false;
@@ -1532,7 +1579,7 @@ namespace Centrifugal.Centrifuge
             _disconnects++;
             if (_transport != null)
             {
-                CloseCurrentTransport();
+                CloseCurrentTransport(transportOpened);
                 // Its close is ignored, so a new attempt doesn't wait for it.
                 _transportClosed = true;
             }
@@ -1601,9 +1648,10 @@ namespace Centrifugal.Centrifuge
         private void FailUnauthorized() =>
             DisconnectInternal(CentrifugeDisconnectedCodes.Unauthorized, "unauthorized", false);
 
-        /// <summary>Closes the current transport: what its writer didn't write yet is dropped, the close and
-        /// the disposal run in the background.</summary>
-        private void CloseCurrentTransport()
+        /// <summary>Closes the current transport: what its writer didn't write yet is dropped. An opened transport gets
+        /// its close frame, and is cancelled when the grace passed; a transport that never opened is cancelled at once.</summary>
+        /// <param name="opened">The transport raised its Opened event.</param>
+        private void CloseCurrentTransport(bool opened)
         {
             var transport = _transport!;
             _transport = null;
@@ -1616,7 +1664,14 @@ namespace Centrifugal.Centrifuge
             _openCts?.Cancel();
             _openCts?.Dispose();
             _openCts = null;
-            CloseWithGrace(transport);
+            if (opened)
+            {
+                CloseWithGrace(transport);
+            }
+            else
+            {
+                CancelTransportNow(transport);
+            }
         }
 
         private static async Task CloseTransportAsync(ITransport transport)
@@ -2163,14 +2218,19 @@ namespace Centrifugal.Centrifuge
         /// The position moves only when the handler did not fail. A publication whose handler threw isn't
         /// delivered: the position stays before it, so the next recovery delivers it again.
         /// </summary>
-        private Exception? RaiseServerPublication(string channel, Publication pub)
+        /// <param name="channel">The channel.</param>
+        /// <param name="pub">The publication.</param>
+        /// <param name="connectPath">True for a recovered publication of a connect reply (its failure is reported as "unclassified").</param>
+        private Exception? RaiseServerPublication(string channel, Publication pub, bool connectPath = false)
         {
             var args = CreatePublicationArgs(channel, pub);
             if (pub.Offset > 0) _pendingServerSubOffsets[channel] = pub.Offset;
             Exception? failure;
             try
             {
-                failure = _host.RaiseNotice(Publication, args, "publication");
+                failure = connectPath
+                    ? RaiseConnectNotice(Publication, args)
+                    : _host.RaiseNotice(Publication, args, "publication");
             }
             finally
             {
