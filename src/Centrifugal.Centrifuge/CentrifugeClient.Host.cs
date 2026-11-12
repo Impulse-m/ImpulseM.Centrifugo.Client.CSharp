@@ -179,7 +179,7 @@ namespace Centrifugal.Centrifuge {
 
             /// <summary>Sends one plain command on the given transport, with the client timeout.</summary>
             public Task<Protocol.Reply> SendOnTransportAsync(ITransport transport, Protocol.Command command, CancellationToken cancellationToken) {
-                throw new NotImplementedException();
+                return owner.SendOnTransportCall(transport, command, cancellationToken);
             }
 
 
@@ -194,19 +194,20 @@ namespace Centrifugal.Centrifuge {
 
             /// <summary>Runs the connect reply path for a reply held by the token exchange.</summary>
             public void ResumeConnect(Protocol.ConnectResult result) {
-                throw new NotImplementedException();
+                owner.ResumeHeldConnect(result);
             }
 
 
             /// <summary>Applies the ping interval and the pong flag of a held connect reply.</summary>
             public void ApplyPing(uint pingSeconds, bool sendPong) {
-                throw new NotImplementedException();
+                owner._serverPing = pingSeconds;
+                owner._sendPong = sendPong;
             }
 
 
             /// <summary>Cancels the transport without a close handshake.</summary>
             public void CancelTransport(ITransport transport) {
-                throw new NotImplementedException();
+                owner.CancelTransportNow(transport);
             }
 
 
