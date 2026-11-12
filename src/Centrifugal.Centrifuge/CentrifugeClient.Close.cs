@@ -174,7 +174,6 @@ namespace Centrifugal.Centrifuge
                     ClearConnectTimer();
                     ClearReconnectTimer();
                     ClearServerPingTimer();
-                    ClearRefreshTimer();
                     _flushTimer?.Cancel();
                     _flushTimer = null;
                     _rpcSession.OnClose();

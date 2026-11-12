@@ -101,7 +101,6 @@ namespace Centrifugal.Centrifuge
         private bool _flushNow;
         private LoopTimer? _flushTimer;
         private bool _refreshRequired;
-        private LoopTimer? _refreshTimer;
         private readonly Dictionary<uint, PendingCall> _calls = new();
         private string _token;
         private ReadOnlyMemory<byte> _data;
@@ -1440,7 +1439,6 @@ namespace Centrifugal.Centrifuge
             _clientId = null;
             _connection++;
             ClearServerPingTimer();
-            ClearRefreshTimer();
 
             foreach (var sub in _subscriptions.Values)
             {
@@ -1766,92 +1764,7 @@ namespace Centrifugal.Centrifuge
 
         /// <summary>The token refresh timer of a connected client (for tests).</summary>
         internal void RefreshConnectionToken() =>
-            Loop.Invoke(() =>
-            {
-                if (_state == CentrifugeClientState.Connected) Refresh();
-            });
-
-        private void ScheduleRefresh(int delayMs)
-        {
-            ClearRefreshTimer();
-            _refreshTimer = LoopTimer.Start(Loop, delayMs, () =>
-            {
-                _refreshTimer = null;
-                Refresh();
-            });
-        }
-
-        private void Refresh()
-        {
-            var connection = _connection;
-            GetConnectionToken(token =>
-            {
-                if (connection != _connection) return;
-                if (string.IsNullOrEmpty(token))
-                {
-                    FailUnauthorized();
-                    return;
-                }
-                _token = token!;
-                if (_state != CentrifugeClientState.Connected) return;
-
-                var command = new Command { Refresh = new RefreshRequest { Token = _token } };
-                RegisterCall(command, reply =>
-                {
-                    if (connection != _connection) return;
-                    if (reply.Refresh != null) RefreshResponse(reply.Refresh);
-                    // A reply breaking the protocol: retried as a temporary error.
-                    else RefreshError(new CentrifugeException(CentrifugeErrorCodes.TransportClosed, "refresh reply without result", true));
-                }, (error, _) =>
-                {
-                    // A disconnect fails the pending command too: the connection it was for is gone.
-                    if (connection == _connection) RefreshError(error);
-                });
-                AddCommand(command);
-            }, error =>
-            {
-                if (connection != _connection || _state != CentrifugeClientState.Connected) return;
-                if (error is CentrifugeUnauthorizedException)
-                {
-                    FailUnauthorized();
-                    return;
-                }
-                EmitError("refreshToken", new CentrifugeException(CentrifugeErrorCodes.ClientRefreshToken, error.Message, true, error),
-                    () => ScheduleRefresh(GetRefreshRetryDelay()));
-            });
-        }
-
-        private void RefreshError(CentrifugeException error)
-        {
-            if (error.Code < 100 || error.Temporary)
-            {
-                EmitError("refresh", error, () => ScheduleRefresh(GetRefreshRetryDelay()));
-            }
-            else
-            {
-                DisconnectInternal(error.Code, error.Message, false);
-            }
-        }
-
-        private static int GetRefreshRetryDelay() =>
-            Utilities.CalculateBackoff(0, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(10));
-
-        private void RefreshResponse(RefreshResult result)
-        {
-            ClearRefreshTimer();
-            if (result.Expires)
-            {
-                // The client id changes only if the reply carries one (Centrifugo never sets it).
-                if (!string.IsNullOrEmpty(result.Client)) _clientId = result.Client;
-                ScheduleRefresh(Utilities.TtlToMilliseconds(result.Ttl));
-            }
-        }
-
-        private void ClearRefreshTimer()
-        {
-            _refreshTimer?.Cancel();
-            _refreshTimer = null;
-        }
+            Loop.Invoke(() => _auth.RenewNow());
 
         private void ClearReconnectTimer()
         {
