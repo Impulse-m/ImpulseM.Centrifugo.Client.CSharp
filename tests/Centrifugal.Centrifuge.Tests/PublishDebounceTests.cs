@@ -253,5 +253,43 @@ namespace Centrifugal.Centrifuge.Tests {
 
             Assert.Equal(0, timers.PendingCount);
         }
+
+
+        [Fact]
+        // R5: a cancelled window that the clock has passed does not run.
+        public void Window_CancelledThenAdvancedPastDue_NothingRuns() {
+            PublishDebounce debounce = NewDebounce();
+            PublishInStep(debounce, "a", 100);
+            PublishInStep(debounce, "b", 100);
+            CancelInStep(debounce);
+
+            timers.Advance(200);
+
+            Assert.Equal(new List<string> { "a" }, SentTexts());
+            Assert.Equal(0, timers.PendingCount);
+        }
+
+
+        [Fact]
+        // R5: a window end that the clock queued before a cancel and a re-arm does nothing. Only the publish made after the
+        // cancel is sent, and its own window is the one left armed.
+        public async Task Window_FireQueuedBeforeCancel_DoesNothing() {
+            PublishDebounce debounce = NewDebounce();
+            _ = PublishInStep(debounce, "a", 100);
+            _ = PublishInStep(debounce, "b", 100);
+            loop.Execute(() => {
+                // The window end is queued behind this step, so the cancel and the re-arm below run first.
+                timers.Advance(100);
+                debounce.Cancel();
+                _ = debounce.Publish(Encoding.UTF8.GetBytes("c"), 100, CancellationToken.None);
+            });
+            // A barrier that the loop runs after the queued window end, which is then known to have run.
+            TaskCompletionSource<bool> passed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            loop.Execute(() => passed.TrySetResult(true));
+            await passed.Task.WaitAsync(TimeSpan.FromSeconds(5));
+
+            Assert.Equal(new List<string> { "a", "c" }, SentTexts());
+            Assert.Equal(1, timers.PendingWithDelay(100));
+        }
     }
 }

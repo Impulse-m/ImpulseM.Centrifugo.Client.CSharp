@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -10,67 +11,85 @@ using Xunit;
 // subscribe reply (one second here). Ported in part from SubscriptionRefreshRetryTest.java: the integration part of
 // subscriptionRefreshWith103KeepsTheConnection (Refresh_103_KeepsSubscription) uses the same ttl 1.
 // Gap tests (no Java test pins them): Refresh_OtherCode_Unsubscribes and Refresh_NoTokenGetter_KeepsUpstreamBehaviour.
-// The retry of a refused token waits for the connection's retry delay (5 to 10 seconds), so it is covered by the unit
-// tests in SubscriptionRefreshRetryTests instead.
+// The refresh timers run on the fake clock: the test moves the clock with Advance, and a barrier (a publish that the
+// fake server answers) follows each step whose effect the test checks. No test waits for real time.
 namespace Centrifugal.Centrifuge.Tests {
 
 
     [Collection("Integration")]
-    public class SubscriptionRefreshTests : IAsyncLifetime {
+    public class SubscriptionRefreshTests : FakeServerTestBase {
         private static readonly TimeSpan wait = TimeSpan.FromSeconds(5);
-        private readonly FakeCentrifugoServer server = new FakeCentrifugoServer();
-        private CentrifugeClient? client;
+        private readonly CommandArrivals refreshes = new CommandArrivals(wait);
 
 
-        public async Task InitializeAsync() {
-            await server.StartAsync();
-        }
-
-
-        public async Task DisposeAsync() {
-            if (client != null) {
-                await client.DisposeAsync();
-            }
-            await server.DisposeAsync();
+        public override async Task InitializeAsync() {
+            await base.InitializeAsync();
+            Server.BeforeCommand = cmd => {
+                if (cmd.SubRefresh != null) {
+                    refreshes.Add();
+                }
+                return Task.CompletedTask;
+            };
         }
 
 
         private int CountRefreshes() {
-            return server.Received.Count(c => c.SubRefresh != null);
+            return Server.Received.Count(c => c.SubRefresh != null);
         }
 
 
-        private async Task BarrierAsync() {
-            await client!.PublishAsync("barrier", ReadOnlyMemory<byte>.Empty).WaitAsync(wait);
+        private static async Task BarrierAsync(CentrifugeClient testClient) {
+            await testClient.PublishAsync("barrier", ReadOnlyMemory<byte>.Empty).WaitAsync(wait);
+        }
+
+
+        // The barrier is answered after the steps that came before it, so the timers they armed are in place.
+        private static async Task AdvanceAsync(CentrifugeClient testClient, FakeStepTimerFactory timers, int ms) {
+            await BarrierAsync(testClient);
+            timers.Advance(ms);
+        }
+
+
+        // Answers the oldest held refresh as accepted with a one-second TTL, then waits until the answer is processed.
+        // The fake server dispatches its commands in order, so the barrier comes after the refresh was held.
+        private async Task AcceptNextRefreshAsync(CentrifugeClient testClient, ConcurrentQueue<Command> held) {
+            Assert.True(held.TryDequeue(out Command? refresh));
+            await Server.SendReplyAsync(new Reply { Id = refresh!.Id, SubRefresh = new SubRefreshResult { Expires = true, Ttl = 1 } });
+            await BarrierAsync(testClient);
         }
 
 
         [Fact]
-        // Java: subscriptionRefreshWith103KeepsTheConnection (integration part, ttl 1)
+        // The integration part of subscriptionRefreshWith103KeepsTheConnection (ttl 1). The unit part is OnRefusal_103_Keeps.
         public async Task Refresh_103_KeepsSubscription() {
-            server.OnSubscribe = (_, _) => new SubscribeResult { Expires = true, Ttl = 1 };
-            server.OnCommand = cmd => {
+            Server.OnSubscribe = (_, _) => new SubscribeResult { Expires = true, Ttl = 1 };
+            Server.OnCommand = cmd => {
                 if (cmd.SubRefresh == null) {
                     return null;
                 }
-                Reply error = server.ErrorReply(103, "permission denied", false, null);
+                Reply error = Server.ErrorReply(103, "permission denied", false, null);
                 error.Id = cmd.Id;
                 return error;
             };
-            client = new CentrifugeClient(server.Url, new CentrifugeClientOptions());
-            client.Connect();
-            await client.ReadyAsync().WaitAsync(wait);
+            CentrifugeClient testClient = NewClientWithTestClock(out FakeStepTimerFactory timers);
+            testClient.Connect();
+            await testClient.ReadyAsync().WaitAsync(wait);
             TaskCompletionSource<int> refreshError = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
-            CentrifugeSubscription sub = client.NewSubscription("ch", new CentrifugeSubscriptionOptions { GetToken = _ => Task.FromResult("t1") });
+            TaskCompletionSource<bool> subscribed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            CentrifugeSubscription sub = testClient.NewSubscription("ch", new CentrifugeSubscriptionOptions { GetToken = _ => Task.FromResult("t1") });
             sub.Error += (_, e) => {
                 if (e.Type == "refresh") {
                     refreshError.TrySetResult(e.Code);
                 }
             };
+            sub.Subscribed += (_, _) => subscribed.TrySetResult(true);
             sub.Subscribe();
+            await subscribed.Task.WaitAsync(wait);
+
+            await AdvanceAsync(testClient, timers, 1000);
 
             Assert.Equal(103, await refreshError.Task.WaitAsync(wait));
-            await BarrierAsync();
+            await BarrierAsync(testClient);
             Assert.Equal(CentrifugeSubscriptionState.Subscribed, sub.State);
             Assert.Equal(1, CountRefreshes());
         }
@@ -79,22 +98,27 @@ namespace Centrifugal.Centrifuge.Tests {
         [Fact]
         // A refresh refused with another code unsubscribes with that code and message.
         public async Task Refresh_OtherCode_Unsubscribes() {
-            server.OnSubscribe = (_, _) => new SubscribeResult { Expires = true, Ttl = 1 };
-            server.OnCommand = cmd => {
+            Server.OnSubscribe = (_, _) => new SubscribeResult { Expires = true, Ttl = 1 };
+            Server.OnCommand = cmd => {
                 if (cmd.SubRefresh == null) {
                     return null;
                 }
-                Reply error = server.ErrorReply(3000, "forbidden", false, null);
+                Reply error = Server.ErrorReply(3000, "forbidden", false, null);
                 error.Id = cmd.Id;
                 return error;
             };
-            client = new CentrifugeClient(server.Url, new CentrifugeClientOptions());
-            client.Connect();
-            await client.ReadyAsync().WaitAsync(wait);
+            CentrifugeClient testClient = NewClientWithTestClock(out FakeStepTimerFactory timers);
+            testClient.Connect();
+            await testClient.ReadyAsync().WaitAsync(wait);
             TaskCompletionSource<int> unsubscribed = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
-            CentrifugeSubscription sub = client.NewSubscription("ch", new CentrifugeSubscriptionOptions { GetToken = _ => Task.FromResult("t1") });
+            TaskCompletionSource<bool> subscribed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            CentrifugeSubscription sub = testClient.NewSubscription("ch", new CentrifugeSubscriptionOptions { GetToken = _ => Task.FromResult("t1") });
             sub.Unsubscribed += (_, e) => unsubscribed.TrySetResult(e.Code);
+            sub.Subscribed += (_, _) => subscribed.TrySetResult(true);
             sub.Subscribe();
+            await subscribed.Task.WaitAsync(wait);
+
+            await AdvanceAsync(testClient, timers, 1000);
 
             Assert.Equal(3000, await unsubscribed.Task.WaitAsync(wait));
         }
@@ -103,14 +127,19 @@ namespace Centrifugal.Centrifuge.Tests {
         [Fact]
         // A refresh without a token getter is a configuration error, then unauthorized.
         public async Task Refresh_NoTokenGetter_KeepsUpstreamBehaviour() {
-            server.OnSubscribe = (_, _) => new SubscribeResult { Expires = true, Ttl = 1 };
-            client = new CentrifugeClient(server.Url, new CentrifugeClientOptions());
-            client.Connect();
-            await client.ReadyAsync().WaitAsync(wait);
+            Server.OnSubscribe = (_, _) => new SubscribeResult { Expires = true, Ttl = 1 };
+            CentrifugeClient testClient = NewClientWithTestClock(out FakeStepTimerFactory timers);
+            testClient.Connect();
+            await testClient.ReadyAsync().WaitAsync(wait);
             TaskCompletionSource<int> unsubscribed = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
-            CentrifugeSubscription sub = client.NewSubscription("ch", new CentrifugeSubscriptionOptions { Token = "static" });
+            TaskCompletionSource<bool> subscribed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            CentrifugeSubscription sub = testClient.NewSubscription("ch", new CentrifugeSubscriptionOptions { Token = "static" });
             sub.Unsubscribed += (_, e) => unsubscribed.TrySetResult(e.Code);
+            sub.Subscribed += (_, _) => subscribed.TrySetResult(true);
             sub.Subscribe();
+            await subscribed.Task.WaitAsync(wait);
+
+            await AdvanceAsync(testClient, timers, 1000);
 
             Assert.Equal(CentrifugeUnsubscribedCodes.Unauthorized, await unsubscribed.Task.WaitAsync(wait));
         }
@@ -119,13 +148,14 @@ namespace Centrifugal.Centrifuge.Tests {
         [Fact]
         // A token getter that throws during a refresh reports a refreshToken error and keeps the subscription subscribed.
         public async Task Refresh_TokenGetterFails_ReportsAndKeepsSubscription() {
-            server.OnSubscribe = (_, _) => new SubscribeResult { Expires = true, Ttl = 1 };
-            client = new CentrifugeClient(server.Url, new CentrifugeClientOptions());
-            client.Connect();
-            await client.ReadyAsync().WaitAsync(wait);
+            Server.OnSubscribe = (_, _) => new SubscribeResult { Expires = true, Ttl = 1 };
+            CentrifugeClient testClient = NewClientWithTestClock(out FakeStepTimerFactory timers);
+            testClient.Connect();
+            await testClient.ReadyAsync().WaitAsync(wait);
             int calls = 0;
             TaskCompletionSource<string> errorType = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
-            CentrifugeSubscription sub = client.NewSubscription("ch", new CentrifugeSubscriptionOptions {
+            TaskCompletionSource<bool> subscribed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            CentrifugeSubscription sub = testClient.NewSubscription("ch", new CentrifugeSubscriptionOptions {
                 GetToken = _ => {
                     if (Interlocked.Increment(ref calls) == 2) {
                         throw new InvalidOperationException("token failed");
@@ -138,7 +168,11 @@ namespace Centrifugal.Centrifuge.Tests {
                     errorType.TrySetResult(e.Type);
                 }
             };
+            sub.Subscribed += (_, _) => subscribed.TrySetResult(true);
             sub.Subscribe();
+            await subscribed.Task.WaitAsync(wait);
+
+            await AdvanceAsync(testClient, timers, 1000);
 
             Assert.Equal("refreshToken", await errorType.Task.WaitAsync(wait));
             Assert.Equal(CentrifugeSubscriptionState.Subscribed, sub.State);
@@ -149,21 +183,22 @@ namespace Centrifugal.Centrifuge.Tests {
         [Fact]
         // A refresh error is reported before the subscription classifies it: the error event comes before the unsubscribe.
         public async Task Refresh_ErrorIsReportedBeforeClassification() {
-            server.OnSubscribe = (_, _) => new SubscribeResult { Expires = true, Ttl = 1 };
-            server.OnCommand = cmd => {
+            Server.OnSubscribe = (_, _) => new SubscribeResult { Expires = true, Ttl = 1 };
+            Server.OnCommand = cmd => {
                 if (cmd.SubRefresh == null) {
                     return null;
                 }
-                Reply error = server.ErrorReply(3000, "forbidden", false, null);
+                Reply error = Server.ErrorReply(3000, "forbidden", false, null);
                 error.Id = cmd.Id;
                 return error;
             };
-            client = new CentrifugeClient(server.Url, new CentrifugeClientOptions());
-            client.Connect();
-            await client.ReadyAsync().WaitAsync(wait);
+            CentrifugeClient testClient = NewClientWithTestClock(out FakeStepTimerFactory timers);
+            testClient.Connect();
+            await testClient.ReadyAsync().WaitAsync(wait);
             List<string> order = new List<string>();
             TaskCompletionSource<bool> done = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-            CentrifugeSubscription sub = client.NewSubscription("ch", new CentrifugeSubscriptionOptions { GetToken = _ => Task.FromResult("t1") });
+            TaskCompletionSource<bool> subscribed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            CentrifugeSubscription sub = testClient.NewSubscription("ch", new CentrifugeSubscriptionOptions { GetToken = _ => Task.FromResult("t1") });
             sub.Error += (_, e) => {
                 if (e.Type == "refresh") {
                     order.Add("error");
@@ -173,7 +208,11 @@ namespace Centrifugal.Centrifuge.Tests {
                 order.Add("unsubscribed");
                 done.TrySetResult(true);
             };
+            sub.Subscribed += (_, _) => subscribed.TrySetResult(true);
             sub.Subscribe();
+            await subscribed.Task.WaitAsync(wait);
+
+            await AdvanceAsync(testClient, timers, 1000);
 
             await done.Task.WaitAsync(wait);
             Assert.Equal(new List<string> { "error", "unsubscribed" }, order);
@@ -181,93 +220,168 @@ namespace Centrifugal.Centrifuge.Tests {
 
 
         [Fact]
-        // Java: subscriptionRefreshDoesNotResendARefusedToken (integration part). A token refused with 109 is retried after the
-        // connection's retry delay of 5 to 10 seconds. The getter returns the same token, so it is not sent again. The test waits
-        // past the longest retry delay.
+        // The integration part of subscriptionRefreshDoesNotResendARefusedToken; the unit part is IsRefused_RefusedTokenIsNotSentAgain.
+        // A token refused with 109 is retried after the connection's retry delay (5 to 10 seconds; the minimum draw gives 5
+        // seconds). The getter returns the same token, so it is not sent again: the retry calls the getter and sends nothing.
         public async Task Refresh_Refused109_SameTokenNotSentAgain() {
-            server.OnSubscribe = (_, _) => new SubscribeResult { Expires = true, Ttl = 1 };
-            server.OnCommand = cmd => {
+            Server.OnSubscribe = (_, _) => new SubscribeResult { Expires = true, Ttl = 1 };
+            Server.OnCommand = cmd => {
                 if (cmd.SubRefresh == null) {
                     return null;
                 }
-                Reply error = server.ErrorReply(109, "token expired", false, null);
+                Reply error = Server.ErrorReply(109, "token expired", false, null);
                 error.Id = cmd.Id;
                 return error;
             };
-            client = new CentrifugeClient(server.Url, new CentrifugeClientOptions());
-            client.Connect();
-            await client.ReadyAsync().WaitAsync(wait);
-            CentrifugeSubscription sub = client.NewSubscription("ch", new CentrifugeSubscriptionOptions { GetToken = _ => Task.FromResult("same-token") });
+            CentrifugeClient testClient = NewClientWithTestClock(out FakeStepTimerFactory timers);
+            testClient.Connect();
+            await testClient.ReadyAsync().WaitAsync(wait);
+            CommandArrivals tokenCalls = new CommandArrivals(wait);
+            TaskCompletionSource<int> refreshError = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
+            TaskCompletionSource<bool> subscribed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            CentrifugeSubscription sub = testClient.NewSubscription("ch", new CentrifugeSubscriptionOptions {
+                GetToken = _ => {
+                    tokenCalls.Add();
+                    return Task.FromResult("same-token");
+                }
+            });
+            sub.Error += (_, e) => {
+                if (e.Type == "refresh") {
+                    refreshError.TrySetResult(e.Code);
+                }
+            };
+            sub.Subscribed += (_, _) => subscribed.TrySetResult(true);
             sub.Subscribe();
+            await subscribed.Task.WaitAsync(wait);
 
-            await Task.Delay(TimeSpan.FromSeconds(12));
-            await BarrierAsync();
+            await AdvanceAsync(testClient, timers, 1000);
 
+            Assert.Equal(109, await refreshError.Task.WaitAsync(wait));
+            await BarrierAsync(testClient);
+            timers.Advance(timers.RequestedDelays[timers.RequestedDelays.Count - 1]);
+            // Token calls: the subscribe, the refused refresh and the retry.
+            await tokenCalls.Reached(3);
+            await BarrierAsync(testClient);
+
+            // Best effort: the getter's continuation that would send a refresh is posted to the loop after the getter
+            // returns, and the barrier is posted from this thread, so the two posts race. A regression that sends the
+            // refused token again is caught only in the runs where the barrier comes after the continuation. A strict
+            // check needs a test-only hook in Subscription.cs or Client.cs, which this test does not use.
             Assert.Equal(1, CountRefreshes());
             Assert.Equal(CentrifugeSubscriptionState.Subscribed, sub.State);
+            // No retry is armed after the refused token (the timed part of subscriptionRefreshDoesNotResendARefusedToken).
+            // The ping watchdog of the connect reply (ping 25 s) is the only timer left.
+            Assert.Equal(0, timers.PendingWithDelay(1000));
+            Assert.Equal(1, timers.PendingCount);
         }
 
 
         [Fact]
         // A refresh reply that arrives after the subscription unsubscribed is dropped: no refresh is sent after it.
         public async Task Refresh_ReplyAfterUnsubscribe_IsDropped() {
-            server.OnSubscribe = (_, _) => new SubscribeResult { Expires = true, Ttl = 1 };
+            Server.OnSubscribe = (_, _) => new SubscribeResult { Expires = true, Ttl = 1 };
             TaskCompletionSource<Command> held = new TaskCompletionSource<Command>(TaskCreationOptions.RunContinuationsAsynchronously);
-            server.OnCommand = cmd => {
+            Server.OnCommand = cmd => {
                 if (cmd.SubRefresh == null) {
                     return null;
                 }
                 held.TrySetResult(cmd);
                 return FakeCentrifugoServer.NoReply;
             };
-            client = new CentrifugeClient(server.Url, new CentrifugeClientOptions());
-            client.Connect();
-            await client.ReadyAsync().WaitAsync(wait);
-            CentrifugeSubscription sub = client.NewSubscription("ch", new CentrifugeSubscriptionOptions { GetToken = _ => Task.FromResult("t1") });
+            CentrifugeClient testClient = NewClientWithTestClock(out FakeStepTimerFactory timers);
+            testClient.Connect();
+            await testClient.ReadyAsync().WaitAsync(wait);
+            TaskCompletionSource<bool> subscribed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            CentrifugeSubscription sub = testClient.NewSubscription("ch", new CentrifugeSubscriptionOptions { GetToken = _ => Task.FromResult("t1") });
+            sub.Subscribed += (_, _) => subscribed.TrySetResult(true);
             sub.Subscribe();
-            Command refresh = await held.Task.WaitAsync(TimeSpan.FromSeconds(10));
+            await subscribed.Task.WaitAsync(wait);
+
+            await AdvanceAsync(testClient, timers, 1000);
+            Command refresh = await held.Task.WaitAsync(wait);
 
             sub.Unsubscribe();
-            await server.SendReplyAsync(new Reply { Id = refresh.Id, SubRefresh = new SubRefreshResult { Expires = true, Ttl = 1 } });
-            await Task.Delay(TimeSpan.FromMilliseconds(1500));
-            await BarrierAsync();
+            await Server.SendReplyAsync(new Reply { Id = refresh.Id, SubRefresh = new SubRefreshResult { Expires = true, Ttl = 1 } });
+            await BarrierAsync(testClient);
+            // A reply that had re-armed the timer would fire now, and send a second refresh.
+            timers.Advance(1000);
+            await BarrierAsync(testClient);
 
             Assert.Equal(CentrifugeSubscriptionState.Unsubscribed, sub.State);
             Assert.Equal(1, CountRefreshes());
+            Assert.Equal(0, timers.PendingWithDelay(1000));
         }
 
 
         [Fact]
         // A refresh accepted without expires arms no further refresh.
         public async Task Refresh_AcceptedWithoutExpires_ArmsNothing() {
-            server.OnSubscribe = (_, _) => new SubscribeResult { Expires = true, Ttl = 1 };
-            server.OnCommand = cmd => cmd.SubRefresh == null ? null : new Reply { Id = cmd.Id, SubRefresh = new SubRefreshResult() };
-            client = new CentrifugeClient(server.Url, new CentrifugeClientOptions());
-            client.Connect();
-            await client.ReadyAsync().WaitAsync(wait);
-            CentrifugeSubscription sub = client.NewSubscription("ch", new CentrifugeSubscriptionOptions { GetToken = _ => Task.FromResult("t1") });
+            Server.OnSubscribe = (_, _) => new SubscribeResult { Expires = true, Ttl = 1 };
+            Server.OnCommand = cmd => cmd.SubRefresh == null ? null : new Reply { Id = cmd.Id, SubRefresh = new SubRefreshResult() };
+            CentrifugeClient testClient = NewClientWithTestClock(out FakeStepTimerFactory timers);
+            testClient.Connect();
+            await testClient.ReadyAsync().WaitAsync(wait);
+            TaskCompletionSource<bool> subscribed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            CentrifugeSubscription sub = testClient.NewSubscription("ch", new CentrifugeSubscriptionOptions { GetToken = _ => Task.FromResult("t1") });
+            sub.Subscribed += (_, _) => subscribed.TrySetResult(true);
             sub.Subscribe();
+            await subscribed.Task.WaitAsync(wait);
 
-            await Task.Delay(TimeSpan.FromMilliseconds(2500));
+            await AdvanceAsync(testClient, timers, 1000);
+            await refreshes.Reached(1);
+            await BarrierAsync(testClient);
+            // A timer armed by the accepted reply would fire now, and send a second refresh.
+            timers.Advance(1000);
+            await BarrierAsync(testClient);
 
             Assert.Equal(1, CountRefreshes());
+            Assert.Equal(0, timers.PendingWithDelay(1000));
         }
 
 
         [Fact]
-        // One refresh timer at a time: each accepted refresh arms one timer, so the refreshes come once per TTL.
+        // One refresh timer at a time. A refresh started while the TTL timer is pending drops that timer, and its accepted
+        // reply arms exactly one timer. The refreshes are held until the test answers them, so each in-flight state is checked.
         public async Task Refresh_ReplacesTimer_NoDuplicate() {
-            server.OnSubscribe = (_, _) => new SubscribeResult { Expires = true, Ttl = 1 };
-            server.OnCommand = cmd => cmd.SubRefresh == null ? null : new Reply { Id = cmd.Id, SubRefresh = new SubRefreshResult { Expires = true, Ttl = 1 } };
-            client = new CentrifugeClient(server.Url, new CentrifugeClientOptions());
-            client.Connect();
-            await client.ReadyAsync().WaitAsync(wait);
-            CentrifugeSubscription sub = client.NewSubscription("ch", new CentrifugeSubscriptionOptions { GetToken = _ => Task.FromResult("t1") });
+            Server.OnSubscribe = (_, _) => new SubscribeResult { Expires = true, Ttl = 1 };
+            ConcurrentQueue<Command> held = new ConcurrentQueue<Command>();
+            Server.OnCommand = cmd => {
+                if (cmd.SubRefresh == null) {
+                    return null;
+                }
+                held.Enqueue(cmd);
+                return FakeCentrifugoServer.NoReply;
+            };
+            CentrifugeClient testClient = NewClientWithTestClock(out FakeStepTimerFactory timers);
+            testClient.Connect();
+            await testClient.ReadyAsync().WaitAsync(wait);
+            TaskCompletionSource<bool> subscribed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            CentrifugeSubscription sub = testClient.NewSubscription("ch", new CentrifugeSubscriptionOptions { GetToken = _ => Task.FromResult("t1") });
+            sub.Subscribed += (_, _) => subscribed.TrySetResult(true);
             sub.Subscribe();
+            await subscribed.Task.WaitAsync(wait);
 
-            await Task.Delay(TimeSpan.FromMilliseconds(2300));
+            // The TTL timer fires and its refresh is held: no refresh timer is pending while the refresh is in flight.
+            // The ping watchdog of the connect reply is a separate timer and is not counted here.
+            await AdvanceAsync(testClient, timers, 1000);
+            await refreshes.Reached(1);
+            await BarrierAsync(testClient);
+            Assert.Equal(0, timers.PendingWithDelay(1000));
 
+            // The accepted reply arms one timer.
+            await AcceptNextRefreshAsync(testClient, held);
+            Assert.Equal(1, timers.PendingWithDelay(1000));
+
+            // A refresh started while that timer is pending drops it, so the in-flight state has no refresh timer.
+            sub.RefreshToken();
+            await refreshes.Reached(2);
+            await BarrierAsync(testClient);
+            Assert.Equal(0, timers.PendingWithDelay(1000));
+
+            // Its accepted reply arms exactly one timer: no duplicate.
+            await AcceptNextRefreshAsync(testClient, held);
             Assert.Equal(2, CountRefreshes());
+            Assert.Equal(1, timers.PendingWithDelay(1000));
         }
 
 
@@ -275,15 +389,15 @@ namespace Centrifugal.Centrifuge.Tests {
         // Leaving SUBSCRIBED drops the refresh timer: the resubscribe reply has no expires, so no refresh is sent.
         public async Task Leaving_Subscribed_DropsRefreshTimer() {
             int subscribes = 0;
-            server.OnSubscribe = (_, _) => Interlocked.Increment(ref subscribes) == 1
+            Server.OnSubscribe = (_, _) => Interlocked.Increment(ref subscribes) == 1
                 ? new SubscribeResult { Expires = true, Ttl = 1 }
                 : new SubscribeResult();
-            client = new CentrifugeClient(server.Url, new CentrifugeClientOptions());
-            client.Connect();
-            await client.ReadyAsync().WaitAsync(wait);
+            CentrifugeClient testClient = NewClientWithTestClock(out FakeStepTimerFactory timers);
+            testClient.Connect();
+            await testClient.ReadyAsync().WaitAsync(wait);
             TaskCompletionSource<bool> firstSubscribed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             TaskCompletionSource<bool> secondSubscribed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-            CentrifugeSubscription sub = client.NewSubscription("ch", new CentrifugeSubscriptionOptions { GetToken = _ => Task.FromResult("t1") });
+            CentrifugeSubscription sub = testClient.NewSubscription("ch", new CentrifugeSubscriptionOptions { GetToken = _ => Task.FromResult("t1") });
             sub.Subscribed += (_, _) => {
                 if (!firstSubscribed.Task.IsCompleted) {
                     firstSubscribed.TrySetResult(true);
@@ -294,13 +408,17 @@ namespace Centrifugal.Centrifuge.Tests {
             sub.Subscribe();
             await firstSubscribed.Task.WaitAsync(wait);
 
-            await server.SendPushAsync(new Push {
+            await Server.SendPushAsync(new Push {
                 Channel = "ch",
                 Unsubscribe = new Unsubscribe { Code = 2500, Reason = "resubscribe" }
             });
             await secondSubscribed.Task.WaitAsync(wait);
-            await Task.Delay(TimeSpan.FromMilliseconds(1500));
+            await BarrierAsync(testClient);
+            // The TTL of the first subscribe would fire now, if its timer had survived the leave.
+            timers.Advance(1000);
+            await BarrierAsync(testClient);
 
+            Assert.Equal(0, timers.PendingWithDelay(1000));
             Assert.Equal(0, CountRefreshes());
         }
 
