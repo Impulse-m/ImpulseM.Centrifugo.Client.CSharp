@@ -51,6 +51,12 @@ namespace Centrifugal.Centrifuge {
         /// <summary>The connection token. The setter stores the token.</summary>
         string ConnectionToken { get; set; }
 
+        /// <summary>Options.GetToken is set, so a new connection token can be asked for.</summary>
+        bool HasTokenGetter { get; }
+
+        /// <summary>Stores the client id a refresh reply carries. Called only with a non-empty id.</summary>
+        void SetClientId(string clientId);
+
         /// <summary>The retry policy shared by the connection refresh and the subscription refresh. One per client.</summary>
         IRefreshRetryPolicy RefreshRetryPolicy { get; }
 

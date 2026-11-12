@@ -171,6 +171,20 @@ namespace Centrifugal.Centrifuge.Tests {
         public string ConnectionToken { get; set; } = string.Empty;
 
 
+        /// <summary>Options.GetToken is set. True by default; a test sets it false for a client without a getter.</summary>
+        public bool HasTokenGetter { get; set; } = true;
+
+
+        /// <summary>The client id the last refresh reply carried, or null.</summary>
+        public string? ClientId { get; private set; }
+
+
+        /// <summary>Stores the client id a refresh reply carries.</summary>
+        public void SetClientId(string clientId) {
+            ClientId = clientId;
+        }
+
+
         /// <summary>The retry policy of the host.</summary>
         public IRefreshRetryPolicy RefreshRetryPolicy { get; set; } = new RefreshRetryPolicy(new FixedRandom(0.0), 5000, 10000, 300000, true);
 

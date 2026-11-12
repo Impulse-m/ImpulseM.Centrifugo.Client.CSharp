@@ -135,6 +135,20 @@ namespace Centrifugal.Centrifuge {
             }
 
 
+            /// <summary>Options.GetToken is set.</summary>
+            public bool HasTokenGetter {
+                get {
+                    return owner._options.GetToken != null;
+                }
+            }
+
+
+            /// <summary>Stores the client id a refresh reply carries.</summary>
+            public void SetClientId(string clientId) {
+                owner._clientId = clientId;
+            }
+
+
             /// <summary>The retry policy shared by the connection refresh and the subscription refresh.</summary>
             public IRefreshRetryPolicy RefreshRetryPolicy {
                 get {

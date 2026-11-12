@@ -1,6 +1,6 @@
 // The pure offset rule of the server time: the offset is the server time minus the local time, and a zero or implausible
 // server time gives no offset. The client keeps the previous offset over a reply with an implausible time.
-// Not ported: ServerTimeTest.serverTimeIgnoresAnImplausibleReplyTime: the check needs a real reply over the rpc path, which these pure tests do not run.
+// ServerTimeTest.serverTimeIgnoresAnImplausibleReplyTime is ported in RpcServerTimeTests, over a real reply; the pure check is here.
 // Not ported: ExtensionsTest.estimatedServerTime...: the server time is one addition in CentrifugeClient.Host (local clock plus offset), with no separate function to test.
 using System;
 using Xunit;
@@ -29,7 +29,7 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
-        // Java: serverTimeIgnoresAnImplausibleReplyTime
+        // The pure part of the Java serverTimeIgnoresAnImplausibleReplyTime; the reply part is in RpcServerTimeTests.
         [Fact]
         public void ServerTimeOffsetFrom_ImplausibleTime_ReturnsNull() {
             Assert.Null(ProtocolExtensions.ServerTimeOffsetFrom(long.MaxValue, LocalMillis));

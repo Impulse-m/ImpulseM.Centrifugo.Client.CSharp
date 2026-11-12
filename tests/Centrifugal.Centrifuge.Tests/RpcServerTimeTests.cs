@@ -69,6 +69,7 @@ namespace Centrifugal.Centrifuge.Tests {
 
         /// <summary>A reply time more than a year away from the local clock is ignored, on the rpc path.</summary>
         [Fact]
+        // Java: serverTimeIgnoresAnImplausibleReplyTime
         public async Task ServerTime_ImplausibleReplyTime_IsIgnored() {
             EnableRpcOptions();
             long implausible = LocalMillis + 400L * 24L * 60L * 60L * 1000L;
