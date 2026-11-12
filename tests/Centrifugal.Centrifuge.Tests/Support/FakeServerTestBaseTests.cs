@@ -37,7 +37,7 @@ namespace Centrifugal.Centrifuge.Tests {
             client.Connect();
             await connected;
 
-            Assert.Same(timers, client.StepTimers);
+            Assert.Same(timers, client.Host.Timers);
         }
     }
 }

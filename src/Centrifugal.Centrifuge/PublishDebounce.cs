@@ -41,7 +41,8 @@ namespace Centrifugal.Centrifuge {
         /// <summary>
         /// Publishes data inside the debounce window. An idle window sends the data at once and returns that send, then opens
         /// a window of windowMillis. An open window keeps the data as the latest pending value and returns a task that
-        /// completes with success at once.
+        /// completes with success at the end of the current step; the send of that value comes later, at the window end,
+        /// and the caller does not wait for it.
         /// </summary>
         /// <param name="data">The data to publish.</param>
         /// <param name="windowMillis">The window in milliseconds, from the server (above zero).</param>
@@ -89,6 +90,13 @@ namespace Centrifugal.Centrifuge {
         }
 
 
+        /// <summary>
+        /// Runs when a window ends: sends the latest pending value and arms the next window, unless a cancel came in
+        /// the meantime. The failure of that send stays unobserved: no caller is left to receive it, because the callers
+        /// that coalesced into the window completed at the end of their step already, and no failed event is raised for
+        /// it. The next window still arms after a failed send.
+        /// </summary>
+        /// <param name="armed">The generation the window was armed in; a window of an earlier generation is ignored.</param>
         private void Fire(long armed) {
             if (armed != generation) {
                 return;
@@ -100,7 +108,6 @@ namespace Centrifugal.Centrifuge {
             }
             pending = null;
             long before = generation;
-            // The window end is not reported: the publish of the window end is sent and its outcome is observed only.
             ObserveFailure(Send(data, CancellationToken.None));
             // A cancel during the send wins: the window is not armed again after it.
             if (before == generation) {
@@ -120,7 +127,9 @@ namespace Centrifugal.Centrifuge {
 
         private static void ObserveFailure(Task sent) {
             sent.ContinueWith(
-                static task => { _ = task.Exception; },
+                static (Task task) => {
+                    _ = task.Exception;
+                },
                 TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously);
         }
 

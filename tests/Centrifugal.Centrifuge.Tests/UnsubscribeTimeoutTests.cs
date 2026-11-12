@@ -3,9 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-// An unsubscribe that gets no reply. Ported from UnsubscribeTimeoutThreadSafetyTest.java (1 test) under the new name
-// UnsubscribeTimeout_RunsOnLoop_Reconnects (testUnsubscribeTimeoutRunsOnClientExecutor). The timeout reply is handled on the
-// loop, so the client reconnects with code 4.
+// An unsubscribe that gets no reply. The timeout reply is handled on the loop, so the client reconnects with the
+// unsubscribe error code.
 namespace Centrifugal.Centrifuge.Tests {
 
 

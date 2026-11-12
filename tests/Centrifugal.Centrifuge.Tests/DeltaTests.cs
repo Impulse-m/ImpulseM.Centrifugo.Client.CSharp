@@ -7,10 +7,8 @@ using Centrifugal.Centrifuge.Protocol;
 using Google.Protobuf;
 using Xunit;
 
-// Delta publications (Fossil) of a subscription. Ported from DeltaTest.java (2 tests):
-// testDeltaWithoutBaseStopsTheClient -> DeltaWithoutBase_DisconnectsWithCode2,
-// testDeliveredDataIsNotTheBase -> DeliveredData_IsNotTheBase. The source, delta and expected text are the first Fossil
-// vector of FossilTests.cs.
+// Delta publications (Fossil) of a subscription. The source, delta and expected text are the first Fossil vector of
+// FossilTests.cs.
 namespace Centrifugal.Centrifuge.Tests {
 
 

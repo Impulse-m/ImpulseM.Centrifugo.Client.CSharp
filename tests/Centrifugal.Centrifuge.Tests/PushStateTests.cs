@@ -5,12 +5,8 @@ using System.Threading.Tasks;
 using Centrifugal.Centrifuge.Protocol;
 using Xunit;
 
-// Unit-level routing of unsubscribe and publication pushes against the subscription state. Ported from PushStateTest.java (4 tests):
-// testUnsubscribeErrorReplyReconnects -> UnsubscribeErrorReply_Reconnects,
-// testPublicationAfterUnsubscribeIsNotDelivered -> PublicationAfterUnsubscribe_IsNotDelivered,
-// testResubscribePushAfterUnsubscribeIsIgnored -> ResubscribePush_AfterUnsubscribe_IsIgnored,
-// testServerSidePublicationIsNotTakenByUnsubscribedClientSideObject -> ServerSidePublication_NotTakenByUnsubscribedClientObject.
-// A barrier (a publish, answered by the fake server) follows each push, so the test sees the push processed.
+// Unit-level routing of unsubscribe and publication pushes against the subscription state. A barrier (a publish, answered
+// by the fake server) follows each push, so the test sees the push processed.
 namespace Centrifugal.Centrifuge.Tests {
 
 

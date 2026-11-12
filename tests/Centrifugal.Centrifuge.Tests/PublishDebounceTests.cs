@@ -5,15 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-// Tests of the publish debounce window (PublishDebounce). Ported from PublishDebounceTest.java (8 tests):
-// publishFirstIsSentAtOnceAndWindowCoalescesTheRest -> Publish_FirstSentAtOnce_WindowCoalescesRest,
-// idleWindowEndsAndNextPublishIsSentAtOnce -> Publish_AfterIdleWindows_SendsAtOnce,
-// unsubscribeDropsPendingValue -> Unsubscribe_DropsPending, reconnectDropsPendingValue -> Reconnect_DropsPending,
-// zeroWindowSendsEveryPublish -> Publish_ZeroWindow_SendsEveryPublish,
-// windowAboveSignedIntRangeIsCapped -> CapWindow_AboveSignedRange_ReturnsIntMax,
-// timerDrivenPublishRefusedByServerDoesNotStopTheNextWindow -> WindowEnd_Refused_NextWindowStillSends,
-// throwingCallbackOfCoalescedPublishRunsOnce -> Publish_InsideWindow_CompletesOnce (renamed: the coalesced caller gets a task, not a callback).
-// The windows run on FakeStepTimerFactory, so no test waits for real time.
+// Tests of the publish debounce window (PublishDebounce). The windows run on FakeStepTimerFactory, so no test waits for
+// real time.
 namespace Centrifugal.Centrifuge.Tests {
 
 
@@ -111,7 +104,8 @@ namespace Centrifugal.Centrifuge.Tests {
 
 
         [Fact]
-        // Java: unsubscribeDropsPendingValue (the subscription's unsubscribe calls Cancel)
+        // Java: unsubscribeDropsPendingValue
+        // The subscription's unsubscribe calls Cancel, which drops the pending value.
         public void Unsubscribe_DropsPending() {
             PublishDebounce debounce = NewDebounce();
             PublishInStep(debounce, "a", 100);
@@ -126,7 +120,8 @@ namespace Centrifugal.Centrifuge.Tests {
 
 
         [Fact]
-        // Java: reconnectDropsPendingValue (a transport loss moves the subscription to subscribing, which calls Cancel)
+        // Java: reconnectDropsPendingValue
+        // A transport loss moves the subscription to subscribing, which calls Cancel and drops the pending value.
         public void Reconnect_DropsPending() {
             PublishDebounce debounce = NewDebounce();
             PublishInStep(debounce, "a", 100);
@@ -141,7 +136,8 @@ namespace Centrifugal.Centrifuge.Tests {
 
 
         [Fact]
-        // Java: zeroWindowSendsEveryPublish (a zero window arms nothing, so each publish is sent at once)
+        // Java: zeroWindowSendsEveryPublish
+        // A zero window arms nothing, so each publish is sent at once.
         public void Publish_ZeroWindow_SendsEveryPublish() {
             PublishDebounce debounce = NewDebounce();
 
@@ -154,7 +150,8 @@ namespace Centrifugal.Centrifuge.Tests {
 
 
         [Fact]
-        // Java: windowAboveSignedIntRangeIsCapped (the wire value 2147483649 is read as unsigned)
+        // Java: windowAboveSignedIntRangeIsCapped
+        // The wire value 2147483649 is read as unsigned, so it is capped rather than wrapped.
         public void CapWindow_AboveSignedRange_ReturnsIntMax() {
             Assert.Equal(int.MaxValue, PublishDebounce.CapWindow(2147483649u));
             Assert.Equal(int.MaxValue, PublishDebounce.CapWindow(uint.MaxValue));
@@ -184,7 +181,8 @@ namespace Centrifugal.Centrifuge.Tests {
 
 
         [Fact]
-        // Java: throwingCallbackOfCoalescedPublishRunsOnce (renamed: the coalesced caller gets a task, not a callback)
+        // Java: throwingCallbackOfCoalescedPublishRunsOnce
+        // The coalesced caller gets a task, not a callback.
         public void Publish_InsideWindow_CompletesOnce() {
             PublishDebounce debounce = NewDebounce();
             PublishInStep(debounce, "a", 100);
@@ -256,7 +254,7 @@ namespace Centrifugal.Centrifuge.Tests {
 
 
         [Fact]
-        // R5: a cancelled window that the clock has passed does not run.
+        // A cancelled window that the clock has passed does not run.
         public void Window_CancelledThenAdvancedPastDue_NothingRuns() {
             PublishDebounce debounce = NewDebounce();
             PublishInStep(debounce, "a", 100);
@@ -271,7 +269,7 @@ namespace Centrifugal.Centrifuge.Tests {
 
 
         [Fact]
-        // R5: a window end that the clock queued before a cancel and a re-arm does nothing. Only the publish made after the
+        // A window end that the clock queued before a cancel and a re-arm does nothing. Only the publish made after the
         // cancel is sent, and its own window is the one left armed.
         public async Task Window_FireQueuedBeforeCancel_DoesNothing() {
             PublishDebounce debounce = NewDebounce();

@@ -8,9 +8,8 @@ using Centrifugal.Centrifuge.Protocol;
 using Xunit;
 
 // The subscription token refresh timer and its refusals, against the fake server. The timer is the full TTL of the
-// subscribe reply (one second here). Ported in part from SubscriptionRefreshRetryTest.java: the integration part of
-// subscriptionRefreshWith103KeepsTheConnection (Refresh_103_KeepsSubscription) uses the same ttl 1.
-// Gap tests (no Java test pins them): Refresh_OtherCode_Unsubscribes and Refresh_NoTokenGetter_KeepsUpstreamBehaviour.
+// subscribe reply (one second here).
+// Refresh_OtherCode_Unsubscribes and Refresh_NoTokenGetter_KeepsUpstreamBehaviour check the rules stated in the code.
 // The refresh timers run on the fake clock: the test moves the clock with Advance, and a barrier (a publish that the
 // fake server answers) follows each step whose effect the test checks. No test waits for real time.
 namespace Centrifugal.Centrifuge.Tests {

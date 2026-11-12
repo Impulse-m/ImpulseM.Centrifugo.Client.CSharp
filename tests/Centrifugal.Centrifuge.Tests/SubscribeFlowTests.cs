@@ -8,11 +8,11 @@ using Centrifugal.Centrifuge.Protocol;
 using Google.Protobuf;
 using Xunit;
 
-// Subscribe replies, token fetches, state getter, publish waits and unsubscribe of a subscription. No Java test pins these
-// rules, so each expectation comes from the subscription rules of the port brief. The resubscribe retries and the publish
-// debounce windows run on the fake clock: a test fires a retry with Advance, after a barrier (a publish that the fake server
-// answers) that the failed step came before. The upstream reconnect and timeout timers stay real, and the tests that use
-// them are the ones with a Timeout or a reconnect option.
+// Subscribe replies, token fetches, state getter, publish waits and unsubscribe of a subscription. No upstream test pins
+// these rules, so each expectation follows the subscription rules stated in the code. The resubscribe retries and the
+// publish debounce windows run on the fake clock: a test fires a retry with Advance, after a barrier (a publish that the
+// fake server answers) that the failed step came before. The upstream reconnect and timeout timers stay real, and the
+// tests that use them are the ones with a Timeout or a reconnect option.
 namespace Centrifugal.Centrifuge.Tests {
 
 
@@ -387,6 +387,21 @@ namespace Centrifugal.Centrifuge.Tests {
 
 
         [Fact]
+        // A publish with no debounce window in the subscribe reply goes to the server at once and completes.
+        public async Task PublishAsync_NoWindow_ReachesServerAndCompletes() {
+            await ConnectAsync();
+            CentrifugeSubscription sub = client!.NewSubscription("ch");
+            sub.Subscribe();
+            await sub.ReadyAsync(wait);
+
+            await sub.PublishAsync(new byte[] { 1 }).WaitAsync(wait);
+
+            Assert.Equal(1, CountCommands(c => c.Publish != null && c.Publish.Channel == "ch"));
+            sub.Unsubscribe();
+        }
+
+
+        [Fact]
         // A publish made while the subscribe is in flight waits for SUBSCRIBED, then is sent.
         public async Task PublishAsync_NotSubscribed_WaitsForSubscribed() {
             server.DeferCommand(cmd => cmd.Subscribe != null);
@@ -588,7 +603,7 @@ namespace Centrifugal.Centrifuge.Tests {
 
         [Fact]
         // A server unsubscribe with code 2500 raises Subscribing once, and the resubscribe is sent at once without a backoff.
-        // The window of the step itself sends nothing; the resubscribe that follows is the one R60 requires.
+        // The step itself sends nothing; the resubscribe that follows is the one sent.
         public async Task MoveToSubscribing_EventOnceNoSend() {
             await ConnectAsync();
             int subscribingEvents = 0;

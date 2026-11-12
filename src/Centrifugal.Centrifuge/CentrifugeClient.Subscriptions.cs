@@ -1,17 +1,17 @@
-using System;
-
-namespace Centrifugal.Centrifuge {
-
-
+namespace Centrifugal.Centrifuge
+{
     /// <summary>
-    /// The subscription members of the client. The subscriptions reach the timers of the client through these
-    /// internal members; the publish, unsubscribe and disconnect calls they make are the client methods of Client.cs.
+    /// The subscriptions reach the client through this internal member: the timers and the refresh retry policy come
+    /// from the host adapter, and the publish, unsubscribe and disconnect calls are the client methods of Client.cs.
     /// </summary>
-    public partial class CentrifugeClient {
-        /// <summary>The step timer factory of the client. The subscriptions create their timers with it.</summary>
-        internal IStepTimerFactory StepTimers {
-            get {
-                return _timers;
+    public partial class CentrifugeClient
+    {
+        /// <summary>The host of the client's helpers: the timers, the refresh retry policy and the loop.</summary>
+        internal IClientHost Host
+        {
+            get
+            {
+                return _host;
             }
         }
     }
