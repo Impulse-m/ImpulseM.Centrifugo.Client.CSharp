@@ -1,8 +1,3 @@
-// Ported from the Java test ReplyErrorTest:
-// - nullApplicationFieldsAreTreatedAsAbsent: ported (NullApplicationFields_AreTreatedAsAbsent)
-// - replyErrorCarriesApplicationFields: ported (ReplyError_CarriesApplicationFields)
-// - replyErrorApplicationFieldsAreEmptyWhenAbsent: ported (ReplyError_ApplicationFieldsEmpty_WhenAbsent)
-// - replyErrorMetadataIsUnmodifiable: ported (ReplyError_Metadata_IsReadOnly)
 using System;
 using System.Collections.Generic;
 using Centrifugal.Centrifuge.Protocol;
@@ -63,7 +58,7 @@ namespace Centrifugal.Centrifuge.Tests {
             Assert.Empty(error.Metadata);
         }
 
-        // No Java test pins the client-local codes (the Java ReplyError constants); the values are the wire contract of the fork.
+        // The client-local codes are the values the client reports itself; the server never sends them.
         /// <summary>The client-local codes are 15 (unsupported), 16 (limit exceeded) and 17 (cancelled), which the server never sends.</summary>
         [Fact]
         public void ClientLocalCodes_Values() {

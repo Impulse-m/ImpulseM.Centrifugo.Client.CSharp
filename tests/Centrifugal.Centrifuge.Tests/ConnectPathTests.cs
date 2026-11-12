@@ -1,10 +1,6 @@
-﻿// Connect path rules with no other test: R14.7 (client-side subscriptions are written with the connect of a reconnect; partial:
-// the subscribe is checked, a queued write is not, so the "before queued writes" part is open), R45 (the reconnect waits the
-// delay; partial: the backoff growth and the attempt counter are open, the upstream reconnect timer has no seam), R51 (a refresh
-// required with no token getter), R52 (a connect call that times out), R57 (the disconnect push code rule), R14.13 (a send
-// issued while connecting is written after the connect reply).
-// No Java test pins these by name. The reconnect and the connect timeout are upstream LoopTimers with no test seam, so
-// the tests that wait for them use real time with the smallest option values (named in each test).
+﻿// The connect path: the subscribe that follows a reconnect's connect, the reconnect delay, a refresh with no token getter,
+// the connect timeout, and the disconnect push codes. The reconnect and the connect timeout are upstream timers with no test
+// seam, so the tests that wait for them use real time with the smallest option values (named in each test).
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -84,7 +80,7 @@ namespace Centrifugal.Centrifuge.Tests {
         /// <summary>
         /// A failed connect attempt is retried after the reconnect delay: the arrivals of the connect commands on the fake server
         /// are at least the delay apart. Real time: the reconnect timer is an upstream LoopTimer, so the delays are set to 150 ms and
-        /// the attempts time out after 50 ms. Only the minimum wait is read here; the backoff growth and the attempt counter are open.
+        /// the attempts time out after 50 ms. Only the minimum wait is checked here.
         /// </summary>
         [Fact]
         public async Task Reconnect_WaitsTheReconnectDelayBetweenAttempts() {
@@ -126,7 +122,7 @@ namespace Centrifugal.Centrifuge.Tests {
         /// <summary>
         /// A connect call that gets no reply in time fails the attempt: the client raises a connect error with the timeout
         /// and makes a new attempt. Real time: the call timer and the reconnect are upstream LoopTimers, with the smallest
-        /// option values. A failed attempt raises no Connecting event (the state stays Connecting, as in Java).
+        /// option values. A failed attempt raises no Connecting event (the state stays Connecting).
         /// </summary>
         [Fact]
         public async Task ConnectWithoutReply_TimesOut_AndMakesANewAttempt() {
@@ -162,7 +158,7 @@ namespace Centrifugal.Centrifuge.Tests {
 
 
         /// <summary>
-        /// A send issued while the connect is in flight (rule R14.13) is written after the connect reply, and its call completes.
+        /// A send issued while the connect is in flight is written after the connect reply, and its call completes.
         /// The fake server holds the connect until the test has issued the send.
         /// </summary>
         [Fact]

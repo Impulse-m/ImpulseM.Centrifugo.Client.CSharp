@@ -1,15 +1,9 @@
-// No Java test pins the error path by name. Lead decision L3, kept upstream, no code change (note only): a throwing
-// error handler disconnects the client (upstream HandlerFailed), so the Java rule that drops it (plan 1.4.9, Java T15)
-// is not ported.
-// Rule coverage: R36 (error messages carry the exception message) is pinned by Unclassified_KeepsTheCauseMessage;
-// R35 (no token or instance in a log line) by Logs_CarryNoTokenAndNoInstance; R58 (which event carries which throwable)
-// by Step_Throws_RaisesUnclassifiedErrorWithTheCause for the wrapped case. The raw case of R58 (a ReplyError event) is open,
-// see the mismatch below.
-// Mismatch a, open, lead decision: Java raises the connect error reply as a raw ReplyError before it disconnects (R53).
-// The upstream ConnectError raises no error event for a non-temporary connect error (code 100 and up, not 109), it only
-// disconnects with the server code. ConnectErrorReply_DisconnectsWithTheServerCode pins the disconnect and the absence of an
-// unclassified event; it does not pin a raw error type.
-// Lead decision L3, kept upstream (note): code 109 on a connect reply keeps the upstream code and reconnect (R53).
+// The upstream rule is kept: a throwing error handler disconnects the client, as a failing handler of any other event does.
+// The upstream rule is kept: a connect error reply with a permanent code (100 and up, not 109) raises no error event; the client
+// only disconnects with the server's code. ConnectErrorReply_DisconnectsWithTheServerCode pins the disconnect and the absence
+// of an unclassified event; it does not pin a raw error type.
+// The upstream rule is kept: code 109 on a connect reply keeps the upstream code and reconnects, and the next attempt asks for
+// a new token.
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -73,7 +67,6 @@ namespace Centrifugal.Centrifuge.Tests {
             Assert.DoesNotContain("unclassified", errorTypes);
         }
 
-        // Rule R35: the logs of a client with a token and an instance carry neither value.
         /// <summary>Neither the token nor the instance of the client appears in a log line or an exception message.</summary>
         [Fact]
         public async Task Logs_CarryNoTokenAndNoInstance() {

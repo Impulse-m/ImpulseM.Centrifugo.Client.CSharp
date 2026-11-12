@@ -1,7 +1,6 @@
 ﻿// Tests of the internal seams of the connect path: SendOnTransportCall (the plain command of the token exchange),
-// CancelTransportNow and ResumeHeldConnect. No Java test pins these by name; they follow the rules of the transport
-// and the held connect reply. The timeout test uses the upstream call timer (a LoopTimer) with the smallest option that
-// still leaves the connect time to finish, which is the one real-time wait of this file.
+// CancelTransportNow and ResumeHeldConnect. The timeout test uses the upstream call timer (a LoopTimer) with the smallest
+// option that still leaves the connect time to finish, which is the one real-time wait of this file.
 using System;
 using System.Collections.Generic;
 using System.Threading;

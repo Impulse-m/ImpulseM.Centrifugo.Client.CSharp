@@ -1,29 +1,17 @@
-// Java ConnectListenerTest:
-// - listenerFailureInOnConnectedLeavesTheHandshakeWhole: ported in part (OnConnected_ListenerThrows_LeavesTheHandshakeWhole).
-//   The queued call is a client-side subscribe, not an rpc (the rpc answer belongs to slice S07). The expiry timer is an
-//   upstream LoopTimer with no test seam, so its arming is not checked; the watchdog (fork timer) is checked.
-// - errorFromOnConnectedStillDeliversTheRecoveredPublication: ported (OnConnected_ErrorThrows_StillDeliversRecoveredPublication).
-//   An Exception subclass stands in for NoClassDefFoundError (rule R17).
-// - queuedCallIsWrittenBeforeTheSubscribedAndPublicationCallbacks: ordering part ported (QueuedCall_IsWrittenBeforeSubscribedAndPublication,
-//   the queued call is a client-side subscribe). Open: the "{}" result of the queued rpc call needs the rpc answer of slice S07.
-// Java ServerPingDisabledTest.testConnectionStaysWithoutServerPings: ported (ServerPingDisabled_ConnectionStaysWithoutServerPings),
-// with the fake clock in place of the real one-second wait.
-// Java AppExceptionTest.testThrowingConnectedHandlerStopsVisibly is ported below.
-// Lead decision L2: a failure of a connect handler is reported as "unclassified" (the tests above pin it). No test pins the
-// earlier error type "connected".
-// Lead decision L3, kept upstream, no code change (notes only):
-// - a throwing Connecting handler (O-3, rule R42.9, R43f): Java testThrowingConnectingHandlerDoesNotStopConnect is not ported.
-//   The handler's failure disconnects the client with code 2 and no reconnect (upstream HandlerFailed).
-// - connect error 109 (R53): upstream code and reconnect, with the refresh on the next attempt (Client.ConnectError).
-// - a null token from GetToken (R12c): upstream FailUnauthorized, not the Java "bad protocol (token)" path.
-// - a bad endpoint (R46): the upstream constructor ArgumentException stays; no ConfigurationError event.
-// - a throwing Error handler (plan 1.4.9, Java T15): upstream disconnects the client, the Java drop is not ported.
+// The connect path around the event handlers. A failure of a handler is reported as an error of type "unclassified", and the
+// client disconnects once with code 2; the rest of the connect reply still runs.
+// Not ported: testThrowingConnectingHandlerDoesNotStopConnect: a failing handler disconnects the client with code 2 and no
+// reconnect, so the connect does not go on past it.
+// The upstream rule is kept: a null token from GetToken fails the client as unauthorized, with no bad-protocol disconnect.
+// The upstream rule is kept: a bad endpoint is refused by the constructor with an ArgumentException, and no error event is raised.
+// The upstream rule is kept: a recovered publication of a server-side subscription is delivered only when the connect reply says it recovered.
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Centrifugal.Centrifuge.Protocol;
+using Centrifugal.Centrifuge.Transports;
 using Google.Protobuf;
 using Xunit;
 
@@ -84,10 +72,11 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
-        // Java: listenerFailureInOnConnectedLeavesTheHandshakeWhole (the expiry timer part is not checked, see the header)
+        // Java: listenerFailureInOnConnectedLeavesTheHandshakeWhole
         /// <summary>
         /// A Connected handler that throws leaves the handshake whole: the call queued while disconnected reaches the server,
-        /// the ping watchdog is armed when the failure is reported, and the failure is reported as "unclassified".
+        /// the ping watchdog is armed when the failure is reported, and the failure is reported as "unclassified". The expiry
+        /// timer is an upstream timer with no test seam, so its arming is not checked.
         /// </summary>
         [Fact]
         public async Task OnConnected_ListenerThrows_LeavesTheHandshakeWhole() {
@@ -133,9 +122,10 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
-        // Java: queuedCallIsWrittenBeforeTheSubscribedAndPublicationCallbacks (the ordering part; the rpc result waits for S07)
+        // Java: queuedCallIsWrittenBeforeTheSubscribedAndPublicationCallbacks
         /// <summary>
         /// A call queued while disconnected is written before the subscribed and the publication callbacks of the connect reply run.
+        /// The queued call is a client-side subscribe, so the result of an rpc call is not checked here.
         /// The subscribed callback waits on the loop until the fake server has received the queued subscribe; the server reads it
         /// on its own thread, so the wait does not deadlock.
         /// </summary>
@@ -202,6 +192,52 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
+        /// <summary>
+        /// A failure while the connect reply is processed outside the notice list (here, reading the transport's emulation flag
+        /// in the connect reply) is reported as an error of type "unclassified" that wraps the exception. The client disconnects
+        /// once with code 2 and reason "bad protocol (message)", and does not reconnect.
+        /// </summary>
+        [Fact]
+        public async Task ConnectReply_FailsOutsideTheNotices_DisconnectsOnceWithCode2NoReconnect() {
+            CentrifugeClient client = NewClient();
+            TaskCompletionSource<ForwardingTransport> created =
+                new TaskCompletionSource<ForwardingTransport>(TaskCreationOptions.RunContinuationsAsynchronously);
+            client.UseTestTransport((CentrifugeTransportType type, string endpoint) => {
+                ForwardingTransport transport = new ForwardingTransport(new WebSocketTransport(endpoint), false, false);
+                created.TrySetResult(transport);
+                return transport;
+            });
+            // Armed once the connect command is written, so the flag is read when the reply is handled.
+            Server.BeforeCommand = (Command command) => {
+                if (command.Connect != null) {
+                    created.Task.Result.ThrowOnUsesEmulation = true;
+                }
+                return Task.CompletedTask;
+            };
+            List<CentrifugeErrorEventArgs> errors = new List<CentrifugeErrorEventArgs>();
+            client.Error += (_, e) => errors.Add(e);
+            List<CentrifugeDisconnectedEventArgs> disconnects = new List<CentrifugeDisconnectedEventArgs>();
+            client.Disconnected += (_, e) => disconnects.Add(e);
+            List<CentrifugeConnectingEventArgs> connecting = new List<CentrifugeConnectingEventArgs>();
+            client.Connecting += (_, e) => connecting.Add(e);
+            Task<CentrifugeDisconnectedEventArgs> disconnected = ClientCoreSeamEvents.WhenDisconnected(client);
+
+            client.Connect();
+            CentrifugeDisconnectedEventArgs args = await disconnected.WaitAsync(TimeSpan.FromSeconds(10));
+            await client.LoopBarrierAsync();
+
+            Assert.Equal(2, args.Code);
+            Assert.Equal("bad protocol (message)", args.Reason);
+            Assert.Equal(CentrifugeClientState.Disconnected, client.State);
+            Assert.Single(disconnects);
+            CentrifugeErrorEventArgs error = Assert.Single(errors);
+            Assert.Equal("unclassified", error.Type);
+            Assert.IsType<InvalidOperationException>(((CentrifugeUnclassifiedException)error.Exception!).Error);
+            // The only Connecting event is the one of the connect call: no reconnect follows the disconnect.
+            Assert.Single(connecting);
+        }
+
+
         // Java: testConnectionStaysWithoutServerPings
         /// <summary>A server with pings disabled sends no ping interval: the client arms no watchdog, stays connected and does not reconnect.</summary>
         [Fact]
@@ -246,7 +282,7 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
-        // An Exception standing in for the Error of the Java test (rule R17: C# has no Error class).
+        // An exception type standing in for a fatal error (C# has no Error class).
         private sealed class LinkageFailure : Exception {
             public LinkageFailure(string message) : base(message) {
             }

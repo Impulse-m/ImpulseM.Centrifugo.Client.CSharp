@@ -1,25 +1,19 @@
-// No Java test pins these rules by name; they follow the close rules of the Java client (close with an
-// awaited termination, the return value for a zero wait, the close reason "client closed").
-// Java CallSettleTest:
-// - testCallWaitingForConnectionFailsOnClose: ported (Publish_WaitingForTheConnection_FailsOnClose).
-// - testSlowCallbackIsCalledOnce, testThrowingCallbackIsCalledOnce: not applicable. A C# publish completes one Task;
-//   there is no callback to be slow or to throw.
-// - testReplyQueuedBehindBusyExecutorIsNotTimedOut: open. It needs a handler that blocks the loop while the upstream call
-//   timer (real time) runs; the rule is the rpc settle of slice S07.
-// - testSubscriptionCallTimeoutCallbackRunsOnClientThread: slice S05 (subscription publish), not this file.
-// Java CallFutureTest (7 tests): not applicable. The Java CallFuture type has no C# counterpart; a TaskCompletionSource
-// settles once (TrySetResult returns false on the second call), and the continuation runs once.
-// Rule R54 (a reply handler that fails in dispatch, outside the notice list): open, lead decision (the matrix row names it).
-// Rule R44 (a transport that never opened is cancelled at once by a disconnect): Disconnect_NeverOpenedTransportWithHeldClose_IsCancelledAtOnce.
+// Not ported: testSlowCallbackIsCalledOnce and testThrowingCallbackIsCalledOnce: a publish completes one Task, so there is
+// no callback to be slow or to throw.
+// Not ported: testReplyQueuedBehindBusyExecutorIsNotTimedOut: it needs a handler that blocks the loop while the real call timer runs.
+// Not ported: testSubscriptionCallTimeoutCallbackRunsOnClientThread: the subscription publish is not a close test.
+// Not ported: CallFutureTest: the future type has no C# counterpart; a TaskCompletionSource settles once.
+// The upstream rule is kept: a transport that never opened is cancelled at once by a disconnect, whatever its close does.
 using System;
 using System.Collections.Concurrent;
+using System.Threading;
 using System.Threading.Tasks;
 using Centrifugal.Centrifuge.Protocol;
 using Centrifugal.Centrifuge.Transports;
 using Xunit;
 
 namespace Centrifugal.Centrifuge.Tests {
-    /// <summary>Close with a wait, and the calls after close.</summary>
+    /// <summary>Close with a wait, the grace of a transport that is closed, and the calls after close.</summary>
     public sealed class CloseTests : FakeServerTestBase {
         /// <summary>Called from an event handler (inside a step), CloseAsync does not wait and returns false, and the close happens.</summary>
         [Fact]
@@ -35,7 +29,7 @@ namespace Centrifugal.Centrifuge.Tests {
             Assert.Throws<ObjectDisposedException>(() => client.Connect());
         }
 
-        /// <summary>Zero wait: the close still happens, and the result is false (Java close(0) returns false).</summary>
+        /// <summary>A zero wait returns false, and the close still happens.</summary>
         [Fact]
         public async Task CloseAsync_WithZeroWait_ReturnsFalseAndCloses() {
             CentrifugeClient client = NewClient();
@@ -56,7 +50,27 @@ namespace Centrifugal.Centrifuge.Tests {
             Assert.True(completed);
         }
 
-        /// <summary>A connected client closed with CloseAsync disconnects with code 0 and reason "client closed" (Java).</summary>
+        /// <summary>An infinite wait waits without a timeout, and returns true when the close completes.</summary>
+        [Fact]
+        public async Task CloseAsync_InfiniteWait_WaitsWithoutATimeout() {
+            CentrifugeClient client = NewClient();
+
+            bool completed = await client.CloseAsync(Timeout.InfiniteTimeSpan);
+
+            Assert.True(completed);
+        }
+
+        /// <summary>A wait above int.MaxValue milliseconds waits without a timeout instead of throwing, and returns true when the close completes.</summary>
+        [Fact]
+        public async Task CloseAsync_WaitAboveIntMaxValueMilliseconds_WaitsWithoutATimeout() {
+            CentrifugeClient client = NewClient();
+
+            bool completed = await client.CloseAsync(TimeSpan.FromMilliseconds(int.MaxValue + 1000.0));
+
+            Assert.True(completed);
+        }
+
+        /// <summary>A connected client closed with CloseAsync disconnects with code 0 and reason "client closed".</summary>
         [Fact]
         public async Task CloseFromConnected_RaisesDisconnectedZeroClientClosed() {
             CentrifugeClient client = NewClient();
@@ -118,7 +132,7 @@ namespace Centrifugal.Centrifuge.Tests {
 
         /// <summary>
         /// A transport that never opened is cancelled by the close step at once, although its close never completes. The close
-        /// step cancels every grace timer (R25.6), so this test does not show the R44 branch; see
+        /// step cancels every grace timer at once, so this test does not show the disconnect path; see
         /// <see cref="Disconnect_NeverOpenedTransportWithHeldClose_IsCancelledAtOnce"/>.
         /// </summary>
         [Fact]
@@ -141,7 +155,7 @@ namespace Centrifugal.Centrifuge.Tests {
             Assert.Equal(0, timers.PendingWithDelay(1000));
         }
 
-        /// <summary>An opened transport whose close is not answered is cancelled by the close step at once, not after the grace (R25.6).</summary>
+        /// <summary>An opened transport whose close is not answered is cancelled by the close step at once, not after the grace.</summary>
         [Fact]
         public async Task Close_OpenedTransportWithHeldClose_IsCancelledAtOnce() {
             CentrifugeClient client = NewClientWithTestClock(out FakeStepTimerFactory timers);
@@ -165,7 +179,7 @@ namespace Centrifugal.Centrifuge.Tests {
 
         /// <summary>
         /// An opened transport whose close is not answered is cancelled when the clock passes the 1000 ms grace, and not
-        /// before (R44). The disconnect is the path that waits for the grace; the close step does not.
+        /// before. The disconnect is the path that waits for the grace; the close step does not.
         /// </summary>
         [Fact]
         public async Task Disconnect_OpenedTransportWithHeldClose_IsCancelledWhenTheGraceEnds() {
@@ -196,8 +210,8 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
         /// <summary>
-        /// A transport that never opened is cancelled by a disconnect at once, although its close never completes (R44): the
-        /// dispose does not wait for the 1000 ms grace, which the close step would not show (see the close test above).
+        /// A transport that never opened is cancelled by a disconnect at once, although its close never completes: the dispose
+        /// does not wait for the 1000 ms grace, which the close step would not show (see the close test above).
         /// </summary>
         [Fact]
         public async Task Disconnect_NeverOpenedTransportWithHeldClose_IsCancelledAtOnce() {
@@ -216,6 +230,32 @@ namespace Centrifugal.Centrifuge.Tests {
             await client.LoopBarrierAsync();
 
             Assert.Equal(1, transport.DisposeCount);
+            Assert.Equal(0, timers.PendingWithDelay(1000));
+        }
+
+        /// <summary>
+        /// An opened transport whose close completes within the grace: the grace timer is cancelled when the close completes, so
+        /// no timer is pending once the transport is disposed, and the timer never fires on the closed transport.
+        /// </summary>
+        [Fact]
+        public async Task Disconnect_CloseCompletesWithinTheGrace_CancelsTheGraceTimer() {
+            CentrifugeClient client = NewClientWithTestClock(out FakeStepTimerFactory timers);
+            TaskCompletionSource<ForwardingTransport> created =
+                new TaskCompletionSource<ForwardingTransport>(TaskCreationOptions.RunContinuationsAsynchronously);
+            client.UseTestTransport((CentrifugeTransportType type, string endpoint) => {
+                ForwardingTransport transport = new ForwardingTransport(new WebSocketTransport(endpoint), false, false);
+                created.TrySetResult(transport);
+                return transport;
+            });
+            client.Connect();
+            ForwardingTransport transport = await created.Task.WaitAsync(TimeSpan.FromSeconds(10));
+            await client.ReadyAsync(TimeSpan.FromSeconds(10));
+
+            client.Disconnect();
+            // Disposed completes after the close step of the transport, which cancels the grace timer on the loop.
+            await transport.Disposed.WaitAsync(TimeSpan.FromSeconds(10));
+            await client.LoopBarrierAsync();
+
             Assert.Equal(0, timers.PendingWithDelay(1000));
         }
 
@@ -239,6 +279,28 @@ namespace Centrifugal.Centrifuge.Tests {
             bool completed = await client.CloseAsync(TimeSpan.FromSeconds(10));
 
             Assert.True(completed);
+        }
+
+        /// <summary>
+        /// A Disconnected handler that disposes the client during the close joins the close that runs: the Disconnected event is
+        /// raised once, and CloseAsync returns true.
+        /// </summary>
+        [Fact]
+        public async Task Dispose_FromDisconnectedHandlerDuringClose_JoinsTheClose() {
+            CentrifugeClient client = NewClient();
+            int disconnects = 0;
+            client.Disconnected += (_, _) => {
+                disconnects++;
+                client.Dispose();
+            };
+            client.Connect();
+            await client.ReadyAsync(TimeSpan.FromSeconds(10));
+
+            bool completed = await client.CloseAsync(TimeSpan.FromSeconds(10));
+            await client.LoopBarrierAsync();
+
+            Assert.True(completed);
+            Assert.Equal(1, disconnects);
         }
 
         // Java: testCallWaitingForConnectionFailsOnClose

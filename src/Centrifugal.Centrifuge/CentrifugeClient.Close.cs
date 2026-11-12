@@ -29,16 +29,18 @@ namespace Centrifugal.Centrifuge
         /// Closes the client: the subscriptions are moved to subscribing, the client disconnects, the transport is cancelled
         /// and the client's work ends. Later calls to the client fail. Returns true when the close step completed within
         /// <paramref name="awaitTermination"/>. Returns false, and the close still happens, when
-        /// <paramref name="awaitTermination"/> is zero or negative, when the wait times out, or when called from
-        /// an event handler (the handler holds the loop, so the close cannot be waited for there).
+        /// <paramref name="awaitTermination"/> is zero or negative (other than <see cref="System.Threading.Timeout.InfiniteTimeSpan"/>),
+        /// when the wait times out, or when called from an event handler (the handler holds the loop, so the close cannot be waited
+        /// for there).
         /// </summary>
-        /// <param name="awaitTermination">The longest time to wait for the close step to complete.</param>
+        /// <param name="awaitTermination">The longest time to wait for the close step to complete.
+        /// <see cref="System.Threading.Timeout.InfiniteTimeSpan"/> waits without a timeout.</param>
         /// <param name="cancellationToken">Stops the wait, not the close.</param>
         /// <returns>True when the close completed in time, else false.</returns>
         public Task<bool> CloseAsync(TimeSpan awaitTermination, CancellationToken cancellationToken = default)
         {
             Task operation = StartClose();
-            if (awaitTermination <= TimeSpan.Zero || Loop.InStep)
+            if (Loop.InStep || (awaitTermination <= TimeSpan.Zero && awaitTermination != System.Threading.Timeout.InfiniteTimeSpan))
             {
                 return Task.FromResult(false);
             }
@@ -89,7 +91,9 @@ namespace Centrifugal.Centrifuge
         }
 
         /// <summary>
-        /// Waits for the close step with a timeout.
+        /// Waits for the close step with a timeout. The timeout delay is cancelled when the close step completes, so no
+        /// timer is left behind. A limit that is <see cref="Timeout.InfiniteTimeSpan"/> or above int.MaxValue milliseconds
+        /// waits without a timeout.
         /// </summary>
         /// <param name="operation">The close step.</param>
         /// <param name="awaitTermination">The longest time to wait.</param>
@@ -97,18 +101,33 @@ namespace Centrifugal.Centrifuge
         /// <returns>True when the close step completed in time.</returns>
         private static async Task<bool> WaitForCloseAsync(Task operation, TimeSpan awaitTermination, CancellationToken cancellationToken)
         {
-            Task timeout = Task.Delay(awaitTermination, cancellationToken);
-            Task finished = await Task.WhenAny(operation, timeout).ConfigureAwait(false);
-            if (finished != operation)
+            using CancellationTokenSource limit = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            if (IsBoundedWait(awaitTermination))
             {
-                if (timeout.IsCanceled)
-                {
-                    throw new OperationCanceledException(cancellationToken);
-                }
-                return false;
+                limit.CancelAfter(awaitTermination);
             }
-            return true;
+            Task timeout = Task.Delay(System.Threading.Timeout.Infinite, limit.Token);
+            Task finished = await Task.WhenAny(operation, timeout).ConfigureAwait(false);
+            if (finished == operation)
+            {
+                // The close completed: its timeout delay is cancelled with it.
+                limit.Cancel();
+                return true;
+            }
+            if (cancellationToken.IsCancellationRequested)
+            {
+                throw new OperationCanceledException(cancellationToken);
+            }
+            return false;
         }
+
+        /// <summary>
+        /// Whether a wait with this limit can end at a timeout: the limit is not <see cref="Timeout.InfiniteTimeSpan"/>
+        /// and fits the timer of the framework (at most int.MaxValue milliseconds).
+        /// </summary>
+        /// <param name="awaitTermination">The limit of the wait.</param>
+        private static bool IsBoundedWait(TimeSpan awaitTermination) =>
+            awaitTermination != System.Threading.Timeout.InfiniteTimeSpan && awaitTermination.TotalMilliseconds <= int.MaxValue;
 
         /// <summary>
         /// Starts the close step at the first call and returns its task. Later calls get the same task, so each close
@@ -122,59 +141,101 @@ namespace Centrifugal.Centrifuge
                 if (closeOperation == null)
                 {
                     Interlocked.Exchange(ref _disposed, 1);
-                    closeOperation = Close();
+                    TaskCompletionSource<bool> closed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+                    // Stored before the close runs: a handler that disposes the client during the close joins this close.
+                    closeOperation = closed.Task;
+                    RunClose(closed);
                 }
                 return closeOperation;
             }
         }
 
         /// <summary>
-        /// The close step. Its task completes when the step has ended. The close does not wait for the peer: the last
-        /// transport is cancelled at once.
+        /// The close step. It completes <paramref name="closed"/> when the step has ended. The close does not wait for
+        /// the peer: the last transport is cancelled at once.
         /// </summary>
-        /// <returns>The task of the close step.</returns>
-        private Task Close()
+        /// <param name="closed">Completed when the close step has ended.</param>
+        private void RunClose(TaskCompletionSource<bool> closed)
         {
-            TaskCompletionSource<bool> closed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             Loop.Invoke(() =>
             {
-                _auth.InvalidateTimerFetch();
-                // Removed before its Unsubscribed event: a handler may create a new subscription of the channel.
-                foreach (CentrifugeSubscription sub in _subscriptions.Values.ToList())
+                // Completed even when the step throws, so that a later close call joins this one instead of waiting forever.
+                try
                 {
-                    Unregister(sub);
-                    sub.CloseForClient();
+                    _auth.InvalidateTimerFetch();
+                    // Removed before its Unsubscribed event: a handler may create a new subscription of the channel.
+                    foreach (CentrifugeSubscription sub in _subscriptions.Values.ToList())
+                    {
+                        Unregister(sub);
+                        sub.CloseForClient();
+                    }
+                    DisconnectInternal(CentrifugeDisconnectedCodes.DisconnectCalled, "client closed", false);
+                    // The live timers of the client end with it: none may fire after the close.
+                    ClearConnectTimer();
+                    ClearReconnectTimer();
+                    ClearServerPingTimer();
+                    ClearRefreshTimer();
+                    _flushTimer?.Cancel();
+                    _flushTimer = null;
+                    _rpcSession.OnClose();
+                    _auth.FailWaiting();
+                    CancelCloseGraceTimers();
                 }
-                DisconnectInternal(CentrifugeDisconnectedCodes.DisconnectCalled, "client closed", false);
-                // The live timers of the client end with it (Java scheduler.shutdownNow): none may fire after the close.
-                ClearConnectTimer();
-                ClearReconnectTimer();
-                ClearServerPingTimer();
-                ClearRefreshTimer();
-                _flushTimer?.Cancel();
-                _flushTimer = null;
-                _rpcSession.OnClose();
-                _auth.FailWaiting();
-                CancelCloseGraceTimers();
-                Loop.Complete(() => closed.TrySetResult(true));
+                finally
+                {
+                    Loop.Complete(() => closed.TrySetResult(true));
+                }
             });
-            return closed.Task;
         }
 
         /// <summary>
-        /// Closes a transport with a close frame, and cancels it when the grace has passed (Java closeTransport). A peer that
-        /// never answers the close frame would otherwise keep the socket. Runs on the loop.
+        /// Closes a transport with a close frame, and cancels it when the grace has passed. A peer that never answers the
+        /// close frame would otherwise keep the socket. A close that completes within the grace cancels the grace timer.
+        /// Runs on the loop.
         /// </summary>
         /// <param name="transport">The transport to close.</param>
         private void CloseWithGrace(ITransport transport)
         {
-            _ = CloseTransportAsync(transport);
+            _ = CloseGraceAsync(transport);
             IStepTimer timer = _timers.Start(CloseGraceMs, () =>
             {
                 closeGraceTimers.Remove(transport);
                 CancelTransportNow(transport);
             });
             closeGraceTimers[transport] = timer;
+        }
+
+        /// <summary>
+        /// Sends the close frame of a transport and waits for the close to complete. Then the grace timer of the transport is
+        /// cancelled on the loop, so it never fires on a transport that closed, and the transport is disposed.
+        /// </summary>
+        /// <param name="transport">The transport to close.</param>
+        private async Task CloseGraceAsync(ITransport transport)
+        {
+            try
+            {
+                await Task.Run(transport.CloseAsync).ConfigureAwait(false);
+            }
+            catch
+            {
+                // The connection is torn down anyway.
+            }
+            Loop.Execute(() => CancelCloseGrace(transport));
+            transport.Dispose();
+        }
+
+        /// <summary>
+        /// Cancels the grace timer of a transport whose close completed, and removes it. Runs on the loop.
+        /// </summary>
+        /// <param name="transport">The transport whose close completed.</param>
+        private void CancelCloseGrace(ITransport transport)
+        {
+            if (!closeGraceTimers.TryGetValue(transport, out IStepTimer? timer))
+            {
+                return;
+            }
+            closeGraceTimers.Remove(transport);
+            timer!.Cancel();
         }
 
         /// <summary>

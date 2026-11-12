@@ -1211,7 +1211,7 @@ namespace Centrifugal.Centrifuge
             {
                 if (reply.Connect != null)
                 {
-                    ConnectResponse(reply.Connect);
+                    RunConnectReplyStep(() => ConnectResponse(reply.Connect));
                     return;
                 }
                 // A reply breaking the protocol: the attempt fails as with a temporary error.
@@ -1331,195 +1331,6 @@ namespace Centrifugal.Centrifuge
             if (_tokenExchange.InterceptConnect(result)) return;
 
             AcceptConnect(result);
-        }
-
-        /// <summary>
-        /// The connect path after the reply is accepted (the held reply of the token exchange resumes here too).
-        /// Order: the connection fields and the Connected state, then the expiry, the ping fields, the queued
-        /// subscribe and rpc commands and the ping timer, and only then the event handlers, as a list of notices
-        /// (<see cref="ConnectNotices"/>). A handler that fails disconnects the client once, after the list ran.
-        /// </summary>
-        private void AcceptConnect(ConnectResult result)
-        {
-            _clientId = result.Client;
-            _connection++;
-            // Before the events: a handler's commands go to the emulation session of this connection.
-            _session = result.Session;
-            _node = result.Node;
-            var transition = SetState(CentrifugeClientState.Connected);
-            // A StateChanged handler may have disconnected already.
-            if (TransitionSuperseded(transition)) return;
-
-            ClearRefreshTimer();
-            if (result.Expires) ScheduleRefresh(Utilities.TtlToMilliseconds(result.Ttl));
-
-            _serverPing = result.Ping;
-            _sendPong = result.Pong;
-            SendSubscribeCommands();
-            _host.FlushRpc();
-            if (TransitionSuperseded(transition)) return;
-            if (result.Ping > 0) WaitServerPing();
-
-            var notices = new ConnectNotices(_host, transition);
-            notices.Add(() => RaiseConnectNotice(Connected, new CentrifugeConnectedEventArgs(result.Client,
-                _transport?.Name ?? string.Empty, result.Data.ToByteArray(), result.User, result.AuthClass)), false);
-            // Runs after a failing Connected handler (as Java does): the identity is recorded either way.
-            notices.Add(() => ReportConnectFailure(ConnectIdentityNotice(result)), true);
-            AddServerSubNotices(notices, result.Subs);
-
-            var failure = notices.Run();
-            if (failure != null && !TransitionSuperseded(transition)) HandlerFailed(failure);
-            if (!TransitionSuperseded(transition)) _promises.ResolveAll();
-        }
-
-        /// <summary>
-        /// Reports a failure of a connect notice as an error of type "unclassified", wrapping the handler's exception.
-        /// Returns the failure unchanged; the connect path disconnects once after the list ran.
-        /// </summary>
-        /// <param name="failure">The handler failure, or null.</param>
-        private Exception? ReportConnectFailure(Exception? failure)
-        {
-            if (failure != null) EmitErrorEvent("unclassified", new CentrifugeUnclassifiedException(failure));
-            return failure;
-        }
-
-        /// <summary>
-        /// Raises one handler of the connect notice list. A failure is reported as "unclassified" (see <see cref="ReportConnectFailure"/>),
-        /// not under the handler's own event type, and returned.
-        /// </summary>
-        private Exception? RaiseConnectNotice<TArgs>(EventHandler<TArgs>? handler, TArgs args)
-        {
-            return ReportConnectFailure(EventDispatch.Raise(this, handler, args, "connect", null, _logger));
-        }
-
-        /// <summary>
-        /// The identity notice of a connect reply. The auth event is raised without its own error report, so the
-        /// failure of its handler is reported once, as "unclassified", by the caller.
-        /// </summary>
-        /// <param name="result">The connect reply.</param>
-        private Exception? ConnectIdentityNotice(ConnectResult result)
-        {
-            _connectAuthRaise = true;
-            try
-            {
-                return _identity.OnConnectIdentity(result);
-            }
-            finally
-            {
-                _connectAuthRaise = false;
-            }
-        }
-
-        /// <summary>
-        /// Adds the server-side notices of a connect reply: each channel subscribed (in map order), then the
-        /// recovered publications, then the channels the reply doesn't have any longer, unsubscribed. The
-        /// registry entry of a subscribed channel is stored when its notice runs, so a skipped notice stores nothing.
-        /// </summary>
-        private void AddServerSubNotices(ConnectNotices notices, Google.Protobuf.Collections.MapField<string, SubscribeResult> subs)
-        {
-            foreach (var kvp in subs)
-            {
-                var channel = kvp.Key;
-                var sub = kvp.Value;
-                notices.Add(() =>
-                {
-                    _serverSubs[channel] = new ServerSubscription(sub.Offset, sub.Epoch, sub.Recoverable) { Subscribed = true };
-                    return RaiseConnectNotice(ServerSubscribed, ServerSubscribedArgs(channel, sub.WasRecovering, sub.Recovered,
-                        sub.Recoverable, sub.Positioned, sub.Offset, sub.Epoch, sub.Data));
-                }, false);
-            }
-
-            foreach (var kvp in subs)
-            {
-                if (!kvp.Value.Recovered) continue;
-                var channel = kvp.Key;
-                foreach (var pub in kvp.Value.Publications)
-                {
-                    var publication = pub;
-                    notices.Add(() => RaiseServerPublication(channel, publication, true), true);
-                }
-            }
-
-            foreach (var channel in _serverSubs.Keys.ToList())
-            {
-                if (subs.ContainsKey(channel)) continue;
-                var removed = channel;
-                notices.Add(() =>
-                {
-                    _serverSubs.Remove(removed);
-                    return RaiseConnectNotice(ServerUnsubscribed, new CentrifugeServerUnsubscribedEventArgs(removed));
-                }, false);
-            }
-        }
-
-        /// <summary>
-        /// Resumes a connect reply that the token exchange held (see <see cref="IClientHost.ResumeConnect"/>).
-        /// Does nothing unless the client is still connecting.
-        /// </summary>
-        internal void ResumeHeldConnect(ConnectResult result)
-        {
-            if (_state != CentrifugeClientState.Connecting) return;
-            AcceptConnect(result);
-        }
-
-        /// <summary>
-        /// Sends one plain command on <paramref name="transport"/>, which must be the current one, and waits for its
-        /// reply with the client timeout. A transport that is not current, or that is lost before the reply, fails the
-        /// task with <see cref="CentrifugeConnectionLostException"/> (a server error reply and a timeout keep their own
-        /// exceptions). The command is not held and not retransmitted. Call in a step.
-        /// </summary>
-        internal Task<Reply> SendOnTransportCall(ITransport transport, Command command, CancellationToken cancellationToken)
-        {
-            var result = new TaskCompletionSource<Reply>(TaskCreationOptions.RunContinuationsAsynchronously);
-            if (cancellationToken.IsCancellationRequested)
-            {
-                Loop.Complete(() => result.TrySetCanceled(cancellationToken));
-                return result.Task;
-            }
-            if (!ReferenceEquals(transport, _transport) || _writer == null)
-            {
-                Loop.Complete(() => result.TrySetException(new CentrifugeConnectionLostException(
-                    CentrifugeErrorCodes.ConnectionClosed, "connection closed", false, null)));
-                return result.Task;
-            }
-            var id = RegisterCall(command, reply => Loop.Complete(() => result.TrySetResult(reply)),
-                (error, replied) => Loop.Complete(() => result.TrySetException(
-                    replied || error is CentrifugeTimeoutException ? error : LostOnTransport(error))));
-            AddCommand(command, urgent: true);
-            if (!cancellationToken.CanBeCanceled) return result.Task;
-            var registration = cancellationToken.Register(() => Loop.Execute(() =>
-            {
-                if (!_calls.TryGetValue(id, out var call)) return;
-                _calls.Remove(id);
-                call.Timer?.Cancel();
-                Loop.Complete(() => result.TrySetCanceled(cancellationToken));
-            }));
-            result.Task.ContinueWith(_ => registration.Dispose(), TaskContinuationOptions.ExecuteSynchronously);
-            return result.Task;
-        }
-
-        /// <summary>The loss of a transport as its own exception type: a write error keeps code 10, anything else is 11.</summary>
-        private static CentrifugeConnectionLostException LostOnTransport(CentrifugeException error) =>
-            new CentrifugeConnectionLostException(
-                error.Code == CentrifugeErrorCodes.TransportWriteError
-                    ? CentrifugeErrorCodes.TransportWriteError
-                    : CentrifugeErrorCodes.ConnectionClosed,
-                error.Message,
-                error.Temporary,
-                error);
-
-        /// <summary>Cancels <paramref name="transport"/> at once, without a close handshake: a held attempt, or a peer that
-        /// does not answer the close. Its close event then ends the attempt through the usual path.</summary>
-        internal void CancelTransportNow(ITransport transport)
-        {
-            try
-            {
-                transport.Dispose();
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogDebug(ex, "Transport cancel failed");
-            }
         }
 
         private static CentrifugeServerSubscribedEventArgs ServerSubscribedArgs(string channel, bool wasRecovering, bool recovered,
@@ -1794,7 +1605,7 @@ namespace Centrifugal.Centrifuge
                 do
                 {
                     var entry = commands[index++];
-                    VarintCodec.WriteDelimitedMessage(ms, entry.Command.ToByteArray());
+                    entry.Command.WriteDelimitedTo(ms);
                     if (entry.Command.Id > 0) (callIds ??= new List<uint>()).Add(entry.Command.Id);
                     if (entry.Sent != null) (sends ??= new List<TaskCompletionSource<bool>>()).Add(entry.Sent);
                 } while (index < commands.Count && ms.Length < MaxCommandBatchSize);
@@ -2211,37 +2022,6 @@ namespace Centrifugal.Centrifuge
         private void HandleServerPublication(string channel, Publication pub)
         {
             HandlerFailed(RaiseServerPublication(channel, pub));
-        }
-
-        /// <summary>
-        /// Raises one server-side publication without disconnecting: returns the handler's failure, or null.
-        /// The position moves only when the handler did not fail. A publication whose handler threw isn't
-        /// delivered: the position stays before it, so the next recovery delivers it again.
-        /// </summary>
-        /// <param name="channel">The channel.</param>
-        /// <param name="pub">The publication.</param>
-        /// <param name="connectPath">True for a recovered publication of a connect reply (its failure is reported as "unclassified").</param>
-        private Exception? RaiseServerPublication(string channel, Publication pub, bool connectPath = false)
-        {
-            var args = CreatePublicationArgs(channel, pub);
-            if (pub.Offset > 0) _pendingServerSubOffsets[channel] = pub.Offset;
-            Exception? failure;
-            try
-            {
-                failure = connectPath
-                    ? RaiseConnectNotice(Publication, args)
-                    : _host.RaiseNotice(Publication, args, "publication");
-            }
-            finally
-            {
-                _pendingServerSubOffsets.Remove(channel);
-            }
-            if (failure != null) return failure;
-            if (!_serverSubs.TryGetValue(channel, out var serverSub)) return null;
-            if (pub.Offset > 0) serverSub.Offset = pub.Offset;
-            // The epoch of a channel that had no stream at subscribe time comes with its first publication.
-            if (!string.IsNullOrEmpty(pub.Epoch)) serverSub.Epoch = pub.Epoch;
-            return null;
         }
 
         /// <summary>A publication that fails to decode (delta) means a corrupt stream: the client disconnects

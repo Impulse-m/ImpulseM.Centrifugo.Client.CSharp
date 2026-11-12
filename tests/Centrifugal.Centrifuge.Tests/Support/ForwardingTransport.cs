@@ -8,16 +8,19 @@ namespace Centrifugal.Centrifuge.Tests {
 
 
     /// <summary>
-    /// A transport that forwards to a real one, with three switches a test sets: the open can be held (it never
+    /// A transport that forwards to a real one, with four switches a test sets: the open can be held (it never
     /// completes and never raises Opened), the close can be held (its close never completes, so the peer never
-    /// answers it), and Dispose can throw after it disposed the inner transport. Dispose is counted.
+    /// answers it), Dispose can throw after it disposed the inner transport, and UsesEmulation can throw once a test
+    /// arms it. Dispose is counted, and Disposed completes when Dispose has returned.
     /// </summary>
     internal sealed class ForwardingTransport : ITransport {
         private readonly ITransport inner;
         private readonly bool holdOpen;
         private readonly bool holdClose;
         private readonly bool throwOnDispose;
+        private readonly TaskCompletionSource<bool> disposed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         private int disposeCount;
+        private volatile bool throwOnUsesEmulation;
 
 
         /// <summary>
@@ -47,6 +50,27 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
+        /// <summary>Completes when Dispose has returned, or has thrown.</summary>
+        public Task Disposed {
+            get {
+                return disposed.Task;
+            }
+        }
+
+
+        /// <summary>
+        /// When true, reading UsesEmulation throws. A test sets it to fail the handling of a reply that reads the flag.
+        /// </summary>
+        public bool ThrowOnUsesEmulation {
+            get {
+                return throwOnUsesEmulation;
+            }
+            set {
+                throwOnUsesEmulation = value;
+            }
+        }
+
+
         /// <summary>The transport type of the inner transport.</summary>
         public CentrifugeTransportType Type {
             get {
@@ -63,9 +87,12 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
-        /// <summary>True when the inner transport uses emulation.</summary>
+        /// <summary>True when the inner transport uses emulation. Throws when <see cref="ThrowOnUsesEmulation"/> is set.</summary>
         public bool UsesEmulation {
             get {
+                if (throwOnUsesEmulation) {
+                    throw new InvalidOperationException("uses emulation failed");
+                }
                 return inner.UsesEmulation;
             }
         }
@@ -120,12 +147,16 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
-        /// <summary>Disposes the inner transport and counts the call.</summary>
+        /// <summary>Disposes the inner transport and counts the call. Then Disposed completes.</summary>
         public void Dispose() {
             Interlocked.Increment(ref disposeCount);
-            inner.Dispose();
-            if (throwOnDispose) {
-                throw new InvalidOperationException("dispose failed");
+            try {
+                inner.Dispose();
+                if (throwOnDispose) {
+                    throw new InvalidOperationException("dispose failed");
+                }
+            } finally {
+                disposed.TrySetResult(true);
             }
         }
 
