@@ -4,6 +4,9 @@
 // The client writes the calls queued in one step as one frame, so a refused frame fails the calls in it: each test here
 // refuses a frame that holds one call.
 // The upstream rule is kept: a write that throws fails its call with the write error (code 10) and keeps the cause.
+// Not ported: RpcExactlyOnceTest.callWhoseSendFailsWithAnErrorFailsAloneAndTheRestOfTheFlushGoesOut, for its second and third calls: the
+// wire transport refuses a whole frame, and the calls queued in one step share one frame, so the calls behind the refused one cannot be
+// kept by the wire transport. The Error variant is not ported either: .NET has no Error that bypasses the Exception handling.
 
 using System;
 using System.Collections.Generic;
@@ -20,7 +23,10 @@ namespace Centrifugal.Centrifuge.Tests {
     [Collection("Integration")]
     public sealed class RpcWriteFailureTests : RpcTestBase {
         // Java: RpcExactlyOnceTest.callWhoseSendFailsWithAnErrorFailsAloneAndTheRestOfTheFlushGoesOut.
-        /// <summary>A plain call whose frame is refused fails alone with code 10 and its cause; the calls after it are sent.</summary>
+        /// <summary>
+        /// A plain call whose frame is refused fails alone with code 10 and its cause. The call queued after it, started once the
+        /// refusal has failed, is sent. The calls queued in the same flush as the refused one are not covered here (see the header).
+        /// </summary>
         [Fact]
         public async Task RpcAsync_RefusedFrameOfAPlainCall_FailsItAloneWith10AndTheLaterCallIsSent() {
             Server.OnCommand = RpcTestHelpers.Serve("ok");
@@ -37,6 +43,29 @@ namespace Centrifugal.Centrifuge.Tests {
             CentrifugeRpcResult later = await RpcTestHelpers.Bounded(client.RpcAsync("later", ReadOnlyMemory<byte>.Empty));
 
             Assert.Equal("ok", System.Text.Encoding.UTF8.GetString(later.Data.Span));
+            Assert.Single(refused);
+            Assert.DoesNotContain(RpcTestHelpers.Requests(Server), (Protocol.Command cmd) => cmd.Rpc.Method == "first");
+        }
+
+
+        /// <summary>
+        /// A call started through RpcCall whose frame is refused fails with CentrifugeConnectionLostException: the same code and cause
+        /// as the plain call, so that the rpc pool recognises the loss by its type.
+        /// </summary>
+        [Fact]
+        public async Task RpcCall_RefusedFrame_FailsWithTheConnectionLostType() {
+            Server.OnCommand = RpcTestHelpers.Serve("ok");
+            List<Protocol.Command> refused = new List<Protocol.Command>();
+            IOException error = new IOException("broken pipe");
+            CentrifugeClient client = NewRefusingClient(null, RefuseFirst((Protocol.Command cmd) => cmd.Rpc != null && cmd.Rpc.Method == "first", error, refused), false);
+            Task<CentrifugeConnectedEventArgs> connected = WhenConnected(client);
+            client.Connect();
+            await connected;
+
+            CentrifugeRpcCall call = client.RpcCall("first", ReadOnlyMemory<byte>.Empty);
+            CentrifugeConnectionLostException failure = await Assert.ThrowsAsync<CentrifugeConnectionLostException>(() => RpcTestHelpers.Bounded(call.Result));
+            Assert.Equal(CentrifugeErrorCodes.TransportWriteError, failure.Code);
+            Assert.Same(error, failure.InnerException);
             Assert.Single(refused);
             Assert.DoesNotContain(RpcTestHelpers.Requests(Server), (Protocol.Command cmd) => cmd.Rpc.Method == "first");
         }
@@ -108,9 +137,11 @@ namespace Centrifugal.Centrifuge.Tests {
             EnableRpcOptions();
             Server.OnCommand = RpcTestHelpers.Serve("ok");
             List<Protocol.Command> refused = new List<Protocol.Command>();
+            // The msg_id of the first call is set once the calls are on the wire: only the cancel of that call is refused.
+            ulong[] firstMsgId = { 0 };
             CentrifugeClient client = NewRefusingClient(
                 new CentrifugeClientOptions { Instance = RpcTestHelpers.Instance },
-                RefuseFirst((Protocol.Command cmd) => cmd.Rpc != null && cmd.Rpc.Cancel != 0, new InvalidOperationException("cancel send failed"), refused),
+                RefuseFirst((Protocol.Command cmd) => cmd.Rpc != null && cmd.Rpc.Cancel != 0 && cmd.Rpc.Cancel == firstMsgId[0], new InvalidOperationException("cancel send failed"), refused),
                 true);
             TaskCompletionSource<CentrifugeErrorEventArgs> reported = new TaskCompletionSource<CentrifugeErrorEventArgs>(TaskCreationOptions.RunContinuationsAsynchronously);
             client.Error += (object? sender, CentrifugeErrorEventArgs args) => reported.TrySetResult(args);
@@ -119,13 +150,23 @@ namespace Centrifugal.Centrifuge.Tests {
             await connected;
 
             RpcTestHelpers.Defer(Server, (Protocol.Command cmd) => cmd.Connect != null || (cmd.Rpc != null && cmd.Rpc.Method == "hold"));
+            CommandArrivals holds = new CommandArrivals(RpcTestHelpers.Wait);
             CommandArrivals reconnects = new CommandArrivals(RpcTestHelpers.Wait);
+            RpcTestHelpers.CountArrivals(Server, holds, (Protocol.Command cmd) => cmd.Rpc != null && cmd.Rpc.Method == "hold");
             RpcTestHelpers.CountArrivals(Server, reconnects, (Protocol.Command cmd) => cmd.Connect != null);
-            CentrifugeRpcCall call = client.RpcCall("hold", ReadOnlyMemory<byte>.Empty);
-            await Server.AwaitHeldAsync();
-            ulong msgId = RpcTestHelpers.Requests(Server).Single((Protocol.Command cmd) => cmd.Rpc.Method == "hold").Rpc.MsgId;
-            call.Cancel();
-            CentrifugeException cancelled = await Assert.ThrowsAsync<CentrifugeException>(() => RpcTestHelpers.Bounded(call.Result));
+            CentrifugeRpcCall first = client.RpcCall("hold", ReadOnlyMemory<byte>.Empty);
+            CentrifugeRpcCall second = client.RpcCall("hold", ReadOnlyMemory<byte>.Empty);
+            await holds.Reached(2);
+            List<ulong> msgIds = RpcTestHelpers.Requests(Server).Where((Protocol.Command cmd) => cmd.Rpc.Method == "hold").Select((Protocol.Command cmd) => cmd.Rpc.MsgId).ToList();
+            firstMsgId[0] = msgIds[0];
+            // The second cancel is written and answered while connected. The barrier is answered after that cancel's reply on the same
+            // socket, so the second cancel is settled before the refused one drops the connection.
+            second.Cancel();
+            CentrifugeException cancelledSecond = await Assert.ThrowsAsync<CentrifugeException>(() => RpcTestHelpers.Bounded(second.Result));
+            Assert.Equal(CentrifugeErrorCodes.Cancelled, cancelledSecond.Code);
+            await RpcTestHelpers.Bounded(client.RpcAsync("barrier", ReadOnlyMemory<byte>.Empty));
+            first.Cancel();
+            CentrifugeException cancelled = await Assert.ThrowsAsync<CentrifugeException>(() => RpcTestHelpers.Bounded(first.Result));
             Assert.Equal(CentrifugeErrorCodes.Cancelled, cancelled.Code);
             CentrifugeErrorEventArgs report = await RpcTestHelpers.Bounded(reported.Task);
             Assert.Equal("unclassified", report.Type);
@@ -144,9 +185,11 @@ namespace Centrifugal.Centrifuge.Tests {
 
             Assert.Equal("ok", System.Text.Encoding.UTF8.GetString(result.Data.Span));
             Assert.Single(refused);
-            Assert.Equal(msgId, refused[0].Rpc.Cancel);
-            Protocol.Command sent = Assert.Single(RpcTestHelpers.Cancels(Server));
-            Assert.Equal(msgId, sent.Rpc.Cancel);
+            Assert.Equal(msgIds[0], refused[0].Rpc.Cancel);
+            // The second cancel went out on the first connection; the refused one is kept and sent with the next connection.
+            List<ulong> sent = RpcTestHelpers.Cancels(Server).Select((Protocol.Command cmd) => cmd.Rpc.Cancel).ToList();
+            Assert.Equal(2, sent.Count);
+            Assert.Equal(msgIds.OrderBy((ulong msgId) => msgId).ToArray(), sent.OrderBy((ulong msgId) => msgId).ToArray());
         }
 
 

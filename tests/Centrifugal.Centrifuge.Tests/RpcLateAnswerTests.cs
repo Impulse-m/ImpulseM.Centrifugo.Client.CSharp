@@ -70,5 +70,57 @@ namespace Centrifugal.Centrifuge.Tests {
             Protocol.Command probe = Assert.Single(RpcTestHelpers.Requests(Server), (Protocol.Command cmd) => cmd.Rpc.Method == "probe");
             Assert.Empty(probe.Rpc.Ack);
         }
+
+
+        // Java: RpcExactlyOnceTest.lateReplyToASettledCallIsAckedWithTheNextCall.
+        /// <summary>
+        /// A call that timed out keeps its attempt for one call timeout. A reply that arrives in that window is acknowledged: the
+        /// next request carries the msg_id of the late reply. The deadline and the window run on the fake clock.
+        /// </summary>
+        [Fact]
+        public async Task RpcCall_LateReplyInItsTimeoutWindow_IsAckedWithTheNextCall() {
+            EnableRpcOptions();
+            Server.OnCommand = RpcTestHelpers.Serve("ok");
+            RpcTestHelpers.Defer(Server, (Protocol.Command cmd) => cmd.Rpc != null && cmd.Rpc.Method == "held");
+            CommandArrivals cancels = new CommandArrivals(RpcTestHelpers.Wait);
+            RpcTestHelpers.CountArrivals(Server, cancels, (Protocol.Command cmd) => cmd.Rpc != null && cmd.Rpc.Cancel != 0);
+            uint[] heldCommandId = { 0 };
+            TaskCompletionSource<bool> lateReceived = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            CentrifugeClient client = NewClientWithTestClock(out FakeStepTimerFactory timers, new CentrifugeClientOptions {
+                Instance = RpcTestHelpers.Instance,
+                Timeout = TimeSpan.FromMilliseconds(300),
+            });
+            client.UseTestTransport((CentrifugeTransportType type, string endpoint) => new RpcWireTransport(
+                new WebSocketTransport(endpoint),
+                null,
+                false,
+                (IReadOnlyList<byte[]> messages) => {
+                    foreach (byte[] message in messages) {
+                        if (heldCommandId[0] != 0 && Protocol.Reply.Parser.ParseFrom(message).Id == heldCommandId[0]) {
+                            lateReceived.TrySetResult(true);
+                        }
+                    }
+                }));
+            Task<CentrifugeConnectedEventArgs> connected = WhenConnected(client);
+            client.Connect();
+            await connected;
+
+            CentrifugeRpcCall call = client.RpcCall("held", ReadOnlyMemory<byte>.Empty);
+            await Server.AwaitHeldAsync();
+            Protocol.Command held = RpcTestHelpers.Requests(Server).Single((Protocol.Command cmd) => cmd.Rpc.Method == "held");
+            heldCommandId[0] = held.Id;
+
+            timers.Advance(300);
+            await Assert.ThrowsAsync<CentrifugeTimeoutException>(() => RpcTestHelpers.Bounded(call.Result));
+            await cancels.Reached(1);
+            Protocol.Command cancel = Assert.Single(RpcTestHelpers.Cancels(Server));
+            Assert.Equal(held.Rpc.MsgId, cancel.Rpc.Cancel);
+            await RpcTestHelpers.AnswerAsync(Server, held.Id, "late");
+            await lateReceived.Task.WaitAsync(RpcTestHelpers.Wait);
+            await RpcTestHelpers.Bounded(client.RpcAsync("probe", ReadOnlyMemory<byte>.Empty));
+
+            Protocol.Command probe = Assert.Single(RpcTestHelpers.Requests(Server), (Protocol.Command cmd) => cmd.Rpc.Method == "probe");
+            Assert.Equal(new[] { held.Rpc.MsgId }, probe.Rpc.Ack.ToArray());
+        }
     }
 }

@@ -143,7 +143,7 @@ namespace Centrifugal.Centrifuge {
                     continue;
                 }
                 if (call.MsgId != 0 && !host.RpcOptionsSupported) {
-                    Settle(call, null, ConnectionLostError(), false);
+                    Settle(call, null, ConnectionLostError(call), false);
                     continue;
                 }
                 WriteCall(call);
@@ -179,7 +179,7 @@ namespace Centrifugal.Centrifuge {
                 if (!keep && call.WireTracked) {
                     KeepCancel(call.MsgId);
                 }
-                Settle(call, null, ConnectionLostError(), false);
+                Settle(call, null, ConnectionLostError(call), false);
             }
             if (!keep) {
                 pendingAcks.Clear();
@@ -335,13 +335,21 @@ namespace Centrifugal.Centrifuge {
                 queue.Add(call);
                 return;
             }
-            Settle(call, null, error is CentrifugeException ? error : WriteFailedError(error), false);
+            Settle(call, null, WriteFailure(call, error), false);
         }
 
 
-        // The error of a write that failed for another cause: code 10 with the cause, as the client reports a failed write.
-        private static CentrifugeException WriteFailedError(Exception error) {
-            return new CentrifugeException(CentrifugeErrorCodes.TransportWriteError, "transport write error", true, error);
+        // The error of a failed write. A transport error (code 10 or 11) keeps its code, message, temporary flag and cause; any
+        // other error becomes code 10 with the error as its cause. A call started through a fork entry point gets the loss type.
+        private static Exception WriteFailure(RpcCallState call, Exception error) {
+            if (error is CentrifugeException failure) {
+                bool isLoss = failure.Code == CentrifugeErrorCodes.TransportWriteError || failure.Code == CentrifugeErrorCodes.ConnectionClosed;
+                if (!call.ForkEntry || !isLoss || failure is CentrifugeConnectionLostException) {
+                    return failure;
+                }
+                return new CentrifugeConnectionLostException(failure.Code, failure.Message, failure.Temporary, failure.InnerException);
+            }
+            return Loss(call, CentrifugeErrorCodes.TransportWriteError, "transport write error", true, error);
         }
 
 
@@ -517,7 +525,7 @@ namespace Centrifugal.Centrifuge {
             if (host.HasInstance && !call.EverSent) {
                 return CancelledError();
             }
-            return ConnectionLostError();
+            return ConnectionLostError(call);
         }
 
 
@@ -526,8 +534,19 @@ namespace Centrifugal.Centrifuge {
         }
 
 
-        private static Exception ConnectionLostError() {
-            return new CentrifugeException(CentrifugeErrorCodes.ConnectionClosed, "connection closed", false);
+        // The error of a connection that closed under the call. The call decides the type: see Loss.
+        private static Exception ConnectionLostError(RpcCallState call) {
+            return Loss(call, CentrifugeErrorCodes.ConnectionClosed, "connection closed", false, null);
+        }
+
+
+        // A client-side loss of the connection. A call started through a fork entry point gets CentrifugeConnectionLostException, so
+        // that the rpc pool recognises it by the type; a plain call keeps the upstream CentrifugeException.
+        private static Exception Loss(RpcCallState call, int code, string message, bool temporary, Exception? cause) {
+            if (call.ForkEntry) {
+                return new CentrifugeConnectionLostException(code, message, temporary, cause);
+            }
+            return new CentrifugeException(code, message, temporary, cause);
         }
     }
 }

@@ -536,7 +536,7 @@ namespace Centrifugal.Centrifuge
 #pragma warning disable RS0027 // The upstream overload keeps its optional token; the options overload takes the token without a default.
         public Task<CentrifugeRpcResult> RpcAsync(string method, ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
         {
-            return RpcAsync(method, data, null, cancellationToken);
+            return StartUpstreamRpc(method, data, cancellationToken);
         }
 #pragma warning restore RS0027
 
