@@ -1,6 +1,5 @@
 // Not ported: testSlowCallbackIsCalledOnce and testThrowingCallbackIsCalledOnce: a publish completes one Task, so there is
 // no callback to be slow or to throw.
-// Not ported: testReplyQueuedBehindBusyExecutorIsNotTimedOut: it needs a handler that blocks the loop while the real call timer runs.
 // Not ported: testSubscriptionCallTimeoutCallbackRunsOnClientThread: the subscription publish is not a close test.
 // Not ported: CallFutureTest: the future type has no C# counterpart; a TaskCompletionSource settles once.
 // The upstream rule is kept: a transport that never opened is cancelled at once by a disconnect, whatever its close does.
