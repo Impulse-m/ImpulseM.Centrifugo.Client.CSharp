@@ -35,6 +35,33 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
+        // Java: RpcExactlyOnceTest.aSettledCallDropsItsPayload.
+        /// <summary>A call that settles drops its payload: after the settle, the call holds no data.</summary>
+        [Fact]
+        public async Task Settle_DropsThePayloadOfTheCall() {
+            FakeClientHost host = new FakeClientHost { HasInstance = true };
+            RpcSession session = new RpcSession(host, host.Timers, 1, FixedRandom.MinimumDraws());
+            RpcCallState call = new RpcCallState(
+                "method",
+                new byte[] { 1, 2, 3 },
+                new System.Collections.Generic.Dictionary<string, string>(),
+                1000,
+                new TaskCompletionSource<CentrifugeRpcResult>());
+
+            host.Loop.Invoke(() => {
+                session.Submit(call);
+                Assert.True(call.Data.HasValue);
+                session.Cancel(call);
+            });
+
+            Assert.True(call.Done);
+            Assert.Null(call.Data);
+            // The step has ended, so the completion is delivered: the cancelled call completes with CANCELLED.
+            CentrifugeException failure = await Assert.ThrowsAsync<CentrifugeException>(() => RpcTestHelpers.Bounded(call.Completion.Task));
+            Assert.Equal(CentrifugeErrorCodes.Cancelled, failure.Code);
+        }
+
+
         private static RpcCallState NewCall(string method) {
             return new RpcCallState(
                 method,

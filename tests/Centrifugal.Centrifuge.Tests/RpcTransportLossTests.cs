@@ -1,7 +1,5 @@
 // Lost transport and terminal loss of the exactly-once rpc calls: a tracked call is sent again with its msg_id after a
 // reconnect, a plain call fails with the transport, and a terminal loss (disconnect or close) fails the calls for good.
-// Not ported: RpcExactlyOnceTest.lateReplyToASettledCallIsAckedWithTheNextCall and the late-reply tests of ServerTimeTest:
-// they need a reply that arrives after the deadline, which the fake server cannot time against the real loop.
 // The upstream rule is kept: a plain call is never sent again after the transport was lost.
 
 using System;
@@ -227,7 +225,7 @@ namespace Centrifugal.Centrifuge.Tests {
             await Server.AwaitHeldAsync();
             ulong msgId = RpcTestHelpers.Requests(Server).Single((Protocol.Command cmd) => cmd.Rpc.Method == "held").Rpc.MsgId;
             client.Disconnect();
-            CentrifugeException error = await Assert.ThrowsAsync<CentrifugeException>(() => RpcTestHelpers.Bounded(call.Result));
+            CentrifugeConnectionLostException error = await Assert.ThrowsAsync<CentrifugeConnectionLostException>(() => RpcTestHelpers.Bounded(call.Result));
             Assert.Equal(CentrifugeErrorCodes.ConnectionClosed, error.Code);
 
             Task<CentrifugeConnectedEventArgs> reconnected = WhenConnected(client);
@@ -265,7 +263,7 @@ namespace Centrifugal.Centrifuge.Tests {
             await RpcTestHelpers.Bounded(connecting.Task);
 
             client.Disconnect();
-            CentrifugeException error = await Assert.ThrowsAsync<CentrifugeException>(() => RpcTestHelpers.Bounded(call.Result));
+            CentrifugeConnectionLostException error = await Assert.ThrowsAsync<CentrifugeConnectionLostException>(() => RpcTestHelpers.Bounded(call.Result));
             Assert.Equal(CentrifugeErrorCodes.ConnectionClosed, error.Code);
 
             Task<CentrifugeConnectedEventArgs> reconnected = WhenConnected(client);

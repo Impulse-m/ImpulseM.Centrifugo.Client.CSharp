@@ -1,8 +1,9 @@
 // Cancel of the exactly-once rpc calls: a call that was not sent is never sent, a sent call is cancelled on the server, and a
 // cancel the connection cannot carry is kept for the next connection.
-// The refused cancel frames are in RpcWriteFailureTests. Not ported: RpcExactlyOnceTest.cancelWhoseSendFailsWithAnErrorIsKept...
-// (the Error twin of a refused cancel: the same path as a synchronous throw) and
-// failedCancelSendIsReportedAfterTheConnectReplyArmsItsExpiryTimer (it observes the expiry timer of the connect reply).
+// The refused cancel frames are in RpcWriteFailureTests. Not ported: RpcExactlyOnceTest.cancelWhoseSendFailsWithAnErrorIsKeptAndTheRestOfTheFlushGoesOut:
+// .NET has no Error that bypasses the Exception handling; a cancel write fault takes the same path as the Exception twin, which is ported in RpcWriteFailureTests.
+// Not ported: RpcExactlyOnceTest.failedCancelSendIsReportedAfterTheConnectReplyArmsItsExpiryTimer:
+// it observes the timer that the connect reply arms, and no test reaches that timer.
 // The upstream rule is kept: a cancel of a call that is done has no effect, and a cancel is never sent without the instance.
 
 using System;

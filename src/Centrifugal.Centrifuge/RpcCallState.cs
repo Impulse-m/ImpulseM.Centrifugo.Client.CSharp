@@ -18,17 +18,24 @@ namespace Centrifugal.Centrifuge {
         /// <param name="headers">The headers sent with the call only.</param>
         /// <param name="timeoutMs">The deadline of the call in milliseconds, counted across all attempts.</param>
         /// <param name="completion">Completed with the result, or faulted, once the call settles.</param>
-        internal RpcCallState(string method, ReadOnlyMemory<byte> data, IReadOnlyDictionary<string, string> headers, int timeoutMs, TaskCompletionSource<CentrifugeRpcResult> completion) {
+        /// <param name="forkEntry">The call was started through a fork entry point. A client-side loss then faults the call with
+        /// <see cref="CentrifugeConnectionLostException"/>; otherwise it faults with a plain <see cref="CentrifugeException"/>.</param>
+        internal RpcCallState(string method, ReadOnlyMemory<byte> data, IReadOnlyDictionary<string, string> headers, int timeoutMs, TaskCompletionSource<CentrifugeRpcResult> completion, bool forkEntry = false) {
             Method = method;
             Data = data;
             Headers = headers;
             TimeoutMs = timeoutMs;
             Completion = completion;
+            ForkEntry = forkEntry;
         }
 
 
         /// <summary>The method name.</summary>
         internal string Method { get; }
+
+
+        /// <summary>The call was started through a fork entry point, so a client-side loss faults it with the loss type.</summary>
+        internal bool ForkEntry { get; }
 
 
         /// <summary>The request payload. Null once the call settled (the payload is dropped).</summary>

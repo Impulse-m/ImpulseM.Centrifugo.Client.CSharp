@@ -1,9 +1,8 @@
 // The server time that the rpc calls take their msg_id clock from, and the replies of a legacy and an rpc call on one connection.
 // Not ported: the push half of ServerTimeTest.serverTimeIsTakenOnlyFromReplies: the fake server cannot send a push that carries a time.
 // The reply half (a reply that answers no pending command sets no offset) is ServerTime_UnsolicitedReply_DoesNotSetTheOffset.
-// Not ported: ServerTimeTest.lateReplyToATimedOutCallDoesNotSetTheOffset and lateReplyToATrackedTimedOutCallDoesNotSetTheOffset:
-// they need a reply that arrives after the deadline, which the fake server cannot time against the real loop.
-// Not ported: CommandIdTest.commandIdWrapsWithoutTrapping: the id counter is upstream code and the port does not change it.
+// Not ported: CommandIdTest.commandIdWrapsWithoutTrapping: the command id counter is upstream code, and no test reaches its wrap
+// without a seam in the client.
 
 using System;
 using System.Linq;
@@ -147,6 +146,64 @@ namespace Centrifugal.Centrifuge.Tests {
 
             Assert.Equal("rpc", System.Text.Encoding.UTF8.GetString(result.Data.Span));
             Assert.Single(RpcTestHelpers.Requests(Server), (Protocol.Command cmd) => cmd.Rpc.Method == "method");
+        }
+
+
+        // Java: ServerTimeTest.lateReplyToATimedOutCallDoesNotSetTheOffset.
+        /// <summary>A reply that arrives after its plain call timed out does not set the server time.</summary>
+        [Fact]
+        public async Task ServerTime_LateReplyToATimedOutPlainCall_DoesNotSetTheOffset() {
+            Server.OnCommand = RpcTestHelpers.Serve("ok");
+            RpcTestHelpers.Defer(Server, (Protocol.Command cmd) => cmd.Rpc != null && cmd.Rpc.Method == "held");
+            CentrifugeClient client = NewClientWithTestClock(out FakeStepTimerFactory timers, new CentrifugeClientOptions { Timeout = TimeSpan.FromMilliseconds(300) });
+            client.WallClockMs = () => LocalMillis;
+            Task<CentrifugeConnectedEventArgs> connected = WhenConnected(client);
+            client.Connect();
+            await connected;
+
+            CentrifugeRpcCall call = client.RpcCall("held", ReadOnlyMemory<byte>.Empty);
+            await Server.AwaitHeldAsync();
+            uint commandId = RpcTestHelpers.Requests(Server).Single((Protocol.Command cmd) => cmd.Rpc.Method == "held").Id;
+            timers.Advance(300);
+            await Assert.ThrowsAsync<CentrifugeTimeoutException>(() => RpcTestHelpers.Bounded(call.Result));
+
+            await Server.SendReplyAsync(new Protocol.Reply { Id = commandId, Time = LocalMillis + 60 * MinuteMillis, Rpc = new Protocol.RPCResult() });
+            // The barrier is answered after the late reply on the same socket, so the late reply is handled before the check.
+            await RpcTestHelpers.Bounded(client.RpcAsync("barrier", ReadOnlyMemory<byte>.Empty));
+
+            Assert.Equal(LocalMillis, client.ServerTimeMillis());
+        }
+
+
+        // Java: ServerTimeTest.lateReplyToATrackedTimedOutCallDoesNotSetTheOffset.
+        /// <summary>A reply that arrives after its tracked call timed out does not set the server time: the next msg_id keeps the local second.</summary>
+        [Fact]
+        public async Task ServerTime_LateReplyToATimedOutTrackedCall_DoesNotSetTheOffset() {
+            EnableRpcOptions();
+            Server.OnCommand = RpcTestHelpers.Serve("ok");
+            RpcTestHelpers.Defer(Server, (Protocol.Command cmd) => cmd.Rpc != null && cmd.Rpc.Method == "held");
+            CentrifugeClient client = NewClientWithTestClock(out FakeStepTimerFactory timers, new CentrifugeClientOptions {
+                Instance = RpcTestHelpers.Instance,
+                Timeout = TimeSpan.FromMilliseconds(300),
+            });
+            client.WallClockMs = () => LocalMillis;
+            Task<CentrifugeConnectedEventArgs> connected = WhenConnected(client);
+            client.Connect();
+            await connected;
+
+            CentrifugeRpcCall call = client.RpcCall("held", ReadOnlyMemory<byte>.Empty);
+            await Server.AwaitHeldAsync();
+            uint commandId = RpcTestHelpers.Requests(Server).Single((Protocol.Command cmd) => cmd.Rpc.Method == "held").Id;
+            timers.Advance(300);
+            await Assert.ThrowsAsync<CentrifugeTimeoutException>(() => RpcTestHelpers.Bounded(call.Result));
+
+            await Server.SendReplyAsync(new Protocol.Reply { Id = commandId, Time = LocalMillis + 60 * MinuteMillis, Rpc = new Protocol.RPCResult() });
+            await RpcTestHelpers.Bounded(client.RpcAsync("barrier", ReadOnlyMemory<byte>.Empty));
+            Assert.Equal(LocalMillis, client.ServerTimeMillis());
+            await RpcTestHelpers.Bounded(client.RpcAsync("second", ReadOnlyMemory<byte>.Empty));
+
+            ulong msgId = RpcTestHelpers.Requests(Server).Single((Protocol.Command cmd) => cmd.Rpc.Method == "second").Rpc.MsgId;
+            Assert.Equal((ulong)(LocalMillis / 1000), msgId >> MsgIdGenerator.SequenceBits);
         }
     }
 }

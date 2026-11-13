@@ -1,6 +1,4 @@
 // Flush of the queued rpc calls on connect: a call made before the connection is written when the connect reply is processed.
-// Not ported: RpcExactlyOnceTest.callWhoseSendFailsWithAnErrorFailsAloneAndTheRestOfTheFlushGoesOut: the fake server has no seam
-// that fails one frame of a live transport.
 // The upstream rule is kept: a call is never written before the client is connected.
 
 using System;

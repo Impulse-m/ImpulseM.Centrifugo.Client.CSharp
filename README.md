@@ -511,11 +511,13 @@ call.Cancel();
 
 A cancelled call is rejected with `CentrifugeErrorCodes.Cancelled` (17). A call which was not sent yet is never sent. When the call was sent, `Cancel()` asks the server to stop it too, over the current connection or the next one that confirms RPC options. Without that capability nothing is cancelled on the server, and a call that was sent is rejected with `Unsupported`. A null method throws `ArgumentNullException` at the call.
 
+The `RpcAsync` overloads that take `CentrifugeRpcOptions` take a token, or none. `RpcCall` takes no token: cancel it through its handle. A token that is cancelled before the call fails the call with `Cancelled` (17) at once: nothing is queued and nothing is sent. The overload with a token and no options keeps `OperationCanceledException` for that case.
+
 ### Exactly-once calls and the connection instance
 
 With a server that confirms RPC options and an instance set in `CentrifugeClientOptions.Instance`, every rpc call carries a `msg_id`, and the server runs each `msg_id` once. A call that is lost with its transport before its reply is kept, and is sent again after the next connect with the same `msg_id` and the retransmit flag set. The server answers from its record, so the call does not run twice. The result then has `Cached` set to `true`.
 
-Without an instance a call is plain: it carries no `msg_id`, is not kept across a lost transport, and fails with a `CentrifugeException` with code 10 or 11 when the transport is lost. A call keeps its original deadline across resends. A call whose deadline passes fails with `CentrifugeTimeoutException`, and a call which was sent is also cancelled on the server.
+Without an instance a call is plain: it carries no `msg_id`, is not kept across a lost transport, and fails with a `CentrifugeException` with code 10 or 11 when the transport is lost. A call made with `RpcCall` or with `CentrifugeRpcOptions` fails in that case with a `CentrifugeException` of the same code, message and cause, and catching `CentrifugeException` handles both. The overload with a token and no options keeps the plain `CentrifugeException` as well. A call keeps its original deadline across resends. A call whose deadline passes fails with `CentrifugeTimeoutException`, and a call which was sent is also cancelled on the server.
 
 The server can refuse a call that it did not run. The refusal carries the metadata key `x-centrifugo-retry`:
 

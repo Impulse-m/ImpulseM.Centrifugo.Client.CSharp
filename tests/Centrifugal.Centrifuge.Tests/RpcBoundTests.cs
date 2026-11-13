@@ -1,6 +1,4 @@
 // The bound of the unsettled rpc calls (maxPendingRpc) and the slots it counts, against the fake server.
-// Not ported: RpcExactlyOnceTest.aSettledCallFreesItsSlotBeforeTheExecutorDeliversIt: it holds the loop in a long step,
-// which the harness cannot do. The slot release in the settling step is checked by the accepted call of settledCallsFreeTheirSlots.
 // The upstream rule is kept: without an instance there is no bound.
 
 using System;
@@ -16,6 +14,53 @@ namespace Centrifugal.Centrifuge.Tests {
     /// <summary>The slots of the bound: a call holds one from its submit until it settles.</summary>
     [Collection("Integration")]
     public sealed class RpcBoundTests : RpcTestBase {
+        // Java: RpcExactlyOnceTest.aSettledCallFreesItsSlotBeforeTheExecutorDeliversIt.
+        /// <summary>
+        /// Two calls whose deadlines fire while the loop is busy free their slots in the steps that settle them: the call made
+        /// behind the busy step and the deadlines is accepted with a bound of two, and both calls time out. The busy step runs
+        /// on a pool thread, so the deadlines and the next call wait behind it. Not observable here: the moment the slot is
+        /// freed relative to the delivery of the completion, since a test sees only the outcome of the next call.
+        /// </summary>
+        [Fact]
+        public async Task RpcCall_DeadlineBehindABusyStep_FreesItsSlotForTheNextCall() {
+            EnableRpcOptions();
+            Server.OnCommand = RpcTestHelpers.Serve("ok");
+            RpcTestHelpers.Defer(Server, (Protocol.Command cmd) => cmd.Rpc != null && cmd.Rpc.Method == "held");
+            CommandArrivals holds = new CommandArrivals(RpcTestHelpers.Wait);
+            RpcTestHelpers.CountArrivals(Server, holds, (Protocol.Command cmd) => cmd.Rpc != null && cmd.Rpc.Method == "held");
+            CentrifugeClient client = NewClientWithTestClock(out FakeStepTimerFactory timers, new CentrifugeClientOptions {
+                Instance = RpcTestHelpers.Instance,
+                MaxPendingRpc = 2,
+                Timeout = TimeSpan.FromMilliseconds(300),
+            });
+            Task<CentrifugeConnectedEventArgs> connected = WhenConnected(client);
+            client.Connect();
+            await connected;
+
+            CentrifugeRpcCall first = client.RpcCall("held", ReadOnlyMemory<byte>.Empty);
+            CentrifugeRpcCall second = client.RpcCall("held", ReadOnlyMemory<byte>.Empty);
+            await holds.Reached(2);
+            ManualResetEventSlim gate = new ManualResetEventSlim(false);
+            TaskCompletionSource<bool> entered = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            Task busy = Task.Run(() => client.Loop.Execute(() => {
+                entered.TrySetResult(true);
+                gate.Wait(RpcTestHelpers.Wait);
+            }));
+            await RpcTestHelpers.Bounded(entered.Task);
+
+            // The deadlines of both held calls are due: their steps, and then the next call's submit, wait behind the busy step.
+            timers.Advance(300);
+            CentrifugeRpcCall next = client.RpcCall("next", ReadOnlyMemory<byte>.Empty);
+            gate.Set();
+            await busy;
+
+            await Assert.ThrowsAsync<CentrifugeTimeoutException>(() => RpcTestHelpers.Bounded(first.Result));
+            await Assert.ThrowsAsync<CentrifugeTimeoutException>(() => RpcTestHelpers.Bounded(second.Result));
+            CentrifugeRpcResult result = await RpcTestHelpers.Bounded(next.Result);
+            Assert.Equal("ok", System.Text.Encoding.UTF8.GetString(result.Data.Span));
+        }
+
+
         // Java: RpcExactlyOnceTest.callsBeyondTheQueueBoundFailWithLimitExceeded.
         /// <summary>A call beyond the bound fails with code 16 at once; the calls within the bound are kept.</summary>
         [Fact]
@@ -135,17 +180,19 @@ namespace Centrifugal.Centrifuge.Tests {
 
 
         /// <summary>
-        /// A call whose token is cancelled before the call is made is refused with the cancellation and sends nothing, and it
-        /// holds no slot: with a bound of one, the next call is accepted.
+        /// A call with options whose token is cancelled before the call fails with code 17 and sends nothing, and it holds no
+        /// slot: with a bound of one, the next call is accepted. The upstream overload keeps OperationCanceledException.
         /// </summary>
         [Fact]
-        public async Task RpcAsync_PreCancelledToken_IsRefusedWithCancellationAndHoldsNoSlot() {
+        public async Task RpcAsync_PreCancelledToken_FailsWith17AndHoldsNoSlot() {
             Server.OnCommand = RpcTestHelpers.Serve("ok");
             CentrifugeClient client = NewClient(new CentrifugeClientOptions { Instance = RpcTestHelpers.Instance, MaxPendingRpc = 1 });
             CancellationTokenSource source = new CancellationTokenSource();
             source.Cancel();
 
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => RpcTestHelpers.Bounded(client.RpcAsync("cancelled", ReadOnlyMemory<byte>.Empty, null, source.Token)));
+            CentrifugeException cancelled = await Assert.ThrowsAsync<CentrifugeException>(() => RpcTestHelpers.Bounded(client.RpcAsync("cancelled", ReadOnlyMemory<byte>.Empty, null, source.Token)));
+            Assert.Equal(CentrifugeErrorCodes.Cancelled, cancelled.Code);
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => RpcTestHelpers.Bounded(client.RpcAsync("cancelled", ReadOnlyMemory<byte>.Empty, source.Token)));
 
             Task<CentrifugeConnectedEventArgs> connected = WhenConnected(client);
             client.Connect();
