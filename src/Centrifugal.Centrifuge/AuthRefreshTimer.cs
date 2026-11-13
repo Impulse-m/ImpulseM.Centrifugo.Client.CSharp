@@ -24,11 +24,15 @@ namespace Centrifugal.Centrifuge {
         }
 
 
+        // A timer without a renewal getter does nothing: no error, no session end, no retry. The fired timer is released first.
         private void OnTimer(long generation) {
             if (generation != timerGeneration) {
                 return;
             }
             timer = null;
+            if (!CanRenew) {
+                return;
+            }
             if (inFlight) {
                 waiting.Add(new WaitingRefresh(null, timerGeneration));
                 return;
@@ -180,6 +184,9 @@ namespace Centrifugal.Centrifuge {
                     host.ReportError("refresh", error);
                     SettleTimerError(error);
                     return;
+                }
+                if (!string.IsNullOrEmpty(result!.Client)) {
+                    host.SetClientId(result.Client);
                 }
                 host.ConnectionToken = token;
                 timerSuperseded = false;

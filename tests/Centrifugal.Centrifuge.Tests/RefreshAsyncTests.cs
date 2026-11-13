@@ -1,5 +1,9 @@
 // The public boundary of the connection token refresh: the null check, the closed client, the bound of calls in progress,
 // and a refresh queued while disconnected that the close fails once.
+// Not ported: refresh after an executor rejection: the client's loop cannot reject a step, so a refresh after close
+// always takes the closed path of refreshAfterCloseCallsBackWithAnError.
+// Not ported: the token source is told of each connect attempt: the pool token source is not in the client yet, so there
+// is no source to notify.
 
 using System;
 using System.Collections.Generic;
@@ -11,6 +15,7 @@ namespace Centrifugal.Centrifuge.Tests {
 
     /// <summary>Checks the public refresh call of the client without a connection.</summary>
     public sealed class RefreshAsyncTests : FakeServerTestBase {
+        // Java: refreshRejectsNullToken
         // A null token is refused at once, before anything is queued.
         [Fact]
         public void RefreshAsync_NullToken_ThrowsArgumentNullException() {

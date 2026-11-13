@@ -134,11 +134,45 @@ namespace Centrifugal.Centrifuge.Tests {
             client.Connect();
             await reconnectedAgain;
 
-            List<string> connectTokens = Server.Received
-                .Where(received => received.Connect != null)
-                .Select(received => received.Connect.Token)
-                .ToList();
-            Assert.Equal("token-1", connectTokens.Last());
+            Assert.Equal("token-1", RefreshTestEvents.ConnectTokens(Server).Last());
+        }
+
+
+        // A refusal restores the token the client held before the refresh. The restore starts over after each refusal: a
+        // refusal after an earlier restore restores the token set in between, not the one from before the first refresh.
+        [Fact]
+        public async Task RefreshAsync_RefusedAgainAfterARestore_RestoresTheTokenSetSinceThen() {
+            Server.OnCommand = (Command command) => {
+                if (command.Refresh != null) {
+                    return new Reply { Id = command.Id, Error = new Error { Code = 103, Message = "permission denied" } };
+                }
+                return null;
+            };
+            CentrifugeClient client = NewClient(new CentrifugeClientOptions { Token = "token-1" });
+            Task connected = WhenConnected(client);
+            Task<CentrifugeAuthResult> firstRefusal = client.RefreshAsync("token-2");
+            client.Connect();
+            await connected;
+            await Assert.ThrowsAsync<CentrifugeException>(() => firstRefusal);
+            await client.LoopBarrierAsync();
+
+            client.Disconnect();
+            await client.LoopBarrierAsync();
+            client.SetToken("token-set");
+            Task<CentrifugeAuthResult> secondRefusal = client.RefreshAsync("token-4");
+            Task reconnected = WhenConnected(client);
+            client.Connect();
+            await reconnected;
+            await Assert.ThrowsAsync<CentrifugeException>(() => secondRefusal);
+            await client.LoopBarrierAsync();
+
+            client.Disconnect();
+            await client.LoopBarrierAsync();
+            Task reconnectedAgain = WhenConnected(client);
+            client.Connect();
+            await reconnectedAgain;
+
+            Assert.Equal(new[] { "token-2", "token-4", "token-set" }, RefreshTestEvents.ConnectTokens(Server).ToArray());
         }
 
 

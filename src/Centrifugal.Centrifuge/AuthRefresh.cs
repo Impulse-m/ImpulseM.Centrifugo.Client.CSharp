@@ -62,10 +62,10 @@ namespace Centrifugal.Centrifuge {
         }
 
 
-        /// <summary>True when the connection token can be renewed by a timer refresh.</summary>
+        /// <summary>True when the connection token can be renewed by a timer refresh: a token exchange or a token getter is set.</summary>
         public bool CanRenew {
             get {
-                return true;
+                return tokenExchange.IsActive || host.HasTokenGetter;
             }
         }
 
@@ -341,6 +341,9 @@ namespace Centrifugal.Centrifuge {
                     Deliver(callbacks, null, error);
                 }
                 else {
+                    if (!string.IsNullOrEmpty(result!.Client)) {
+                        host.SetClientId(result.Client);
+                    }
                     host.ConnectionToken = token;
                     connectTokenStored = false;
                     timerSuperseded = false;
