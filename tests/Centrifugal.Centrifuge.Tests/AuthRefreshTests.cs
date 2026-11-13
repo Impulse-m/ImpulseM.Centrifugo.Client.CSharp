@@ -1,7 +1,5 @@
 // The requested connection token refresh: the identity the server confirms, the shared command of one token, a refusal
 // that keeps the connection, and a refresh made before the connect that is sent with it.
-// Not ported: aThrowingCallbackDoesNotStopTheOthersSharingItsRefresh: the waiters complete as tasks, so a continuation that
-// throws cannot reach the loop or the other waiters; there is no callback that the client runs inline.
 // Not ported: closingFailsEveryWaitingRefreshEvenWhenACallbackThrows: close completes the waiters as tasks; no caller
 // callback runs inside the close step, so there is no throw to report.
 // A cancellation after the call completed has no effect that the public API shows: the outcome is already final.
@@ -91,8 +89,8 @@ namespace Centrifugal.Centrifuge.Tests {
         }
 
 
-        // Java: authEventFiresOnConnectAndWhenTheIdentityChanges (the refresh part). A refresh raises the auth event only when
-        // the identity changes, in steps: the same identity, a new user, then only a new auth class.
+        // The refresh part of the identity rule: a refresh raises the auth event only when the identity changes, in steps:
+        // the same identity, a new user, then only a new auth class.
         [Fact]
         public async Task RefreshAsync_IdentityChanges_RaisesTheAuthEventOnlyOnChange() {
             Server.ConnectResult = ConnectReplies.Connect(client: "fake-client", user: "u1", ping: 25);
